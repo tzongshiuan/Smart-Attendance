@@ -1,0 +1,139 @@
+2019-08-16 15:11:58.074 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest][chooseMemberTest] *** Start ***
+2019-08-16 15:12:10.069 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest] navigate to ChooseModeFragment(employee) success
+2019-08-16 15:12:12.902 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest] back to ChooseMemberFragment success
+2019-08-16 15:12:15.768 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest] navigate to ChooseModeFragment(visitor) success
+2019-08-16 15:12:18.517 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest] back to ChooseMemberFragment success
+2019-08-16 15:12:18.518 32609-32657/com.gorilla.attendance D/ChooseMemberFragmentTest: [UnitTest][chooseMemberTest] *** End ***
+
+2019-08-16 15:14:49.001 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest][enterSettingFragmentTest] *** Start ***
+2019-08-16 15:15:02.368 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:15:05.764 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] test verification failed UI
+2019-08-16 15:15:09.156 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] test verification success
+2019-08-16 15:15:10.240 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] change setting option to position 1 success
+2019-08-16 15:15:11.209 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] change setting option to position 2 success
+2019-08-16 15:15:12.082 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] change setting option to position 3 success
+2019-08-16 15:15:12.359 1163-1241/com.gorilla.attendance D/SettingFragmentTest: [UnitTest][enterSettingFragmentTest] *** End ***
+
+2019-08-16 15:20:09.950 1975-2044/com.gorilla.attendance D/SettingFragmentTest: [UnitTest][changeApplicationModeTest] *** Start ***
+2019-08-16 15:20:23.892 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:20:27.247 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:20:28.913 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:20:44.613 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:20:47.956 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:20:49.428 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:20:50.627 1975-2044/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] change application mode to 0 success
+2019-08-16 15:21:41.234 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:21:44.585 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:21:46.141 1975-2044/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:21:47.337 1975-2044/com.gorilla.attendance D/SettingFragmentTest: [UnitTest] change application mode to 1 success
+2019-08-16 15:21:47.626 1975-2044/com.gorilla.attendance D/SettingFragmentTest: [UnitTest][changeApplicationModeTest] *** End ***
+
+2019-08-16 15:24:13.559 2988-3052/com.gorilla.attendance D/ScreenSaverFragmentTest: [UnitTest][screenSaverTest] *** Start ***
+2019-08-16 15:24:27.480 2988-3052/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:24:30.881 2988-3052/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:24:32.474 2988-3052/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:24:34.313 2988-3052/com.gorilla.attendance D/ScreenSaverFragmentTest: [UnitTest] change setting success
+2019-08-16 15:24:36.452 2988-3052/com.gorilla.attendance D/ScreenSaverFragmentTest: [UnitTest] navigate to ChangeModeFragment and wait screen saver start
+2019-08-16 15:25:11.454 2988-3052/com.gorilla.attendance D/ScreenSaverFragmentTest: [UnitTest] navigate to ScreenSaverFragment success
+2019-08-16 15:25:11.455 2988-3052/com.gorilla.attendance D/ScreenSaverFragmentTest: [UnitTest][screenSaverTest] *** End ***
+
+2019-08-16 15:26:55.046 3605-3668/com.gorilla.attendance D/RegisterErrorTest: [UnitTest][registerFormErrorTest] *** Start ***
+2019-08-16 15:27:09.258 3605-3668/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:27:12.624 3605-3668/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:27:14.243 3605-3668/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:27:25.471 3605-3668/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:27:27.577 3605-3668/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:27:28.579 3605-3668/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] navigate to SecurityCodeFragment success
+2019-08-16 15:27:31.779 3605-3668/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty employee ID success
+2019-08-16 15:27:35.411 3605-3668/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty employee name success
+2019-08-16 15:30:59.189 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest][registerFormErrorTest] *** Start ***
+2019-08-16 15:31:13.624 4123-4169/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:31:16.985 4123-4169/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:31:18.559 4123-4169/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:31:29.710 4123-4169/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:31:31.834 4123-4169/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:31:32.840 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] navigate to SecurityCodeFragment success
+2019-08-16 15:31:36.045 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty employee ID success
+2019-08-16 15:31:39.652 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty employee name success
+2019-08-16 15:31:43.278 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty email success
+2019-08-16 15:31:47.040 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty password success
+2019-08-16 15:31:50.649 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test invalid format password success
+2019-08-16 15:31:54.370 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test empty security code success
+2019-08-16 15:31:56.938 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test invalid security code success
+2019-08-16 15:31:59.512 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest] test valid security code success
+2019-08-16 15:31:59.513 4123-4169/com.gorilla.attendance D/RegisterErrorTest: [UnitTest][registerFormErrorTest] *** End ***
+
+2019-08-16 15:33:25.500 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest][rfidRegistrationTest] *** Start ***
+2019-08-16 15:33:39.340 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:33:42.725 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:33:44.333 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:33:55.575 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:33:57.655 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:33:58.656 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] navigate to RFIDFragment success
+2019-08-16 15:34:06.722 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:34:10.495 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest][rfidRegistrationTest] *** End ***
+2019-08-16 15:34:14.920 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest][rfidVerificationTest] *** Start ***
+2019-08-16 15:34:29.295 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:34:32.664 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:34:34.189 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:34:46.902 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:34:49.910 4514-4560/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:34:50.911 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] navigate to RFIDFragment success
+2019-08-16 15:34:50.912 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] test scan RFID success
+2019-08-16 15:34:50.913 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:34:54.206 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest] open and close door success
+2019-08-16 15:34:54.207 4514-4560/com.gorilla.attendance D/RFIDFragmentTest: [UnitTest][rfidVerificationTest] *** End ***
+
+2019-08-16 15:38:09.944 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest][securityRegistrationTest] *** Start ***
+2019-08-16 15:38:24.322 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:38:27.702 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:38:29.317 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:38:40.435 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:38:42.514 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:38:43.516 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] navigate to SecurityCodeFragment success
+2019-08-16 15:38:48.654 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:38:51.464 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest][securityRegistrationTest] *** End ***
+2019-08-16 15:38:55.853 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest][securityVerificationTest] *** Start ***
+2019-08-16 15:39:09.971 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:39:13.315 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:39:14.818 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:39:27.405 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:39:29.522 5220-5267/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:39:30.526 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] navigate to SecurityCodeFragment success
+2019-08-16 15:39:32.325 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] test invalid security code success
+2019-08-16 15:39:33.135 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] test valid security code success
+2019-08-16 15:39:33.136 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:39:36.421 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest] open and close door success
+2019-08-16 15:39:36.422 5220-5267/com.gorilla.attendance D/SecurityCodeFragmentTest: [UnitTest][securityVerificationTest] *** End ***
+
+2019-08-16 15:40:58.630 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest][qrCodeRegistrationTest] *** Start ***
+2019-08-16 15:41:12.715 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:41:16.075 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:41:17.671 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:41:29.507 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:41:31.714 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:41:32.715 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] navigate to QrCodeFragment success
+2019-08-16 15:41:37.308 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:41:39.887 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest][qrCodeRegistrationTest] *** End ***
+2019-08-16 15:41:44.339 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest][qrCodeVerificationTest] *** Start ***
+2019-08-16 15:41:58.082 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:42:01.430 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:42:02.900 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:42:17.205 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:42:19.244 6578-6626/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:42:20.245 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] navigate to QrCodeFragment success
+2019-08-16 15:42:22.531 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] test invalid security code success
+2019-08-16 15:42:22.823 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] test valid security code success
+2019-08-16 15:42:22.824 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:42:26.120 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest] open and close door success
+2019-08-16 15:42:26.121 6578-6626/com.gorilla.attendance D/QrCodeFragmentTest: [UnitTest][qrCodeVerificationTest] *** End ***
+
+2019-08-16 15:43:42.188 7358-7404/com.gorilla.attendance D/FacialIdentifactionFragmentTest: [UnitTest][facialRegistrationTest] *** Start ***
+2019-08-16 15:43:56.348 7358-7404/com.gorilla.attendance D/TestTool: [UnitTest] navigate to SettingFragment success
+2019-08-16 15:43:59.720 7358-7404/com.gorilla.attendance D/TestTool: [UnitTest] setting account verification success
+2019-08-16 15:44:01.337 7358-7404/com.gorilla.attendance D/TestTool: [UnitTest] change setting option to position 1 success
+2019-08-16 15:44:12.395 7358-7404/com.gorilla.attendance D/TestTool: [UnitTest] navigate to ChangeModeFragment success
+2019-08-16 15:44:14.499 7358-7404/com.gorilla.attendance D/TestTool: [UnitTest] navigate to specified mode success
+2019-08-16 15:44:15.503 7358-7404/com.gorilla.attendance D/FacialIdentifactionFragmentTest: [UnitTest] navigate to FaceIdentificationFragment success
+2019-08-16 15:44:20.651 7358-7404/com.gorilla.attendance D/FacialIdentifactionFragmentTest: [UnitTest] ========== Skip Face Verification ===========
+2019-08-16 15:44:23.391 7358-7404/com.gorilla.attendance D/FacialIdentifactionFragmentTest: [UnitTest][facialRegistrationTest] *** End ***
