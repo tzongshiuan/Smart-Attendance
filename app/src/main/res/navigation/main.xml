@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main.xml" app:startDestination="@id/chooseModeFragment">
+
+    <fragment android:id="@+id/baseFragment"
+              android:name="com.gorilla.attendance.ui.common.BaseFragment"
+              android:label="BaseFragment">
+    </fragment>
+
+    <fragment android:id="@+id/chooseMemberFragment"
+              android:name="com.gorilla.attendance.ui.chooseMember.ChooseMemberFragment"
+              android:label="ChooseMemberFragment">
+        <action android:id="@+id/showChooseModeFragment"
+                app:destination="@+id/chooseModeFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"/>
+    </fragment>
+
+    <fragment android:id="@+id/chooseModeFragment"
+              android:name="com.gorilla.attendance.ui.chooseMode.ChooseModeFragment"
+              android:label="ChooseModeFragment"
+              app:enterAnim="@anim/slide_right_in"
+              app:exitAnim="@anim/slide_left_out"
+              app:popEnterAnim="@anim/slide_left_in"
+              app:popExitAnim="@anim/slide_right_out">
+
+        <action android:id="@+id/showRFIDFragment"
+                app:destination="@+id/RFIDFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"/>
+
+        <action android:id="@+id/showSecurityCodeFragment"
+                app:destination="@+id/securityCodeFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"/>
+
+        <action android:id="@+id/showQrCodeFragment"
+                app:destination="@+id/qrCodeFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"/>
+
+        <action android:id="@+id/showFaceIdentificationFragment"
+                app:destination="@+id/faceIdentificationFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"/>
+    </fragment>
+
+    <fragment android:id="@+id/RFIDFragment"
+              android:name="com.gorilla.attendance.ui.rfid.RFIDFragment"
+              android:label="RFIDFragment"/>
+
+    <fragment android:id="@+id/qrCodeFragment"
+              android:name="com.gorilla.attendance.ui.qrCode.QrCodeFragment"
+              android:label="QrCodeFragment"/>
+
+    <fragment android:id="@+id/securityCodeFragment"
+              android:name="com.gorilla.attendance.ui.securityCode.SecurityCodeFragment"
+              android:label="SecurityCodeFragment"/>
+
+    <fragment android:id="@+id/faceIdentificationFragment"
+              android:name="com.gorilla.attendance.ui.faceIdentification.FaceIdentificationFragment"
+              android:label="FaceIdentificationFragment"/>
+
+    <fragment android:id="@+id/settingFragment"
+              android:name="com.gorilla.attendance.ui.setting.SettingFragment"
+              android:label="SettingFragment" >
+        <action android:id="@+id/showBaseFragment"
+                app:destination="@id/baseFragment"
+                app:enterAnim="@anim/slide_right_in"
+                app:exitAnim="@anim/slide_left_out"
+                app:popEnterAnim="@anim/slide_left_in"
+                app:popExitAnim="@anim/slide_right_out"
+                app:popUpTo="@+id/main.xml"
+                app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment android:id="@+id/screenSaverFragment"
+              android:name="com.gorilla.attendance.ui.screenSaver.ScreenSaverFragment"
+              android:label="ScreenSaverFragment"/>
+
+</navigation>

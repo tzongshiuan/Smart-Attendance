@@ -1,0 +1,23 @@
+{
+    "status": "success",
+    "data": {
+        "videos": [
+            {
+                "name": "fish.mp4",
+                "url": "ftp://192.168.11.158/Video/e7/62/023e0963ff50-4decbf97-9f31-17f4-e762.mp4",
+                "thumbUrl": "http://192.168.11.158/ContentStorage/Video/e7/62/023e0963ff50-4decbf97-9f31-17f4-e762.jpg",
+                "priority": 1,
+                "length": 233,
+                "fileSize": 14078684
+            },
+            {
+                "name": "facebook.mp4",
+                "url": "ftp://192.168.11.158/Video/28/68/2fd01603b410-47f9a3c9-17fc-9478-2868.mp4",
+                "thumbUrl": "http://192.168.11.158/ContentStorage/Video/28/68/2fd01603b410-47f9a3c9-17fc-9478-2868.jpg",
+                "priority": 2,
+                "length": 179,
+                "fileSize": 8242738
+            }
+        ]
+    }
+}

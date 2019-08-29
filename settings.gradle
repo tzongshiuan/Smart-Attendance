@@ -1,0 +1,4 @@
+include ':app', 'FDRControl'
+include ':downloader_library'
+include ':zip_file'
+include ':licensing_library'

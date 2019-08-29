@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--customized recycler view-->
+    <!--<declare-styleable name="StyledRecyclerView">-->
+        <!--<attr name="rvDividerDrawable" format="reference" />-->
+        <!--<attr name="rvDividerMode">-->
+            <!--<flag name="none" value="0" />-->
+            <!--<flag name="beginning" value="1" />-->
+            <!--<flag name="middle" value="2" />-->
+            <!--<flag name="end" value="4" />-->
+        <!--</attr>-->
+    <!--</declare-styleable>-->
+
+    <!--Attributes in setting-->
+    <string-array name="setting_array">
+        <item>@string/connection_setting</item>
+        <item>@string/function_setting</item>
+        <item>@string/linked_device</item>
+        <item>@string/bluetooth_setting</item>
+    </string-array>
+
+    <string-array name="app_mode_array">
+        <item>@string/register_mode</item>
+        <item>@string/verification_mode</item>
+    </string-array>
+
+    <string-array name="check_in_out_array">
+        <item>@string/check_in</item>
+        <item>@string/check_out</item>
+        <item>@string/check_option</item>
+    </string-array>
+
+    <string-array name="webcam_array">
+        <item>Android built-in lens</item>
+        <item>RTSP web camera</item>
+    </string-array>
+
+    <string-array name="door_module_array">
+        <item>BlueTooth</item>
+        <item>COM_USBRelay</item>
+    </string-array>
+
+    <!--Attributes in WhiteBoardFragment-->
+    <!--<attr name="spectrum_colors" format="reference" />-->
+    <!--<attr name="spectrum_outlineWidth" format="dimension" />-->
+    <!--<attr name="spectrum_columnCount" format="integer" />-->
+</resources>

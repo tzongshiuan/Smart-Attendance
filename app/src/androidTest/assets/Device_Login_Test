@@ -1,0 +1,26 @@
+{
+    "status": "success",
+    "data": {
+        "locale": "zh_TW",
+        "deviceName": "ASUS_TC",
+        "modulesModes": [
+            {
+                "module": 3,
+                "modes": [
+                    1,
+                    3
+                ]
+            },
+            {
+                "module": 4,
+                "modes": [
+                    5,
+                    4,
+                    3,
+                    2,
+                    1
+                ]
+            }
+        ]
+    }
+}

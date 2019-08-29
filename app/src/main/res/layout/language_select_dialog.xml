@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent">
+
+
+    <TextView
+            android:id="@+id/chSimText"
+            android:layout_width="@dimen/language_dialog_width"
+            android:layout_height="@dimen/language_dialog_height"
+            android:gravity="center"
+            android:textSize="@dimen/language_dialog_text_size"
+            android:text="@string/local_to_ch_simplified"
+            android:textColor="@color/black"
+            android:background="@drawable/button_state_language_select"
+            tools:textColor="@color/white"
+            tools:background="@drawable/language_select_border_choose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/chTraText" />
+
+    <TextView
+            android:id="@+id/chTraText"
+            android:layout_width="@dimen/language_dialog_width"
+            android:layout_height="@dimen/language_dialog_height"
+            android:gravity="center"
+            android:textSize="@dimen/language_dialog_text_size"
+            android:text="@string/local_to_ch_traditional"
+            android:textColor="@color/black"
+            android:background="@drawable/button_state_language_select"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chSimText"
+            app:layout_constraintBottom_toTopOf="@+id/enText"/>
+
+    <TextView
+            android:id="@+id/enText"
+            android:layout_width="@dimen/language_dialog_width"
+            android:layout_height="@dimen/language_dialog_height"
+            android:gravity="center"
+            android:textSize="@dimen/language_dialog_text_size"
+            android:text="@string/local_to_en"
+            android:textColor="@color/black"
+            android:background="@drawable/button_state_language_select"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chTraText"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

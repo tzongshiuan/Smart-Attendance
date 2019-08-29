@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="viewModel"
+                type="com.gorilla.attendance.ui.screenSaver.ScreenSaverViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/screenSaverLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg">
+
+        <!--Common screen saver-->
+        <RelativeLayout
+                android:id="@+id/commonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/splitLine">
+            <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    tools:text="17:55"
+                    android:textSize="@dimen/toolbar_title_text_size"
+                    android:textColor="@color/toolbar_text_color"/>
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/timeText"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="8dp" tools:ignore="RelativeOverlap">
+
+                <TextView
+                        android:id="@+id/dateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="2019-07-07"
+                        android:textSize="@dimen/toolbar_subtitle_text_size"
+                        android:textColor="@color/toolbar_text_color"
+                        tools:ignore="SmallSp"/>
+
+                <TextView
+                        android:id="@+id/weekDayText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="SAT"
+                        android:textSize="@dimen/toolbar_subtitle_text_size"
+                        android:textColor="@color/toolbar_text_color"
+                        tools:ignore="SmallSp"/>
+            </LinearLayout>
+
+            <TextView
+                    android:id="@+id/companyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/app_full_name"
+                    android:textSize="@dimen/toolbar_subtitle_text_size"
+                    android:textColor="@color/toolbar_text_color" tools:ignore="RelativeOverlap"/>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/splitLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@drawable/ic_toolbar_bottom_line_bg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.48"/>
+
+        <com.gorilla.attendance.ui.common.MarqueeTextView
+                android:id="@+id/marqueeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                tools:text="marquee test marquee test marquee test marquee test marquee test marquee test"
+                android:elevation="16dp"
+                android:textSize="@dimen/toolbar_subtitle_text_size"
+                android:textColor="@color/toolbar_text_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/splitLine"/>
+
+        <TextView
+                android:id="@+id/touchHintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="@string/touch_to_begin"
+                android:textSize="@dimen/toolbar_subtitle_text_size"
+                android:textColor="@color/toolbar_text_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.constraintlayout.widget.Group
+                android:id="@+id/commonGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:constraint_referenced_ids="commonLayout, splitLine, marqueeText, touchHintText"/>
+
+        <!--Video screen saver, show this when there are video file in the SD card path -->
+        <RelativeLayout
+                android:id="@+id/videoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

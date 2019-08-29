@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="viewModel"
+                type="com.gorilla.attendance.ui.faceIdentification.FaceIdentificationViewModel"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg">
+
+        <com.gorilla.attendance.ui.register.EmployeeRegForm
+                android:id="@+id/employeeRegisterForm"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                tools:layout="@layout/employee_register_layout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/footerBar"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+        <com.gorilla.attendance.ui.register.VisitorRegForm
+                android:id="@+id/visitorRegisterForm"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                tools:layout="@layout/visitor_register_layout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/footerBar"
+                android:visibility="gone"
+                tools:visibility="gone"/>
+
+        <FrameLayout
+                android:id="@+id/fdrFrame"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/footerBar"
+                android:visibility="visible"/>
+
+        <include
+                android:id="@+id/footerBar"
+                layout="@layout/footer_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" >
+        </include>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/register_dialog_bg">
+
+    <ImageView
+            android:id="@+id/titelIcon"
+            android:layout_width="@dimen/state_icon_size"
+            android:layout_height="@dimen/state_icon_size"
+            android:layout_marginEnd="10dp"
+            android:src="@mipmap/ic_error"
+            app:layout_constraintTop_toTopOf="@+id/dialogTitleText"
+            app:layout_constraintBottom_toBottomOf="@+id/dialogTitleText"
+            app:layout_constraintEnd_toStartOf="@+id/dialogTitleText"/>
+
+    <TextView
+            android:id="@+id/dialogTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/hint_dialog_title_height"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="@dimen/state_title_size"
+            tools:text="Dialog Title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/messageText" />
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/yellow"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitleText"/>
+
+    <TextView
+            android:id="@+id/messageText"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/hint_dialog_message_height"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="@dimen/state_text_size"
+            tools:text="Dialog message text, Dialog message text, Dialog message text, Dialog message text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitleText"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

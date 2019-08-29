@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<shape-->
+        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:shape="rectangle">-->
+    <!--<gradient-->
+            <!--android:angle="0"-->
+            <!--android:startColor="#00000000"-->
+            <!--android:endColor="#00000000"-->
+            <!--android:centerColor="#FFFFFF" />-->
+<!--</shape>-->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:right="@dimen/toolbar_bottom_line_width">
+        <shape android:shape="rectangle">
+            <gradient
+                    android:angle="0"
+                    android:startColor="@color/transparent"
+                    android:centerColor="@color/white"
+                    android:endColor="@color/white"
+                    android:centerX="0.7"/>
+        </shape>
+    </item>
+
+    <item android:left="@dimen/toolbar_bottom_line_width">
+        <shape android:shape="rectangle">
+            <gradient
+                    android:angle="0"
+                    android:startColor="@color/white"
+                    android:centerColor="@color/white"
+                    android:endColor="@color/transparent"
+                    android:centerX="0.3"/>
+        </shape>
+    </item>
+</layer-list>

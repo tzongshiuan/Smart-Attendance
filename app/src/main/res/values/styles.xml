@@ -1,0 +1,151 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/lime</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="NoTitle" parent="AppTheme.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <!-- ToolBar -->
+    <style name="ToolBarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <!--<item name="actionOverflowButtonStyle">@style/ActionButtonOverflowStyle</item>-->
+        <!--<item name="drawerArrowStyle">@style/DrawerArrowStyle</item>-->
+    </style>
+
+
+    <!--FootBar-->
+    <style name="footbar_button_style">
+        <item name="android:layout_width">@dimen/footbar_button_width</item>
+        <item name="android:layout_height">@dimen/footbar_button_height</item>
+        <item name="android:textSize">@dimen/footbar_button_text_size</item>
+        <item name="android:textColor">@color/yellow</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/button_state_yellow</item>
+    </style>
+
+
+    <!--Registration-->
+    <style name="registration_layout_theme">
+        <item name="android:colorEdgeEffect">@color/white</item>
+    </style>
+
+    <style name="registration_text_label_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/state_text_size</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="registration_edit_text_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:textSize">@dimen/state_text_size</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/setting_edit_text_bg</item>
+    </style>
+
+
+    <!--Setting-->
+    <style name="setting_text_label_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/setting_option_text_size</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="setting_edit_text_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:textSize">@dimen/setting_option_text_size</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/setting_edit_text_bg</item>
+    </style>
+
+    <style name="setting_spinner_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/setting_edit_text_bg</item>
+        <item name="android:spinnerMode">dropdown</item>
+        <item name="android:dropDownVerticalOffset">45dp</item>
+    </style>
+
+    <style name="SettingSwitchBtn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:track">@drawable/setting_switch_track</item>
+        <item name="android:thumb">@drawable/setting_switch_thumb</item>
+    </style>
+
+    <style name="SettingSwitchText">
+        <item name="android:textSize">@dimen/setting_switch_text_size</item>
+    </style>
+
+    <style name="bt_control_button_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/button_state_clock_in_out</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/setting_device_list_text_size</item>
+    </style>
+
+
+    <!--OBB downloader-->
+    <style name="DownloaderProgressTheme">
+        <item name="colorAccent">@color/lime</item>
+    </style>
+
+    <style name="DownloaderBigTextStyle">
+        <item name="android:textSize">@dimen/progress_text_size</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+
+    <!--FDR result-->
+    <style name="clock_option_button_style">
+        <item name="android:layout_width">@dimen/fdr_clock_option_button_width</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_marginStart">@dimen/fdr_title_margin</item>
+        <item name="android:background">@drawable/button_state_clock_in_out</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/fdr_clock_option_text_size</item>
+    </style>
+
+</resources>

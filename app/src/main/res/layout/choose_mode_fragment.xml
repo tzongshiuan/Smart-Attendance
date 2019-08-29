@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="viewModel"
+                type="com.gorilla.attendance.ui.chooseMode.ChooseModeViewModel"/>
+
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/ic_bg">
+
+        <TextView
+                android:id="@+id/hintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Please select verification mode"
+                android:textSize="@dimen/choose_text_size"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.12"/>
+
+        <ImageView
+                android:id="@+id/imgIdCard"
+                android:layout_width="@dimen/choose_icon_size"
+                android:layout_height="@dimen/choose_icon_size"
+                android:src="@mipmap/ic_id_card"
+                android:onClick="@{(v) -> viewModel.showRFId(v)}"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imgSecurityCode"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txtIdCard"/>
+
+        <TextView
+                android:id="@+id/txtIdCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/id_card"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/choose_text_size"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/imgIdCard"
+                app:layout_constraintStart_toStartOf="@+id/imgIdCard"
+                app:layout_constraintEnd_toEndOf="@+id/imgIdCard"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+                android:id="@+id/imgSecurityCode"
+                android:layout_width="@dimen/choose_icon_size"
+                android:layout_height="@dimen/choose_icon_size"
+                android:src="@mipmap/ic_security_code"
+                android:onClick="@{(v) -> viewModel.showSecurity(v)}"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/imgIdCard"
+                app:layout_constraintEnd_toStartOf="@+id/imgQrCode"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txtSecurityCode"/>
+
+        <TextView
+                android:id="@+id/txtSecurityCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/security_code"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/choose_text_size"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/imgSecurityCode"
+                app:layout_constraintStart_toStartOf="@+id/imgSecurityCode"
+                app:layout_constraintEnd_toEndOf="@+id/imgSecurityCode"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+                android:id="@+id/imgQrCode"
+                android:layout_width="@dimen/choose_icon_size"
+                android:layout_height="@dimen/choose_icon_size"
+                android:src="@mipmap/ic_qr_code"
+                android:onClick="@{(v) -> viewModel.showQrCode(v)}"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/imgSecurityCode"
+                app:layout_constraintEnd_toStartOf="@+id/imgFacial"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txtQrCode"/>
+
+        <TextView
+                android:id="@+id/txtQrCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qr_code"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/choose_text_size"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/imgQrCode"
+                app:layout_constraintStart_toStartOf="@+id/imgQrCode"
+                app:layout_constraintEnd_toEndOf="@+id/imgQrCode"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+                android:id="@+id/imgFacial"
+                android:layout_width="@dimen/choose_icon_size"
+                android:layout_height="@dimen/choose_icon_size"
+                android:src="@mipmap/ic_facial_recognition"
+                android:onClick="@{(v) -> viewModel.showFaceRecognition(v)}"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/imgQrCode"
+                app:layout_constraintEnd_toStartOf="@+id/imgFinger"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txtFacial"/>
+
+        <TextView
+                android:id="@+id/txtFacial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/facial_recognition"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/choose_text_size"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/imgFacial"
+                app:layout_constraintStart_toStartOf="@+id/imgFacial"
+                app:layout_constraintEnd_toEndOf="@+id/imgFacial"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+                android:id="@+id/imgFinger"
+                android:layout_width="@dimen/choose_icon_size"
+                android:layout_height="@dimen/choose_icon_size"
+                android:src="@mipmap/ic_fingerprint"
+                android:visibility="gone"
+                tools:visibility="gone"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/imgFacial"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txtFinger"/>
+
+        <TextView
+                android:id="@+id/txtFinger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fingerprint_recognition"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/choose_text_size"
+                android:visibility="gone"
+                tools:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/imgFinger"
+                app:layout_constraintStart_toStartOf="@+id/imgFinger"
+                app:layout_constraintEnd_toEndOf="@+id/imgFinger"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

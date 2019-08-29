@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--about Toolbar-->
+    <dimen name="toolbar_title_text_size">24sp</dimen>
+    <dimen name="toolbar_subtitle_text_size">9sp</dimen>
+    <dimen name="toolbar_image_width">40dp</dimen>
+    <dimen name="toolbar_image_height">16dp</dimen>
+    <dimen name="toolbar_bottom_line_width">400dp</dimen>
+
+    <!--about footbar-->
+    <dimen name="footbar_button_width">170dp</dimen>
+    <dimen name="footbar_button_height">60dp</dimen>
+    <dimen name="footbar_button_text_size">18sp</dimen>
+    <dimen name="footbar_middle_text_size">30sp</dimen>
+
+    <!--Common-->
+    <dimen name="common_text_size">24sp</dimen>
+
+    <!--ChooseMember / ChooseMode-->
+    <dimen name="choose_icon_size">150dp</dimen>
+    <dimen name="choose_text_size">24sp</dimen>
+
+    <!--about Setting-->
+    <dimen name="setting_option_text_size">24sp</dimen>
+    <dimen name="setting_device_list_text_size">16sp</dimen>
+    <dimen name="setting_account_edit_width">600dp</dimen>
+    <dimen name="setting_switch_text_size">18sp</dimen>
+
+    <!--about Security Code-->
+    <dimen name="security_edit_width">800dp</dimen>
+
+    <!--about OBB downloader-->
+    <dimen name="progress_text_size">24sp</dimen>
+
+    <!--about registration-->
+    <dimen name="state_icon_size">40dp</dimen>
+    <dimen name="state_icon_text_size">12sp</dimen>
+    <dimen name="state_title_size">28sp</dimen>
+    <dimen name="state_text_size">20sp</dimen>
+    <dimen name="state_transition_length">150dp</dimen>
+    <dimen name="state_transition_margin_top">30dp</dimen>
+    <dimen name="hint_dialog_title_height">100dp</dimen>
+    <dimen name="hint_dialog_message_height">200dp</dimen>
+
+    <!--about FDR-->
+    <dimen name="fdr_width">800dp</dimen>
+    <dimen name="fdr_height">450dp</dimen>
+    <dimen name="fdr_result_image_size">160dp</dimen>
+    <dimen name="circle_image_margin">30dp</dimen>
+    <dimen name="fdr_title_margin">16dp</dimen>
+    <dimen name="fdr_title_text_size">22sp</dimen>
+    <dimen name="fdr_subtitle_text_size">20sp</dimen>
+    <dimen name="fdr_description_width">450dp</dimen>
+    <dimen name="fdr_clock_option_button_width">250dp</dimen>
+    <dimen name="fdr_clock_option_text_size">32sp</dimen>
+    <dimen name="fdr_result_margin">80dp</dimen>
+    <dimen name="fdr_result_text_width">300dp</dimen>
+
+    <integer name="slide_anim_duration">500</integer>
+
+    <dimen name="language_dialog_width">500dp</dimen>
+    <dimen name="language_dialog_height">80dp</dimen>
+    <dimen name="language_dialog_text_size">22sp</dimen>
+</resources>

@@ -1,0 +1,216 @@
+﻿<resources>
+    <string name="app_name">Attendance</string>
+
+    <string name="days_ago">day(s) ago</string>
+    <string name="weeks_ago">week(s) ago</string>
+    <string name="months_ago">month(s) ago</string>
+    <string name="years_ago">year(s) ago</string>
+
+    <string name="recent">recent</string>
+    <string name="popular">popular</string>
+
+    <string name="cancel">取消</string>
+    <string name="save">保存</string>
+    <string name="save_and_apply">保存</string>
+    <string name="retrain">重新訓練</string>
+    <string name="confirm">確認</string>
+    <string name="done">完成</string>
+
+    <string name="account">帳號</string>
+    <string name="password">密碼</string>
+
+    <string name="todo">TODO</string>
+
+    <string name="device_login_error">裝置登入失敗，請確認設定是否正確</string>
+
+    <string name="employee_registration_form">員工註冊</string>
+    <string name="visitor_registration_form">訪客註冊</string>
+
+    <string name="empty_login_info">伺服器位址或是裝置註冊碼為空，請前往設定頁面進行設定</string>
+
+
+    <!--Top ToolBar-->
+    <string name="local_to_ch_simplified">簡體中文</string>
+    <string name="local_to_ch_traditional">繁體中文</string>
+    <string name="local_to_en">English</string>
+
+
+    <!--Obb Download-->
+    <string name="search_wait">處理中</string>
+    <string name="pause">暫停</string>   這用在哪?
+    <string name="resume">復原</string>
+    <string name="retry">重試</string>
+    <string name="status_download_failed">資料同步失敗</string>
+    <string name="status_download_success">資料同步完成</string>
+    <string name="status_download_Obb">下載擴充檔案</string>
+    <string name="status_check_obb">確認擴充檔案</string>
+    <string name="status_check_so">檢察內部擴充檔案</string>
+    <string name="status_unzip_obb">Unzip expansion file to internal storage</string>
+
+
+    <!-- ChooseMember -->
+    <string name="choose_member_title">驗證</string>
+    <string name="choose_member_register_title">註冊</string>
+    <string name="employee">員工</string>
+    <string name="visitor">訪客</string>
+    <string name="choose_member_hint_text">請選擇登入身份</string>
+    <string name="choose_member_register_hint_text">請選擇註冊模式</string>
+
+
+    <!-- ChooseMode -->
+    <string name="choose_mode_employee_verification_title">員工驗證模式</string>
+    <string name="choose_mode_employee_registration_title">員工註冊模式</string>
+    <string name="choose_mode_visitor_verification_title">訪客驗證模式</string>
+    <string name="choose_mode_visitor_registration_title">訪客註冊模式</string>
+    <string name="id_card">門卡驗證</string>
+    <string name="security_code">密碼驗證</string>
+    <string name="qr_code">QR Code驗證</string>
+    <string name="facial_recognition">人臉驗證</string>
+    <string name="fingerprint_recognition">指紋驗證</string>
+    <string name="choose_registration_mode">請選擇註冊模式</string>
+    <string name="choose_verification_mode">請選擇驗證模式</string>
+
+
+    <!--RFID-->
+    <string name="rfid_verification_title">門卡驗證</string>
+    <string name="please_swipe_id_card">請將卡片靠近讀卡機上方感應</string>
+    <string name="rfid_verification_error">卡號錯誤，請重新刷卡</string>
+    <string name="rfid_toast_no_result">卡號錯誤，請重新刷卡</string>
+
+    <!-- SecurityCode -->
+    <string name="security_verification_title">密碼驗證</string>
+    <string name="security_hint">請輸入您的唯一識別碼</string>
+    <string name="security_verification_error">安全碼錯誤，請重新輸入</string>
+    <string name="empty_security_code_msg">安全碼不能為空白</string>
+
+
+    <!--QrCode-->
+    <string name="qr_verification_title">QR Code驗證</string>
+    <string name="qr_scan_hint">請將QR Code對準鏡頭</string>
+    <string name="qr_verification_error">驗證碼不符，請提供正確之驗證碼</string>
+
+
+    <!--Face Verification-->
+    <string name="face_identification_title">人臉驗證</string>
+    <string name="please_face_forward_the_camera">請將臉部對準鏡頭</string>
+    <string name="unknown_user">Unknown User</string>
+    <string name="verification_failed">人臉辨識失敗</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="face_timeout_str_fmt">Timeout: %1$d (sec)</string>
+    <string name="clock_check_in">上班</string>
+    <string name="clock_check_out">下班</string>
+    <string name="clock_pass">開門</string>
+    <string name="clock_arrive">到訪</string>
+    <string name="clock_leave">離開</string>
+    <string name="clock_timeout">驗證時間過期，請重新嘗試</string>
+    <string name="registration_fail">註冊失敗</string>
+    <string name="registration_complete">註冊完成</string>
+    <string name="face_verify_time_expire">人臉識別超時</string>
+    <string name="result_employee_name">性別</string>
+    <string name="result_employee_id">ID</string>
+    <string name="result_visitor_name">訪客姓名</string>
+    <string name="result_visitor_phone">電話號碼</string>
+
+
+    <!--Setting-->
+    <string name="setting_title">終端設定</string>
+    <string name="connection_setting">後台設定</string>
+    <string name="function_setting">操作設定</string>
+    <string name="linked_device">連結設備</string>
+    <string name="bluetooth_setting">藍芽設定</string>
+    <string name="server_ip">Server IP</string>
+    <string name="ftp_ip">FTP IP</string>
+    <string name="web_socket_ip">Web Socket IP</string>
+    <string name="ftp_account">FTP 帳號</string>
+    <string name="ftp_password">FTP 密碼</string>
+    <string name="tablet_phone_name">裝置名稱</string>
+    <string name="tablet_phone_token">裝置註冊碼</string>
+    <string name="idle_time">閒置時間(秒)</string>
+    <string name="hold_verify_result">驗證訊息提示時間 (ms)</string>
+    <string name="face_verify_time">人臉辨識時間 (ms)</string>
+    <string name="application_mode">運作模式</string>
+    <string name="select_clock_in_out">選擇上班/下班</string>
+    <string name="human_detection">活體偵測</string>
+    <string name="fdr_online_mode">人臉辨識線上模式</string>
+    <string name="screen_saver">是否顯示閒置畫面</string>
+    <string name="webcam">Webcam</string>
+    <string name="webcam_url">RTSP URL</string>
+    <string name="webcam_username">RTSP Account</string>
+    <string name="webcam_passowrd">RTSP Password</string>
+    <string name="door_module">門鎖模組</string>
+    <string name="close_door_timeout">自動關門間隔(秒)</string>
+    <string name="device_available">可用的裝置</string>
+    <string name="register_mode">快速註冊</string>
+    <string name="verification_mode">一般驗證</string>
+    <string name="check_in">上班</string>
+    <string name="check_out">下班</string>
+    <string name="check_option">畫面選擇</string>
+    <string name="switch_on">On</string>
+    <string name="switch_off">Off</string>
+    <string name="bluetooth_refresh">重新整理</string>
+    <string name="bluetooth_open">開門</string>
+    <string name="bluetooth_close">關門</string>
+    <string name="invalid_server_ip">Server IP不能為空白</string>
+    <string name="invalid_ftp_ip">FTP IP不能為空白</string>
+    <string name="invalid_web_socket_ip">Web socket IP不能為空白</string>
+    <string name="invalid_ftp_account">FTP account不能為空白</string>
+    <string name="invalid_ftp_password">FTP password不能為空白</string>
+    <string name="invalid_device_token">裝置註冊碼不能為空白</string>
+    <string name="invalid_bluetooth_passowrd">Bluetooth密碼長度必須為8碼</string>
+    <string name="invalid_rtsp_setting">RTSP設定值不能為空白</string>
+    <string name="setting_account_hint">請輸入帳號</string>
+    <string name="setting_password_hint">請輸入密碼</string>
+    <string name="setting_invalid_account_hint">帳號或密碼錯誤，請重新輸入</string>
+
+
+    <!--Registration-->
+    <string name="necessary_prefix_str"><![CDATA[<b><font color=#FF0000>* </b>]]></string>
+    <string name="form_valid_security_code"><![CDATA[<b><font color=#95E37B>可用的安全碼</b>]]></string>
+    <string name="form_invalid_security_code"><![CDATA[<b><font color=#FF0000>已存在此安全碼</b>]]></string>
+    <string name="fill_in_form">基本資料填寫</string>
+    <string name="face_enrollment">臉部註冊</string>
+    <string name="completed">註冊完成</string>
+    <string name="form_employee_id">員工編號</string>
+    <string name="form_employee_name">員工姓名</string>
+    <string name="form_visitor_name">訪客姓名</string>
+    <string name="form_email">E-mail</string>
+    <string name="form_title">職稱</string>
+    <string name="form_password">密碼</string>
+    <string name="form_phone_number">電話</string>
+    <string name="form_rfid">卡片號碼</string>
+    <string name="form_security_code">安全碼</string>
+    <string name="form_check">確認</string>
+    <string name="form_company_name">機構名稱</string>
+    <string name="form_dialog_title">資料錯誤</string>
+    <string name="form_security_code_empty_hint">安全碼欄位不能為空白</string>
+    <string name="form_must_check_security_hint">請先確認安全碼是否重複</string>
+    <string name="form_email_empty_hint">Email 欄位不能為空白</string>
+    <string name="form_invalid_email_format_hint">錯誤的E-Mail格式</string>
+    <string name="form_visitor_name_empty_hint">姓名欄位不能為空白</string>
+    <string name="form_mobile_phone_empty_hint">電話欄位不能為空白</string>
+    <string name="form_employee_id_empty_hint">員工ID 欄位不能為空白</string>
+    <string name="form_employee_name_empty_hint">姓名欄位不能為空白</string>
+    <string name="form_password_empty_hint">密碼欄位不能為空白</string>
+    <string name="form_invalid_password_format_hint">密碼長度為8以上，至少包含1個大小寫字母, 特殊符號及數字</string>
+    <string name="form_employee_register_exist_hint">資料已存在</string>
+    <string name="form_visitor_register_exist_hint">電話或Email已存在</string>
+    <string name="form_state_swip_id_card">掃描門卡</string>
+    <string name="form_state_input_security_code">輸入安全碼</string>
+    <string name="form_state_scan_qr_code">掃描 QR Code</string>
+    <string name="form_state_exist_profile_1">用戶個人資料已存在</string>
+    <string name="form_state_exist_profile_2">系統將重新註冊您的臉部信息</string>
+
+
+    <!--Screen Saver-->
+    <string name="app_full_name">Gorilla Smart Attendance</string>
+    <string name="touch_to_begin">Touch the screen to begin</string>
+
+
+    <!-- FooterBar -->
+    <string name="back">回前頁</string>
+    <string name="registration">註冊</string>
+    <string name="verification">驗證</string>
+    <string name="submit">下一步</string>
+
+
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#D2232A</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+
+    <color name="transparent">#00000000</color>
+    <color name="black">#000000</color>
+    <color name="black_trans_30">#b2000000</color>
+    <color name="red">#FF0000</color>
+    <color name="dark_grey">#FF262629</color>
+    <color name="light_grey">#FF8F939C</color>
+    <color name="grey">#EDF0F7</color>
+    <color name="white">#FFFFFF</color>
+    <color name="hint">#AFd9d9d9</color>
+    <color name="forest_green">#228B22</color>
+    <color name="green">#008000</color>
+    <color name="lime">#00FF00</color>
+
+    <color name="yellow">#ffe900</color>
+    <color name="click_effect">#AF451D96</color>
+
+    <color name="toolbar_text_color">#FFFFFF</color>
+
+    <color name="error_color">#f98a83</color>
+
+    <!--Switch Button-->
+    <color name="switch_btn_on">#489CE7</color>
+    <color name="switch_btn_off">#FFFFFF</color>
+
+</resources>

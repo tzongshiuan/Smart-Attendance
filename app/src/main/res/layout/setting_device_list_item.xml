@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="deviceName"
+                type="String"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/optionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            tools:background="@drawable/setting_bluetooth_item_bg">
+
+        <TextView
+                android:id="@+id/optionItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:text="@{deviceName}"
+                tools:text="Device Name"
+                android:textSize="@dimen/setting_device_list_text_size"
+                android:textColor="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+                android:id="@+id/bluetoothIcon"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@mipmap/ic_bluetooth_connected"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="W, 1:1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

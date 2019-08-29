@@ -1,0 +1,216 @@
+<resources>
+    <string name="app_name">Attendance</string>
+
+    <string name="days_ago">day(s) ago</string>
+    <string name="weeks_ago">week(s) ago</string>
+    <string name="months_ago">month(s) ago</string>
+    <string name="years_ago">year(s) ago</string>
+
+    <string name="recent">recent</string>
+    <string name="popular">popular</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="save_and_apply">Save</string>
+    <string name="retrain">Retrain</string>
+    <string name="confirm">Confirm</string>
+    <string name="done">Done</string>
+
+    <string name="account">Account</string>
+    <string name="password">Password</string>
+
+    <string name="todo">TODO</string>
+
+    <string name="device_login_error">*Device login failed, please check setting and network.</string>
+
+    <string name="employee_registration_form">Employee Registration Form</string>
+    <string name="visitor_registration_form">Visitor Registration Form</string>
+
+    <string name="empty_login_info">Server IP or device token is empty, please check setting</string>
+
+
+    <!--Top ToolBar-->
+    <string name="local_to_ch_simplified">Simplified Chinese</string>
+    <string name="local_to_ch_traditional">Traditional Chinese</string>
+    <string name="local_to_en">English</string>
+
+
+    <!--Obb Download-->
+    <string name="search_wait">Processing, please wait…</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="retry">Retry</string>
+    <string name="status_download_failed">Download failed</string>
+    <string name="status_download_success">Download success</string>
+    <string name="status_download_Obb">Download expansion files</string>
+    <string name="status_check_obb">Check expansion files</string>
+    <string name="status_check_so">Check internal expansion file</string>
+    <string name="status_unzip_obb">Unzip expansion file to internal storage</string>
+
+
+    <!-- ChooseMember -->
+    <string name="choose_member_title">Identification</string>
+    <string name="choose_member_register_title">Registration</string>
+    <string name="employee">Employee</string>
+    <string name="visitor">Visitor</string>
+    <string name="choose_member_hint_text">Please Login</string>
+    <string name="choose_member_register_hint_text">Please select your registration type</string>
+
+
+    <!-- ChooseMode -->
+    <string name="choose_mode_employee_verification_title">Employee Verification Mode</string>
+    <string name="choose_mode_employee_registration_title">Employee Registration Mode</string>
+    <string name="choose_mode_visitor_verification_title">Visitor Verification Mode</string>
+    <string name="choose_mode_visitor_registration_title">Visitor Registration Mode</string>
+    <string name="id_card">ID card</string>
+    <string name="security_code">Security Code</string>
+    <string name="qr_code">QR Code</string>
+    <string name="facial_recognition">Facial Recognition</string>
+    <string name="fingerprint_recognition">Fingerprint Recognition</string>
+    <string name="choose_registration_mode">Please select an register mode</string>
+    <string name="choose_verification_mode">Please select an authentication mode</string>
+
+
+    <!--RFID-->
+    <string name="rfid_verification_title">ID Card Verification (Employee)</string>
+    <string name="please_swipe_id_card">Please Swipe the ID Card</string>
+    <string name="rfid_verification_error">*Invalid card, please try again</string>
+    <string name="rfid_toast_no_result">Incorrect RFID. Please try again.</string>
+
+    <!-- SecurityCode -->
+    <string name="security_verification_title">Security Code Verification</string>
+    <string name="security_hint">Please enter your unique identifier</string>
+    <string name="security_verification_error">* Invalid security code, please try again</string>
+    <string name="empty_security_code_msg">Security code can not be empty.</string>
+
+
+    <!--QrCode-->
+    <string name="qr_verification_title">QR Code Verification</string>
+    <string name="qr_scan_hint">Please show QR Code</string>
+    <string name="qr_verification_error">Invalid QR code, please try again</string>
+
+
+    <!--Face Verification-->
+    <string name="face_identification_title">Facial Recognition</string>
+    <string name="please_face_forward_the_camera">Please face toward the camera</string>
+    <string name="unknown_user">Unknown User</string>
+    <string name="verification_failed">Verification failed</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="face_timeout_str_fmt">Timeout: %1$d (sec)</string>
+    <string name="clock_check_in">Check In</string>
+    <string name="clock_check_out">Check Out</string>
+    <string name="clock_pass">Pass</string>
+    <string name="clock_arrive">Arrive</string>
+    <string name="clock_leave">Leave</string>
+    <string name="clock_timeout">Clock timeout, please try again.</string>
+    <string name="registration_fail">Registration failed</string>
+    <string name="registration_complete">Registration completed</string>
+    <string name="face_verify_time_expire">Face recognition timeout</string>
+    <string name="result_employee_name">Name</string>
+    <string name="result_employee_id">ID</string>
+    <string name="result_visitor_name">Visitor Name</string>
+    <string name="result_visitor_phone">Phone Number</string>
+
+
+    <!--Setting-->
+    <string name="setting_title">Endpoint Setting</string>
+    <string name="connection_setting">Connection Setting</string>
+    <string name="function_setting">Function Setting</string>
+    <string name="linked_device">Linked Device</string>
+    <string name="bluetooth_setting">Bluetooth Setting</string>
+    <string name="server_ip">Server IP</string>
+    <string name="ftp_ip">FTP IP</string>
+    <string name="web_socket_ip">Web Socket IP</string>
+    <string name="ftp_account">FTP Account</string>
+    <string name="ftp_password">FTP Password</string>
+    <string name="tablet_phone_name">Device Name</string>
+    <string name="tablet_phone_token">Device Token</string>
+    <string name="idle_time">Idle Time (secs)</string>
+    <string name="hold_verify_result">Hold Result (ms)</string>
+    <string name="face_verify_time">Face Detect (ms)</string>
+    <string name="application_mode">Application Mode</string>
+    <string name="select_clock_in_out">Clock In/Out</string>
+    <string name="human_detection">Human Detection</string>
+    <string name="fdr_online_mode">FDR Online Mode</string>
+    <string name="screen_saver">Enable Idle Screen</string>
+    <string name="webcam">Webcam</string>
+    <string name="webcam_url">RTSP URL</string>
+    <string name="webcam_username">RTSP Account</string>
+    <string name="webcam_passowrd">RTSP Password</string>
+    <string name="door_module">Door Module</string>
+    <string name="close_door_timeout">Close Door (secs)</string>
+    <string name="device_available">Available Devices</string>
+    <string name="register_mode">Register Mode</string>
+    <string name="verification_mode">Verification Mode</string>
+    <string name="check_in">Clock In</string>
+    <string name="check_out">Clock Out</string>
+    <string name="check_option">Clock Optional</string>
+    <string name="switch_on">On</string>
+    <string name="switch_off">Off</string>
+    <string name="bluetooth_refresh">Refresh</string>
+    <string name="bluetooth_open">Open</string>
+    <string name="bluetooth_close">Close</string>
+    <string name="invalid_server_ip">Server IP can not be empty</string>
+    <string name="invalid_ftp_ip">FTP IP can not be empty</string>
+    <string name="invalid_web_socket_ip">Web socket IP can not be empty</string>
+    <string name="invalid_ftp_account">FTP account can not be empty</string>
+    <string name="invalid_ftp_password">FTP password can not be empty</string>
+    <string name="invalid_device_token">Device token can not be empty</string>
+    <string name="invalid_bluetooth_passowrd">Bluetooth password length must be 8</string>
+    <string name="invalid_rtsp_setting">RTSP camera setting can not be empty</string>
+    <string name="setting_account_hint">Enter Account</string>
+    <string name="setting_password_hint">Enter Password</string>
+    <string name="setting_invalid_account_hint">* Invalid account or password, please try again</string>
+
+
+    <!--Registration-->
+    <string name="necessary_prefix_str"><![CDATA[<b><font color=#FF0000>* </b>]]></string>
+    <string name="form_valid_security_code"><![CDATA[<b><font color=#95E37B>* Valid security code</b>]]></string>
+    <string name="form_invalid_security_code"><![CDATA[<b><font color=#FF0000>* Invalid security code</b>]]></string>
+    <string name="fill_in_form">Fill In the Form</string>
+    <string name="face_enrollment">Facial Enrollment</string>
+    <string name="completed">Completed</string>
+    <string name="form_employee_id">Employee ID</string>
+    <string name="form_employee_name">Employee Name</string>
+    <string name="form_visitor_name">Visitor Name</string>
+    <string name="form_email">E-mail</string>
+    <string name="form_title">Job Title</string>
+    <string name="form_password">Password</string>
+    <string name="form_phone_number">Mobile Phone</string>
+    <string name="form_rfid">Card ID</string>
+    <string name="form_security_code">Security Code</string>
+    <string name="form_check">Check</string>
+    <string name="form_company_name">Institution Name</string>
+    <string name="form_dialog_title">Error</string>
+    <string name="form_security_code_empty_hint">The security code can not be empty</string>
+    <string name="form_must_check_security_hint">Must check the security code before submitting</string>
+    <string name="form_email_empty_hint">The email address can not be empty</string>
+    <string name="form_invalid_email_format_hint">Invalid E-Mail Format</string>
+    <string name="form_visitor_name_empty_hint">The visitor name can not be empty</string>
+    <string name="form_mobile_phone_empty_hint">The mobile phone number can not be empty</string>
+    <string name="form_employee_id_empty_hint">The employee ID can not be empty</string>
+    <string name="form_employee_name_empty_hint">The employee name can not be empty</string>
+    <string name="form_password_empty_hint">The password can not be empty</string>
+    <string name="form_invalid_password_format_hint">The password must be 8 characters or more and contain at least one English uppercase, lowercase, special character and one number</string>
+    <string name="form_employee_register_exist_hint">The employee ID or RFID or email already exists</string>
+    <string name="form_visitor_register_exist_hint">The mobile phone number or email already exists</string>
+    <string name="form_state_swip_id_card">Swipe ID Card</string>
+    <string name="form_state_input_security_code">Input Security Code</string>
+    <string name="form_state_scan_qr_code">Scan QR Code</string>
+    <string name="form_state_exist_profile_1">The user profile already exists.</string>
+    <string name="form_state_exist_profile_2">The system will re-register your face information.</string>
+
+
+    <!--Screen Saver-->
+    <string name="app_full_name">Gorilla Smart Attendance</string>
+    <string name="touch_to_begin">Touch the screen to begin</string>
+
+
+    <!-- FooterBar -->
+    <string name="back">Back</string>
+    <string name="registration">Registration</string>
+    <string name="verification">Verification</string>
+    <string name="submit">Submit</string>
+
+
+</resources>

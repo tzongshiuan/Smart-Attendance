@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="@drawable/ic_bg">
+
+        <ScrollView
+                android:id="@+id/formLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:theme="@style/registration_layout_theme">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.2"
+                        android:orientation="vertical"/>
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.9"
+                        android:orientation="vertical"/>
+
+                <TextView
+                        android:id="@+id/nameLabel"
+                        android:text="@string/form_visitor_name"
+                        app:layout_constraintTop_toTopOf="@+id/nameEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/nameEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/titleLabel"
+                        android:text="@string/form_title"
+                        app:layout_constraintTop_toTopOf="@+id/titleEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/titleEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/companyLabel"
+                        android:text="@string/form_company_name"
+                        app:layout_constraintTop_toTopOf="@+id/companyEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/companyEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/phoneLabel"
+                        android:text="@string/form_phone_number"
+                        app:layout_constraintTop_toTopOf="@+id/phoneEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/phoneEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/emailLabel"
+                        android:text="@string/form_email"
+                        app:layout_constraintTop_toTopOf="@+id/emailEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/emailEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/securityLabel"
+                        android:text="@string/form_security_code"
+                        app:layout_constraintTop_toTopOf="@+id/visitorSecurityEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
+                        app:layout_constraintBottom_toBottomOf="@+id/visitorSecurityEditText"
+                        style="@style/registration_text_label_style"/>
+
+                <EditText
+                        android:id="@+id/nameEditText"
+                        tools:text="Tsung Hsuan, Lai"
+                        android:hint="@string/form_visitor_name"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="text"
+                        style="@style/registration_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/titleEditText"
+                        tools:text="Software Engineer"
+                        android:hint="@string/form_title"
+                        app:layout_constraintTop_toBottomOf="@+id/nameEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="text"
+                        style="@style/registration_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/companyEditText"
+                        tools:text="Gorilla Technology Inc."
+                        android:hint="@string/form_company_name"
+                        app:layout_constraintTop_toBottomOf="@+id/titleEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="text"
+                        style="@style/registration_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/phoneEditText"
+                        tools:text="0930565748"
+                        android:hint="@string/form_phone_number"
+                        app:layout_constraintTop_toBottomOf="@+id/companyEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="phone"
+                        android:digits="0123456789"
+                        style="@style/registration_edit_text_style"/>
+
+
+                <EditText
+                        android:id="@+id/emailEditText"
+                        tools:text="tsunghsuanlai@goriila-technology.com"
+                        android:hint="@string/form_email"
+                        app:layout_constraintTop_toBottomOf="@+id/phoneEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="textEmailAddress"
+                        style="@style/registration_edit_text_style"/>
+
+
+                <EditText
+                        android:id="@+id/visitorSecurityEditText"
+                        tools:text="12345678"
+                        android:hint="@string/form_security_code"
+                        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/registration_edit_text_style"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

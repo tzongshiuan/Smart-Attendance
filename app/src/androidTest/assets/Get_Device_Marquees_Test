@@ -1,0 +1,37 @@
+{
+    "status": "success",
+    "data": {
+        "marquees": [
+            {
+                "name": "All",
+                "text": {
+                    "zh_TW": "第二堂上課囉！在知道怎麼撰寫、執行第一個 Python 程式之後，接下來就要瞭解一下 Python 這個程式語言，只不過我們只剩五個小時，因而採取的方式是，在這一個小時很快地瀏覽過 Python 語言的重要基本元素，之後四個小時再從更多實際的範例中瞭解 Python 語言。\r\n",
+                    "en_US": "Welcome to wxPython’s Project Phoenix! Phoenix is the improved next-generation wxPython, “better, stronger, faster than he was before.” This new implementation is focused on improving speed, maintainability and extensibility. ",
+                    "zh_CN": "第二堂上课啰！在知道怎么撰写、执行第一个Python 程式之后，接下来就要了解一下Python 这个程式语言，只不过我们只剩五个小时，因而采取的方式是，在这一个小时很快地浏览过Python 语言的重要基本元素，之后四个小时再从更多实际的范例中了解Python 语言。\r\n"
+                },
+                "speed": 1,
+                "direction": 1
+            },
+            {
+                "name": "123",
+                "text": {
+                    "zh_TW": "",
+                    "en_US": "123",
+                    "zh_CN": ""
+                },
+                "speed": 1,
+                "direction": 1
+            },
+            {
+                "name": "autotest_dont_del",
+                "text": {
+                    "zh_TW": "automation test",
+                    "en_US": "automation test",
+                    "zh_CN": "automation test"
+                },
+                "speed": 1,
+                "direction": 1
+            }
+        ]
+    }
+}

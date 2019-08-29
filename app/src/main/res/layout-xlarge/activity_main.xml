@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg">
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                android:theme="@style/ToolBarStyle"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_constraintTop_toTopOf="parent">
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <TextView
+                        android:id="@+id/timeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        tools:text="17:55"
+                        android:textSize="@dimen/toolbar_title_text_size"
+                        android:textColor="@color/toolbar_text_color"/>
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/timeText"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp" tools:ignore="RelativeOverlap">
+
+                    <TextView
+                            android:id="@+id/dateText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="2019-07-07"
+                            android:textSize="@dimen/toolbar_subtitle_text_size"
+                            android:textColor="@color/toolbar_text_color"
+                            tools:ignore="SmallSp"/>
+
+                    <TextView
+                            android:id="@+id/weekDayText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="SAT"
+                            android:textSize="@dimen/toolbar_subtitle_text_size"
+                            android:textColor="@color/toolbar_text_color"
+                            tools:ignore="SmallSp"/>
+                </LinearLayout>
+
+                <TextView
+                        android:id="@+id/titleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="18dp"
+                        tools:text="Toolbar Title"
+                        android:textSize="@dimen/toolbar_title_text_size"
+                        android:textColor="@color/toolbar_text_color" tools:ignore="RelativeOverlap"/>
+
+                <ImageView
+                        android:id="@+id/languageImage"
+                        android:layout_width="@dimen/toolbar_image_width"
+                        android:layout_height="@dimen/toolbar_image_height"
+                        android:scaleType="fitCenter"
+                        android:src="@mipmap/ic_en"
+                        android:layout_toStartOf="@+id/socketImage"
+                        android:layout_centerVertical="true" tools:ignore="ContentDescription"/>
+
+                <ImageView
+                        android:id="@+id/socketImage"
+                        android:layout_width="@dimen/toolbar_image_height"
+                        android:layout_height="@dimen/toolbar_image_height"
+                        android:layout_marginEnd="10dp"
+                        android:src="@mipmap/ic_connected"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" tools:ignore="ContentDescription"/>
+            </RelativeLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+                android:id="@+id/errorHintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="gone"
+                android:text="@string/device_login_error"
+                android:textColor="@color/error_color"
+                android:textSize="@dimen/common_text_size"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <fragment
+                android:id="@+id/container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                tools:layout="@layout/choose_member_fragment"
+                app:defaultNavHost="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <View
+                android:id="@+id/toolbarBottomLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@drawable/ic_toolbar_bottom_line_bg"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.15" />
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.85" />
+
+        <com.gorilla.attendance.ui.main.ObbProgressView
+                android:id="@+id/obbProgressView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/transparent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guidelineLeft"
+                app:layout_constraintEnd_toEndOf="@+id/guidelineRight"
+                app:layout_constraintDimensionRatio="H, 2:1"
+                android:visibility="gone"/>
+
+        <com.gorilla.attendance.ui.common.WaitingProgressView
+                android:id="@+id/waitingView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="gone"
+                tools:visibility="gone" />
+
+        <com.gorilla.attendance.ui.main.FaceVerifyResultView
+                android:id="@+id/faceVerifyResultView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="gone"
+                tools:visibility="gone"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

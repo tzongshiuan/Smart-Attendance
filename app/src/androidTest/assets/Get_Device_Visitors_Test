@@ -1,0 +1,19 @@
+{
+    "status": "success",
+    "data": {
+        "acceptances": [
+            {
+                "id": "40288b1e6ab0b762016be54d22e00aac",
+                "securityCode": "07121234",
+                "rfid": "",
+                "firstName": "hsuan",
+                "lastName": "",
+                "photoUrl": "http://192.168.11.158/SmartEnterprise/api/visitor/photo?id=40288b1e6ab0b762016be54d22e00aac",
+                "mobileNo": "12345678",
+                "intId": 135,
+                "startTime": 1565078903000,
+                "endTime": 1565107199000
+            }
+        ]
+    }
+}

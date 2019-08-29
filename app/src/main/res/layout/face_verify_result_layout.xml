@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="failedNameText" type="String"/>
+
+        <variable name="failedLabelText" type="String"/>
+
+        <variable name="failedText" type="String"/>
+
+        <variable name="userName" type="String"/>
+
+        <variable name="successLabelText" type="String"/>
+
+        <variable name="infoText" type="String"/>
+
+        <variable name="clockText" type="String"/>
+
+        <variable name="calendarText" type="String"/>
+
+        <variable name="timeoutText" type="String"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/optionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            tools:background="@drawable/ic_bg">
+
+        <!--unknown result layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/unknownResultLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/rounded_border"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <ImageView
+                    android:id="@+id/unknownImage"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:layout_marginBottom="@dimen/circle_image_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:src="@mipmap/ic_unknown_user"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:contentDescription="@string/todo"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/unknownBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="right"
+                    app:constraint_referenced_ids="unknownImage"/>
+            
+            <TextView
+                    android:id="@+id/unknownLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    tools:text="Unknown user"
+                    android:text="@{failedNameText}"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_title_text_size"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@+id/unknownImage"
+                    app:layout_constraintStart_toEndOf="@+id/unknownBarrier"/>
+
+            <TextView
+                    android:id="@+id/failedLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    tools:text="Failed"
+                    android:text="@{failedLabelText}"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    app:layout_constraintTop_toBottomOf="@+id/unknownLabel"
+                    app:layout_constraintStart_toEndOf="@+id/unknownBarrier"/>
+
+            <TextView
+                    android:id="@+id/failedDescription"
+                    android:layout_width="@dimen/fdr_description_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginEnd="@dimen/circle_image_margin"
+                    android:text="@{failedText}"
+                    tools:text="Description description description description description description description"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintTop_toBottomOf="@+id/failedLabel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/unknownBarrier"
+                    android:visibility="invisible"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--success result layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/successResultLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/checkOptionLayout"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                android:background="@drawable/rounded_border"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/userImage"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:layout_marginBottom="@dimen/circle_image_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    app:civ_border_width="5dp"
+                    app:civ_border_color="@color/white"
+                    android:src="@mipmap/ic_unknown_user"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:contentDescription="@string/todo"/>
+
+            <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/ic_check_circle_bg"
+                    android:src="@drawable/ic_check_circle"
+                    app:layout_constraintEnd_toEndOf="@+id/userImage"
+                    app:layout_constraintBottom_toBottomOf="@+id/userImage"
+                    app:layout_constraintStart_toStartOf="@+id/userImage"
+                    app:layout_constraintTop_toTopOf="@+id/userImage"
+                    app:layout_constraintHorizontal_bias="1.1"
+                    app:layout_constraintVertical_bias="0.9" tools:ignore="ContentDescription"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/successBarrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="right"
+                    app:constraint_referenced_ids="userImage"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/successBarrier2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="userImage"/>
+
+            <TextView
+                    android:id="@+id/timeoutTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginEnd="@dimen/circle_image_margin"
+                    android:text="@{timeoutText}"
+                    android:textAlignment="viewEnd"
+                    tools:text="Timeout: 5 (s)"
+                    android:alpha="0.3"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_title_text_size"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/successBarrier"
+                    android:visibility="gone"
+                    tools:visibility="invisible"/>
+
+            <TextView
+                    android:id="@+id/userNameText"
+                    android:layout_width="@dimen/fdr_result_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:text="@{userName}"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    tools:text="User Name"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_title_text_size"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@+id/timeoutTextView"
+                    app:layout_constraintStart_toEndOf="@+id/successBarrier"/>
+
+            <TextView
+                    android:id="@+id/welcomeLabel"
+                    android:layout_width="@dimen/fdr_result_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    tools:text="@string/welcome_back"
+                    android:text="@{successLabelText}"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    app:layout_constraintTop_toBottomOf="@+id/userNameText"
+                    app:layout_constraintStart_toEndOf="@+id/successBarrier"/>
+
+            <TextView
+                    android:id="@+id/userInfoText"
+                    android:layout_width="@dimen/fdr_description_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginEnd="@dimen/circle_image_margin"
+                    android:text="@{infoText}"
+                    tools:text="info info info info info info info info info info info info info info info info info info info info"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintTop_toBottomOf="@+id/welcomeLabel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/successBarrier"
+                    android:visibility="invisible"/>
+
+            <ImageView
+                    android:id="@+id/clockImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:src="@drawable/ic_clock"
+                    app:layout_constraintTop_toTopOf="@+id/successBarrier2"
+                    app:layout_constraintStart_toStartOf="@+id/clockTextView"
+                    app:layout_constraintEnd_toEndOf="@+id/clockTextView"
+                    tools:ignore="ContentDescription"/>
+
+            <TextView
+                    android:id="@+id/clockTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/circle_image_margin"
+                    android:gravity="center_horizontal"
+                    android:text="@{clockText}"
+                    tools:text="16:54:32"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    app:layout_constraintStart_toStartOf="@+id/successBarrier"
+                    app:layout_constraintEnd_toStartOf="@+id/splitView"
+                    app:layout_constraintTop_toBottomOf="@+id/clockImage"
+                    app:layout_constraintHorizontal_weight="2"/>
+
+            <View
+                    android:id="@+id/splitView"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:layout_marginBottom="@dimen/circle_image_margin"
+                    android:background="@drawable/ic_fdr_vertical_split_line_bg"
+                    app:layout_constraintTop_toTopOf="@id/successBarrier2"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/clockTextView"
+                    app:layout_constraintEnd_toStartOf="@+id/calendarTextView"/>
+
+            <ImageView
+                    android:id="@+id/calendarImage"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:src="@drawable/ic_calendar"
+                    app:layout_constraintTop_toTopOf="@+id/successBarrier2"
+                    app:layout_constraintStart_toStartOf="@+id/calendarTextView"
+                    app:layout_constraintEnd_toEndOf="@+id/calendarTextView"
+                    tools:ignore="ContentDescription"/>
+
+            <TextView
+                    android:id="@+id/calendarTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/circle_image_margin"
+                    android:gravity="center_horizontal"
+                    android:text="@{calendarText}"
+                    tools:text="2019-01-21 星期一"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    app:layout_constraintStart_toEndOf="@+id/splitView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/calendarImage"
+                    app:layout_constraintHorizontal_weight="3"/>
+
+            <androidx.constraintlayout.widget.Group
+                    android:id="@+id/dateTimeGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="clockImage,clockTextView,splitView,calendarImage,calendarTextView"
+                    tools:visibility="visible"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--check option layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/checkOptionLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintTop_toTopOf="@+id/successResultLayout"
+                app:layout_constraintBottom_toBottomOf="@+id/successResultLayout"
+                app:layout_constraintStart_toEndOf="@+id/successResultLayout"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <Button
+                    android:id="@+id/checkInBtn"
+                    android:text="@string/clock_check_in"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/checkOutBtn"
+                    style="@style/clock_option_button_style"/>
+
+            <Button
+                    android:id="@+id/checkOutBtn"
+                    android:text="@string/clock_check_out"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    app:layout_constraintTop_toBottomOf="@+id/checkInBtn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/passBtn"
+                    style="@style/clock_option_button_style"/>
+
+            <Button
+                    android:id="@+id/passBtn"
+                    android:text="@string/clock_pass"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    app:layout_constraintTop_toBottomOf="@+id/checkOutBtn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/clock_option_button_style"/>
+
+            <Button
+                    android:id="@+id/arriveBtn"
+                    android:text="@string/clock_arrive"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/leaveBtn"
+                    style="@style/clock_option_button_style"/>
+
+            <Button
+                    android:id="@+id/leaveBtn"
+                    android:text="@string/clock_leave"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    app:layout_constraintTop_toBottomOf="@+id/arriveBtn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    style="@style/clock_option_button_style"/>
+
+            <androidx.constraintlayout.widget.Group
+                    android:id="@+id/employeeOptionGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="checkInBtn,checkOutBtn,passBtn"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            <androidx.constraintlayout.widget.Group
+                    android:id="@+id/visitorOptionGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="arriveBtn,leaveBtn"
+                    android:visibility="gone"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--retrain layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/retrainLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Today's shot"
+                    android:textColor="@color/yellow"
+                    app:layout_constraintBottom_toTopOf="@+id/retrainOwnImage"
+                    app:layout_constraintStart_toStartOf="@+id/retrainOwnImage"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainOwnImage"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/retrainOwnImage"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    tools:src="@mipmap/ic_unknown_user"
+                    app:civ_border_width="1dp"
+                    app:civ_border_color="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/splitView2"
+                    android:contentDescription="@string/todo"/>
+
+            <TextView
+                    android:id="@+id/retrainOwnName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tsung Hsuan, Lai"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainOwnImage"
+                    app:layout_constraintStart_toStartOf="@+id/retrainOwnImage"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainOwnImage"/>
+
+            <TextView
+                    android:id="@+id/retrainOwnId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID: 2233556"
+                    android:textColor="@color/white"
+                    android:alpha="0.3"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainOwnName"
+                    app:layout_constraintStart_toStartOf="@+id/retrainOwnImage"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainOwnImage"/>
+
+            <View
+                    android:id="@+id/splitView2"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:layout_marginBottom="@dimen/circle_image_margin"
+                    android:background="@drawable/ic_fdr_vertical_split_line_bg"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.30"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/retrainCandidImage1"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    tools:src="@mipmap/ic_unknown_user"
+                    app:civ_border_width="1dp"
+                    app:civ_border_color="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/splitView2"
+                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage2"
+                    android:contentDescription="@string/todo"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidName1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tsung Hsuan, Lai"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidImage1"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage1"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage1"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidId1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID: 2233556"
+                    android:textColor="@color/white"
+                    android:alpha="0.3"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidName1"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage1"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage1"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/retrainCandidImage2"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    tools:src="@mipmap/ic_unknown_user"
+                    app:civ_border_width="1dp"
+                    app:civ_border_color="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/retrainCandidImage1"
+                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage3"
+                    android:contentDescription="@string/todo"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidName2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tsung Hsuan, Lai"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidImage2"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage2"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage2"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidId2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID: 2233556"
+                    android:textColor="@color/white"
+                    android:alpha="0.3"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidName2"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage2"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage2"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/retrainCandidImage3"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    tools:src="@mipmap/ic_unknown_user"
+                    app:civ_border_width="1dp"
+                    app:civ_border_color="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/retrainCandidImage2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:contentDescription="@string/todo"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidName3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tsung Hsuan, Lai"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidImage3"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage3"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage3"/>
+
+            <TextView
+                    android:id="@+id/retrainCandidId3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID: 2233556"
+                    android:textColor="@color/white"
+                    android:alpha="0.3"
+                    app:layout_constraintTop_toBottomOf="@+id/retrainCandidName3"
+                    app:layout_constraintStart_toStartOf="@+id/retrainCandidImage3"
+                    app:layout_constraintEnd_toEndOf="@+id/retrainCandidImage3"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

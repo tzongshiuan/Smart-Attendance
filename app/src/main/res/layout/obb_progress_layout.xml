@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="progressValue"
+                type="int"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/optionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="25dp"
+            android:background="@drawable/obb_progress_bg">
+        
+        <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DownloaderBigTextStyle"
+                tools:text="Status Text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/progressAsFraction"
+                app:layout_constraintVertical_bias="0.0"/>
+        
+        <TextView
+                android:id="@+id/progressAsFraction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/DownloaderBigTextStyle"
+                tools:text="0MB / 0MB"
+                app:layout_constraintTop_toBottomOf="@+id/statusText"
+                app:layout_constraintBottom_toTopOf="@+id/progressBar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/progressAsPercentage"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <TextView
+                android:id="@+id/progressAsPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/DownloaderBigTextStyle"
+                tools:text="0%"
+                app:layout_constraintTop_toTopOf="@+id/progressAsFraction"
+                app:layout_constraintStart_toEndOf="@+id/progressAsFraction"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:progress="@{progressValue}"
+                tools:progress="50"
+                android:progressDrawable="@drawable/obb_horizontal_progress_bg"
+                app:layout_constraintTop_toBottomOf="@+id/progressAsFraction"
+                app:layout_constraintBottom_toTopOf="@+id/progressAverageSpeed"/>
+
+        <TextView
+                android:id="@+id/progressAverageSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/DownloaderBigTextStyle"
+                tools:text="66.66 MB"
+                app:layout_constraintTop_toBottomOf="@+id/progressBar"
+                app:layout_constraintBottom_toTopOf="@+id/progressGuideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/progressTimeRemaining"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+
+        <TextView
+                android:id="@+id/progressTimeRemaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/DownloaderBigTextStyle"
+                tools:text="66:66"
+                app:layout_constraintTop_toTopOf="@+id/progressAverageSpeed"
+                app:layout_constraintStart_toEndOf="@+id/progressAverageSpeed"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/progressGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintGuide_percent="0.6"/>
+
+        <Button
+                android:id="@+id/pauseBtn"
+                android:text="@string/pause"
+                style="@style/footbar_button_style"
+                app:layout_constraintTop_toBottomOf="@+id/progressGuideline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+                android:id="@+id/retryBtn"
+                android:text="@string/retry"
+                style="@style/footbar_button_style"
+                app:layout_constraintTop_toBottomOf="@+id/progressGuideline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

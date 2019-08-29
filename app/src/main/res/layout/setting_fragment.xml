@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:id="@+id/layout">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+                name="viewModel"
+                type="com.gorilla.attendance.ui.setting.SettingViewModel"/>
+
+        <variable
+                name="isHumanChecked"
+                type="boolean" />
+
+        <variable
+                name="isFdrOnlineChecked"
+                type="boolean" />
+
+        <variable
+                name="isScreenSaverEnable"
+                type="boolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg">
+
+        <!--RecyclerView for options selection-->
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/settingOptionsView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                tools:listitem="@layout/setting_option_item"
+                app:layout_constraintHorizontal_weight="5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnLeft"
+                app:layout_constraintEnd_toStartOf="@+id/guidelineBegin"
+                android:visibility="visible"/>
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineBegin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintGuide_percent="0.28"
+                android:orientation="vertical"/>
+
+        <!--Connection setting layout-->
+        <ScrollView
+                android:id="@+id/connectionLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.35"
+                        android:orientation="vertical"/>
+
+                <TextView
+                        android:id="@+id/serverIpLabel"
+                        android:text="@string/server_ip"
+                        app:layout_constraintTop_toTopOf="@+id/serverIpEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/serverIpEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/ftpIpLabel"
+                        android:text="@string/ftp_ip"
+                        app:layout_constraintTop_toTopOf="@+id/ftpIpEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/ftpIpEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/webSocketIpLabel"
+                        android:text="@string/web_socket_ip"
+                        app:layout_constraintTop_toTopOf="@+id/webSocketIpEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/webSocketIpEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/ftpAccountLabel"
+                        android:text="@string/ftp_account"
+                        app:layout_constraintTop_toTopOf="@+id/ftpAccountEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/ftpAccountEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/ftpPasswordLabel"
+                        android:text="@string/ftp_password"
+                        app:layout_constraintTop_toTopOf="@+id/ftpPasswordEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/ftpPasswordEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/tabletNameLabel"
+                        android:text="@string/tablet_phone_name"
+                        app:layout_constraintTop_toTopOf="@+id/tabletNameEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/tabletNameEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/tabletTokenLabel"
+                        android:text="@string/tablet_phone_token"
+                        app:layout_constraintTop_toTopOf="@+id/tabletTokenEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
+                        app:layout_constraintBottom_toBottomOf="@+id/tabletTokenEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <EditText
+                        android:id="@+id/serverIpEditText"
+                        tools:text="192.168.11.158"
+                        android:hint="@string/server_ip"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/ftpIpEditText"
+                        android:inputType="textUri"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/ftpIpEditText"
+                        tools:text="192.168.11.158"
+                        android:hint="@string/ftp_ip"
+                        app:layout_constraintTop_toBottomOf="@+id/serverIpEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/webSocketIpEditText"
+                        android:inputType="textUri"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/webSocketIpEditText"
+                        tools:text="192.168.11.158"
+                        android:hint="@string/web_socket_ip"
+                        app:layout_constraintTop_toBottomOf="@+id/ftpIpEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/ftpAccountEditText"
+                        android:inputType="textUri"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/ftpAccountEditText"
+                        tools:text="gorilla"
+                        android:hint="@string/ftp_account"
+                        app:layout_constraintTop_toBottomOf="@+id/webSocketIpEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/ftpPasswordEditText"
+                        android:inputType="text"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/ftpPasswordEditText"
+                        tools:text="gorillakm"
+                        android:hint="@string/ftp_password"
+                        app:layout_constraintTop_toBottomOf="@+id/ftpAccountEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/tabletNameEditText"
+                        android:inputType="textVisiblePassword"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/tabletNameEditText"
+                        tools:text="ASUS_EN"
+                        android:hint="@string/tablet_phone_name"
+                        app:layout_constraintTop_toBottomOf="@+id/ftpPasswordEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintBottom_toTopOf="@+id/tabletTokenEditText"
+                        android:inputType="text"
+                        android:enabled="false"
+                        android:alpha="0.5"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/tabletTokenEditText"
+                        tools:text="4953d23b2323-468db869-490d-9b27-79c4"
+                        android:hint="@string/tablet_phone_token"
+                        app:layout_constraintTop_toBottomOf="@+id/tabletNameEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
+                        app:layout_constraintEnd_toStartOf="@+id/tabletTokenQrBtn"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        style="@style/setting_edit_text_style"
+                        android:layout_marginTop="10dp"/>
+
+                <ImageView
+                        android:id="@+id/tabletTokenQrBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@mipmap/ic_qr_setting"
+                        app:layout_constraintDimensionRatio="H, 2:3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/tabletTokenEditText"
+                        app:layout_constraintBottom_toBottomOf="@+id/tabletTokenEditText"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!--Function setting layout-->
+        <ScrollView
+                android:id="@+id/functionLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.35"
+                        android:orientation="vertical"/>
+
+                <TextView
+                        android:id="@+id/idleTimeLabel"
+                        android:text="@string/idle_time"
+                        app:layout_constraintTop_toTopOf="@+id/idleTimeEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/idleTimeEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/holdResultLabel"
+                        android:text="@string/hold_verify_result"
+                        app:layout_constraintTop_toTopOf="@+id/holdResultEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/holdResultEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/faceVerifyTimeLabel"
+                        android:text="@string/face_verify_time"
+                        app:layout_constraintTop_toTopOf="@+id/faceVerifyTimeEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/faceVerifyTimeEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/appModeLabel"
+                        android:text="@string/application_mode"
+                        app:layout_constraintTop_toTopOf="@+id/appModeSpinner"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/appModeSpinner"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/checkInOutLabel"
+                        android:text="@string/select_clock_in_out"
+                        app:layout_constraintTop_toTopOf="@+id/checkInOutSpinner"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/checkInOutSpinner"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/humanLabel"
+                        android:text="@string/human_detection"
+                        app:layout_constraintTop_toTopOf="@+id/humanSwitch"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/humanSwitch"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/fdrLabel"
+                        android:text="@string/fdr_online_mode"
+                        app:layout_constraintTop_toTopOf="@+id/fdrSwitch"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/fdrSwitch"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/screenLabel"
+                        android:text="@string/screen_saver"
+                        app:layout_constraintTop_toTopOf="@+id/screenSwitch"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="@+id/screenSwitch"
+                        style="@style/setting_text_label_style"/>
+
+                <EditText
+                        android:id="@+id/idleTimeEditText"
+                        tools:text="30"
+                        android:hint="@string/idle_time"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/holdResultEditText"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/holdResultEditText"
+                        tools:text="2000"
+                        android:hint="@string/hold_verify_result"
+                        app:layout_constraintTop_toBottomOf="@+id/idleTimeEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/faceVerifyTimeEditText"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/faceVerifyTimeEditText"
+                        tools:text="10000"
+                        android:hint="@string/face_verify_time"
+                        app:layout_constraintTop_toBottomOf="@+id/holdResultEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/appModeSpinner"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <Spinner
+                        android:id="@+id/appModeSpinner"
+                        tools:selectedItemPosition="0"
+                        app:layout_constraintTop_toBottomOf="@+id/faceVerifyTimeEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/checkInOutSpinner"
+                        android:entries="@array/app_mode_array"
+                        style="@style/setting_spinner_style"/>
+
+                <Spinner
+                        android:id="@+id/checkInOutSpinner"
+                        tools:selectedItemPosition="0"
+                        app:layout_constraintTop_toBottomOf="@+id/appModeSpinner"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/humanSwitch"
+                        android:entries="@array/check_in_out_array"
+                        style="@style/setting_spinner_style"/>
+
+                <Switch
+                        android:id="@+id/humanSwitch"
+                        app:layout_constraintTop_toBottomOf="@+id/checkInOutSpinner"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/fdrSwitch"
+                        android:checked="@={isHumanChecked}"
+                        tools:checked="true"
+                        style="@style/SettingSwitchBtn" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/humanSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/humanSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/humanSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/humanSwitch"
+                        app:layout_constraintHorizontal_bias="0.3"
+                        android:text="@string/switch_on"
+                        android:textColor="@color/white"
+                        android:visibility="@{isHumanChecked ? View.VISIBLE : View.GONE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/humanSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/humanSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/humanSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/humanSwitch"
+                        app:layout_constraintHorizontal_bias="0.7"
+                        android:text="@string/switch_off"
+                        android:textColor="@color/black"
+                        android:visibility="@{isHumanChecked ? View.GONE : View.VISIBLE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText" />
+
+                <Switch
+                        android:id="@+id/fdrSwitch"
+                        app:layout_constraintTop_toBottomOf="@+id/humanSwitch"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toTopOf="@+id/screenSwitch"
+                        android:checked="@={isFdrOnlineChecked}"
+                        tools:checked="true"
+                        style="@style/SettingSwitchBtn" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/fdrSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/fdrSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/fdrSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/fdrSwitch"
+                        app:layout_constraintHorizontal_bias="0.3"
+                        android:text="@string/switch_on"
+                        android:textColor="@color/white"
+                        android:visibility="@{isFdrOnlineChecked ? View.VISIBLE : View.GONE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/fdrSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/fdrSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/fdrSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/fdrSwitch"
+                        app:layout_constraintHorizontal_bias="0.7"
+                        android:text="@string/switch_off"
+                        android:textColor="@color/black"
+                        android:visibility="@{isFdrOnlineChecked ? View.GONE : View.VISIBLE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText" />
+
+                <Switch
+                        android:id="@+id/screenSwitch"
+                        app:layout_constraintTop_toBottomOf="@+id/fdrSwitch"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner2"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:checked="@={isScreenSaverEnable}"
+                        tools:checked="true"
+                        style="@style/SettingSwitchBtn" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/screenSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/screenSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/screenSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/screenSwitch"
+                        app:layout_constraintHorizontal_bias="0.3"
+                        android:text="@string/switch_on"
+                        android:textColor="@color/white"
+                        android:visibility="@{isScreenSaverEnable ? View.VISIBLE : View.GONE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/screenSwitch"
+                        app:layout_constraintBottom_toBottomOf="@+id/screenSwitch"
+                        app:layout_constraintStart_toStartOf="@+id/screenSwitch"
+                        app:layout_constraintEnd_toEndOf="@+id/screenSwitch"
+                        app:layout_constraintHorizontal_bias="0.7"
+                        android:text="@string/switch_off"
+                        android:textColor="@color/black"
+                        android:visibility="@{isScreenSaverEnable ? View.GONE : View.VISIBLE}"
+                        tools:visibility="visible"
+                        style="@style/SettingSwitchText" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!--Linked device layout-->
+        <ScrollView
+                android:id="@+id/linkedLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.35"
+                        android:orientation="vertical"/>
+
+                <TextView
+                        android:id="@+id/webcamLabel"
+                        android:text="@string/webcam"
+                        app:layout_constraintTop_toTopOf="@+id/webcamSpinner"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/webcamSpinner"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/webcamUrlLabel"
+                        android:text="@string/webcam_url"
+                        app:layout_constraintTop_toTopOf="@+id/webcamUrlEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/webcamUrlEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/webcamUsernameLabel"
+                        android:text="@string/webcam_username"
+                        app:layout_constraintTop_toTopOf="@+id/webcamUsernameEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/webcamUsernameEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/webcamPasswordLabel"
+                        android:text="@string/webcam_passowrd"
+                        app:layout_constraintTop_toTopOf="@+id/webcamPasswordEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/webcamPasswordEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/doorModuleLabel"
+                        android:text="@string/door_module"
+                        app:layout_constraintTop_toTopOf="@+id/doorModuleSpinner"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/doorModuleSpinner"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/closeDoorLabel"
+                        android:text="@string/close_door_timeout"
+                        app:layout_constraintTop_toTopOf="@+id/closeDoorEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="@+id/closeDoorEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <Spinner
+                        android:id="@+id/webcamSpinner"
+                        tools:selectedItemPosition="0"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        app:layout_constraintBottom_toTopOf="@+id/webcamUrlEditText"
+                        android:entries="@array/webcam_array"
+                        style="@style/setting_spinner_style"/>
+
+                <EditText
+                        android:id="@+id/webcamUrlEditText"
+                        tools:text="192.168.11.158"
+                        android:hint="@string/webcam_url"
+                        app:layout_constraintTop_toBottomOf="@+id/webcamSpinner"
+                        app:layout_constraintBottom_toTopOf="@+id/webcamUsernameEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        android:inputType="textUri"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/webcamUsernameEditText"
+                        tools:text="admin"
+                        android:hint="@string/webcam_username"
+                        app:layout_constraintTop_toBottomOf="@+id/webcamUrlEditText"
+                        app:layout_constraintBottom_toTopOf="@+id/webcamPasswordEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        android:inputType="text"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/webcamPasswordEditText"
+                        tools:text="admin01"
+                        android:hint="@string/webcam_passowrd"
+                        app:layout_constraintTop_toBottomOf="@+id/webcamUsernameEditText"
+                        app:layout_constraintBottom_toTopOf="@+id/doorModuleSpinner"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        android:inputType="textVisiblePassword"
+                        style="@style/setting_edit_text_style"/>
+
+                <Spinner
+                        android:id="@+id/doorModuleSpinner"
+                        tools:selectedItemPosition="0"
+                        app:layout_constraintTop_toBottomOf="@+id/webcamPasswordEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        app:layout_constraintBottom_toTopOf="@+id/closeDoorEditText"
+                        android:entries="@array/door_module_array"
+                        style="@style/setting_spinner_style"/>
+
+                <EditText
+                        android:id="@+id/closeDoorEditText"
+                        android:hint="@string/close_door_timeout"
+                        tools:text="5"
+                        app:layout_constraintTop_toBottomOf="@+id/doorModuleSpinner"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <androidx.constraintlayout.widget.Group
+                        android:id="@+id/webcamGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:constraint_referenced_ids="webcamUrlLabel,webcamUsernameLabel,webcamPasswordLabel,webcamUrlEditText,webcamUsernameEditText,webcamPasswordEditText"
+                        android:visibility="visible"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!--Bluetooth setting layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bluetoothLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineInner4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintGuide_percent="0.35"
+                    android:orientation="vertical"/>
+
+            <TextView
+                    android:id="@+id/closePasswordLabel"
+                    android:text="@string/password"
+                    app:layout_constraintTop_toTopOf="@+id/closePasswordText"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner4"
+                    app:layout_constraintBottom_toBottomOf="@+id/closePasswordText"
+                    style="@style/setting_text_label_style"/>
+
+            <TextView
+                    android:id="@+id/deviceAvailableLabel"
+                    android:text="@string/device_available"
+                    app:layout_constraintTop_toTopOf="@+id/deviceList"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner4"
+                    style="@style/setting_text_label_style"/>
+
+            <Button
+                    android:id="@+id/btRefreshBtn"
+                    android:text="@string/bluetooth_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/deviceAvailableLabel"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner4"
+                    style="@style/bt_control_button_style"/>
+
+            <!--for test-->
+            <Button
+                    android:id="@+id/btOpenBtn"
+                    android:text="@string/bluetooth_open"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/closePasswordLabel"
+                    app:layout_constraintEnd_toStartOf="@+id/btCloseBtn"
+                    style="@style/bt_control_button_style"
+                    android:visibility="gone"/>
+
+            <!--for test-->
+            <Button
+                    android:id="@+id/btCloseBtn"
+                    android:text="@string/bluetooth_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/closePasswordLabel"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner4"
+                    style="@style/bt_control_button_style"
+                    android:visibility="gone"/>
+
+            <EditText
+                    android:id="@+id/closePasswordText"
+                    tools:text="12345678"
+                    android:hint="@string/password"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineInner4"
+                    app:layout_constraintBottom_toTopOf="@+id/deviceList"
+                    android:inputType="textVisiblePassword"
+                    style="@style/setting_edit_text_style"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/deviceList"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/closePasswordText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineInner4"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:background="@drawable/setting_edit_text_bg"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.journeyapps.barcodescanner.DecoratedBarcodeView
+                android:id="@+id/barcodeScanner"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                android:visibility="gone"/>
+
+        <Button
+                android:id="@+id/btnLeft"
+                style="@style/footbar_button_style"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/cancel"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        <Button
+                android:id="@+id/btnRight"
+                style="@style/footbar_button_style"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/save_and_apply"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/authLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/ic_bg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintGuide_percent="0.28"
+                    android:orientation="vertical"/>
+
+            <TextView
+                    android:text="@string/account"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintTop_toTopOf="@+id/settingAccountEditText"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineAccount"
+                    app:layout_constraintBottom_toBottomOf="@+id/settingAccountEditText"
+                    style="@style/setting_text_label_style"/>
+
+            <TextView
+                    android:text="@string/password"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintTop_toTopOf="@+id/settingPasswordEditText"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineAccount"
+                    app:layout_constraintBottom_toBottomOf="@+id/settingPasswordEditText"
+                    style="@style/setting_text_label_style"/>
+
+            <EditText
+                    android:id="@+id/settingAccountEditText"
+                    android:layout_width="@dimen/setting_account_edit_width"
+                    android:layout_height="60dp"
+                    tools:text="aa"
+                    android:inputType="text"
+                    android:hint="@string/setting_account_hint"
+                    android:textColorHint="@color/hint"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_border"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="@dimen/common_text_size"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guidelineAccount"
+                    app:layout_constraintVertical_bias="0.25"/>
+
+            <EditText
+                    android:id="@+id/settingPasswordEditText"
+                    android:layout_width="@dimen/setting_account_edit_width"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="20dp"
+                    tools:text="aa"
+                    android:inputType="textPassword"
+                    android:hint="@string/setting_password_hint"
+                    android:textColorHint="@color/hint"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_border"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="@dimen/common_text_size"
+                    app:layout_constraintTop_toBottomOf="@+id/settingAccountEditText"
+                    app:layout_constraintStart_toEndOf="@+id/guidelineAccount"/>
+
+            <TextView
+                    android:id="@+id/errorHintText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:text="@string/setting_invalid_account_hint"
+                    android:textColor="@color/error_color"
+                    android:textSize="@dimen/common_text_size"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/settingPasswordEditText"
+                    app:layout_constraintStart_toStartOf="@+id/settingPasswordEditText"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

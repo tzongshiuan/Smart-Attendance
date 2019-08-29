@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "708476180693",
+    "firebase_url": "https://smart-attendance-808d1.firebaseio.com",
+    "project_id": "smart-attendance-808d1",
+    "storage_bucket": "smart-attendance-808d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708476180693:android:8a581ef540605191",
+        "android_client_info": {
+          "package_name": "com.gorilla.attendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708476180693-rfb2t6aec2m84cp5tf25qjd9ujlsoom4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2kwxVM54vluY7rY3zOStB1IrLuU8zEVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708476180693-rfb2t6aec2m84cp5tf25qjd9ujlsoom4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
