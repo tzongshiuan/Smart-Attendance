@@ -49,9 +49,6 @@ class RFIDFragmentTest {
         MainActivity.IS_DEBUG_GOGO = true
         MainActivity.IS_SKIP_FDR = true
         MainActivity.USE_TEST_FACE = true
-        MainActivity.SEND_CLOCK_EVENT = false
-        MainActivity.GET_DEVICE_IDENTITIES = true
-        MainActivity.IS_ENABLE_SCREEN_SAVER = false
         MainActivity.IS_SKIP_SCAN_CODE = true
     }
 
@@ -143,8 +140,8 @@ class RFIDFragmentTest {
 
         onView(withId(R.id.employeeSecurityEditText)).perform(scrollTo())
         blockUI(100)
-        onView(withId(R.id.employeeRegisterForm)).perform(TestTool.clickChildWithId(R.id.checkBtn))
-        blockUI(2000)
+        //onView(withId(R.id.employeeRegisterForm)).perform(TestTool.clickChildWithId(R.id.checkBtn))
+        //blockUI(2000)
 
         onView(withId(R.id.btnRight)).perform(click())
 

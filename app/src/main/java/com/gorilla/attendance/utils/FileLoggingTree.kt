@@ -29,27 +29,34 @@ class FileLoggingTree(private val context: Context) : Timber.DebugTree() {
     @SuppressLint("LogNotTimber")
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         try {
-            val direct = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() +  "/AttendanceLogs")
+            if (priority != Log.INFO && priority != Log.VERBOSE) {
+                val direct = File(DeviceUtils.SD_CARD_APP_LOG)
 
-            if (!direct.exists()) {
-                direct.mkdir()
-            }
+                if (!direct.exists()) {
+                    direct.mkdir()
+                }
 
-            val fileNameTimeStamp = SimpleDateFormat("dd-MM-yyyy_hh", Locale.getDefault()).format(Date())
-            val logTimeStamp = SimpleDateFormat("E MMM dd yyyy 'at' hh:mm:ss:SSS aaa", Locale.getDefault()).format(Date())
+                val fileNameTimeStamp =
+                    SimpleDateFormat("dd-MM-yyyy_hh", Locale.getDefault()).format(Date())
+                val logTimeStamp = SimpleDateFormat(
+                    "E MMM dd yyyy 'at' hh:mm:ss:SSS aaa",
+                    Locale.getDefault()
+                ).format(Date())
 
-            val fileName = "$fileNameTimeStamp.html"
+                val fileName = "$fileNameTimeStamp.html"
 
-            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/AttendanceLogs" + separator + fileName)
+                val file =
+                    File(DeviceUtils.SD_CARD_APP_LOG + separator + fileName)
 
-            file.createNewFile()
+                file.createNewFile()
 
-            if (file.exists()) {
+                if (file.exists()) {
 
-                val fileOutputStream = FileOutputStream(file, true)
+                    val fileOutputStream = FileOutputStream(file, true)
 
-                fileOutputStream.write("<p style=\"background:lightgray;\"><strong style=\"background:lightblue;\">&nbsp&nbsp$logTimeStamp :&nbsp&nbsp</strong>&nbsp&nbsp$tag&nbsp&nbsp$message</p>".toByteArray())
-                fileOutputStream.close()
+                    fileOutputStream.write("<p style=\"background:lightgray;\"><strong style=\"background:lightblue;\">&nbsp&nbsp$logTimeStamp :&nbsp&nbsp</strong>&nbsp&nbsp$tag&nbsp&nbsp$message</p>".toByteArray())
+                    fileOutputStream.close()
+                }
             }
         } catch (e: Exception) {
             Log.e("FileLoggingTree", "Error while logging into file : $e")

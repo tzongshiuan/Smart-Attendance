@@ -54,13 +54,16 @@ class SettingFragment : BaseFragment(), Injectable {
 
     private var editSettingState = STATE_VERIFY_SETTING_ACCOUNT
 
+    var preToolbarVisibility = View.VISIBLE
+
+    private var enableDeviceCount = 0
+    private var enableDeviceTime = 0L
 
     /**
      * Parameters which will cause client to do re-login
      */
     private lateinit var oldServerIp: String
     private lateinit var oldWebSocketIp: String
-    private lateinit var oldFtpIp: String
     private lateinit var oldDeviceToken: String
     private var oldApplicationMode: Int = 0
 
@@ -93,13 +96,14 @@ class SettingFragment : BaseFragment(), Injectable {
             isValid?.let {
                 if (it) {
                     editSettingState = STATE_MODIFY_SETTING_CONFIG
+
+                    mBinding?.btnLeft?.visibility = View.VISIBLE
+                    mBinding?.btnRight?.visibility = View.VISIBLE
                     mBinding?.btnRight?.text = getString(R.string.save_and_apply)
 
                     mBinding?.authLayout?.visibility = View.GONE
                     mBinding?.settingOptionsView?.visibility = View.VISIBLE
                     mBinding?.connectionLayout?.visibility = View.VISIBLE
-
-                    hideSoftwareKeyboard()
                 } else {
                     // show error UI
                     showErrorAccountUI()
@@ -112,6 +116,8 @@ class SettingFragment : BaseFragment(), Injectable {
         initViewModelObservers()
 
         mBinding?.viewModel = settingViewModel
+
+        mFdrManager.stopFdr()
     }
 
     override fun onStart() {
@@ -141,9 +147,16 @@ class SettingFragment : BaseFragment(), Injectable {
 
         // restore bluetooth password
         mPreferences.bluetoothPassword = preBtPassword
+
+        if (preToolbarVisibility == View.INVISIBLE) {
+            (activity as MainActivity).setToolbarVisible(false)
+        }
     }
 
     private fun initUI() {
+        preToolbarVisibility = (activity as MainActivity).getToolbarVisibility()
+        (activity as MainActivity).setToolbarVisible(true, isForce = true)
+
         mBinding?.btnLeft?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
@@ -153,7 +166,7 @@ class SettingFragment : BaseFragment(), Injectable {
                 }
         }
 
-        mBinding?.btnRight?.text = getString(R.string.verification)
+        mBinding?.btnRight?.text = getString(R.string.login)
         mBinding?.btnRight?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
@@ -184,14 +197,13 @@ class SettingFragment : BaseFragment(), Injectable {
 
                             if (isNeedLogin()) {
                                 // save and apply
-                                (activity as MainActivity).applyNewSetting()
-
-                                (activity as MainActivity).initFdr()
+                                (activity as MainActivity).applyNewSetting(isNeedReconnectWebSocket())
                             } else {
                                 (activity as MainActivity).navigateToHome()
                             }
                         }
                     }
+                    hideSoftwareKeyboard()
                 }
         }
 
@@ -291,18 +303,71 @@ class SettingFragment : BaseFragment(), Injectable {
 
         // must call at the end of initUI() function
         initSetting()
+
+        mBinding?.serverIpLabel?.let {
+            RxView.clicks(it)
+                .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe {
+                    triggerEnableDevice()
+                }
+        }
+
+        mBinding?.tabletTokenLabel?.let {
+            RxView.clicks(it)
+                .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe {
+                    triggerEnableDevice()
+                }
+        }
+
+        if (mPreferences.isLoginFinish) {
+            mBinding?.serverIpEditText?.isEnabled = false
+            mBinding?.serverIpEditText?.alpha = 0.5f
+
+            mBinding?.tabletTokenEditText?.isEnabled = false
+            mBinding?.tabletTokenEditText?.alpha = 0.5f
+
+            mBinding?.tabletTokenQrBtn?.isEnabled = false
+            mBinding?.tabletTokenQrBtn?.alpha = 0.5f
+        }
+    }
+
+    private fun triggerEnableDevice() {
+        if (enableDeviceCount >= DeviceUtils.ENTER_SETTING_CLICK_NUM
+            || (System.currentTimeMillis() - enableDeviceTime) > DeviceUtils.ENTER_SETTING_INTERVAL_TIME) {
+            enableDeviceCount = 0
+        }
+
+        if (enableDeviceCount == 0) {
+            enableDeviceTime = System.currentTimeMillis()
+        }
+
+        enableDeviceCount++
+
+        if (enableDeviceCount >= DeviceUtils.ENTER_SETTING_CLICK_NUM) {
+            enableDeviceCount = 0
+
+            mBinding?.serverIpEditText?.isEnabled = true
+            mBinding?.serverIpEditText?.alpha = 1.0f
+
+            mBinding?.tabletTokenEditText?.isEnabled = true
+            mBinding?.tabletTokenEditText?.alpha = 1.0f
+
+            mBinding?.tabletTokenQrBtn?.isEnabled = true
+            mBinding?.tabletTokenQrBtn?.alpha = 1.0f
+        }
     }
 
     private fun isNeedLogin(): Boolean {
         return (oldServerIp != mPreferences.serverIp
                 || oldWebSocketIp != mPreferences.webSocketIp
-                || oldFtpIp != mPreferences.ftpIp
                 || oldDeviceToken != mPreferences.tabletToken
                 || oldApplicationMode != mPreferences.applicationMode)
     }
 
-    private fun isNeedInitFdr(): Boolean {
-        return (webCamType != mPreferences.webcamType)
+    private fun isNeedReconnectWebSocket(): Boolean {
+        return (oldWebSocketIp != mPreferences.webSocketIp
+                || oldDeviceToken != mPreferences.tabletToken)
     }
 
     private fun initRecyclerView() {
@@ -318,6 +383,8 @@ class SettingFragment : BaseFragment(), Injectable {
                 mBinding?.connectionLayout?.visibility = View.GONE
                 mBinding?.functionLayout?.visibility = View.GONE
                 mBinding?.linkedLayout?.visibility = View.GONE
+                mBinding?.linkedLayout2?.visibility = View.GONE
+                mBinding?.updateCycleLayout?.visibility = View.GONE
                 mBinding?.bluetoothLayout?.visibility = View.GONE
 
                 when (clickName) {
@@ -334,6 +401,14 @@ class SettingFragment : BaseFragment(), Injectable {
                     }
 
                     list[3] -> {
+                        mBinding?.linkedLayout2?.visibility = View.VISIBLE
+                    }
+
+                    list[4] -> {
+                        mBinding?.updateCycleLayout?.visibility = View.VISIBLE
+                    }
+
+                    list[5] -> {
                         mBinding?.bluetoothLayout?.visibility = View.VISIBLE
                     }
 
@@ -458,6 +533,16 @@ class SettingFragment : BaseFragment(), Injectable {
                 (mBinding?.doorModuleSpinner?.adapter as SettingSpinnerAdapter).notifyDataSetChanged()
             }
         }
+
+        if (mPreferences.doorModule == Constants.BLUETOOTH) {
+            // Show bluetooth setting
+            (mBinding?.settingOptionsView?.adapter as SettingAdapter).showBluetooth()
+            (mBinding?.settingOptionsView?.adapter)?.notifyDataSetChanged()
+        } else {
+            // Hide bluetooth setting
+            (mBinding?.settingOptionsView?.adapter as SettingAdapter).hideBluetooth()
+            (mBinding?.settingOptionsView?.adapter)?.notifyDataSetChanged()
+        }
     }
 
     private fun initSwitchView() {
@@ -476,14 +561,12 @@ class SettingFragment : BaseFragment(), Injectable {
     private fun initSetting() {
         oldServerIp = mPreferences.serverIp
         oldWebSocketIp = mPreferences.webSocketIp
-        oldFtpIp = mPreferences.ftpIp
         oldDeviceToken = mPreferences.tabletToken
         oldApplicationMode = mPreferences.applicationMode
         webCamType = mPreferences.webcamType
 
         // connection setting
         mBinding?.serverIpEditText?.setText(mPreferences.serverIp)
-        mBinding?.ftpIpEditText?.setText(mPreferences.ftpIp)
         mBinding?.webSocketIpEditText?.setText(mPreferences.webSocketIp)
         mBinding?.ftpAccountEditText?.setText(mPreferences.ftpAccount)
         mBinding?.ftpPasswordEditText?.setText(mPreferences.ftpPassword)
@@ -508,6 +591,12 @@ class SettingFragment : BaseFragment(), Injectable {
         mBinding?.webcamPasswordEditText?.setText(mPreferences.webcamPassword)
         mBinding?.doorModuleSpinner?.setSelection(mPreferences.doorModule)
 
+        // update cycle setting
+        mBinding?.refreshUserEditText?.setText(mPreferences.updateUserTime.toString())
+        mBinding?.refreshRecordsEditText?.setText(mPreferences.updateRecordTime.toString())
+        mBinding?.refreshOthersEditText?.setText(mPreferences.updateOtherTime.toString())
+        mBinding?.clearCycleEditText?.setText(mPreferences.clearDataTime.toString())
+
         // bluetooth setting
         mBinding?.closeDoorEditText?.setText(mPreferences.closeDoorTimeout.toString())
         mBinding?.closePasswordText?.setText(mPreferences.bluetoothPassword)
@@ -520,11 +609,6 @@ class SettingFragment : BaseFragment(), Injectable {
     private fun checkNewSetting(): Boolean {
         if (mBinding?.serverIpEditText?.text.toString().isEmpty()) {
             Toast.makeText(context!!, getString(R.string.invalid_server_ip), Toast.LENGTH_LONG).show()
-            return false
-        }
-
-        if (mBinding?.ftpIpEditText?.text.toString().isEmpty()) {
-            Toast.makeText(context!!, getString(R.string.invalid_ftp_ip), Toast.LENGTH_LONG).show()
             return false
         }
 
@@ -572,7 +656,6 @@ class SettingFragment : BaseFragment(), Injectable {
     private fun saveSetting() {
         // connection setting
         mPreferences.serverIp = mBinding?.serverIpEditText?.text.toString()
-        mPreferences.ftpIp = mBinding?.ftpIpEditText?.text.toString()
         mPreferences.webSocketIp = mBinding?.webSocketIpEditText?.text.toString()
         mPreferences.ftpAccount = mBinding?.ftpAccountEditText?.text.toString()
         mPreferences.ftpPassword = mBinding?.ftpPasswordEditText?.text.toString()
@@ -595,6 +678,12 @@ class SettingFragment : BaseFragment(), Injectable {
         mPreferences.webcamUsername = mBinding?.webcamUsernameEditText?.text.toString()
         mPreferences.webcamPassword = mBinding?.webcamPasswordEditText?.text.toString()
         mPreferences.doorModule = mBinding?.doorModuleSpinner?.selectedItemPosition ?: 0
+
+        // update cycle setting
+        mPreferences.updateUserTime = mBinding?.refreshUserEditText?.text.toString().toInt()
+        mPreferences.updateRecordTime = mBinding?.refreshRecordsEditText?.text.toString().toInt()
+        mPreferences.updateOtherTime = mBinding?.refreshOthersEditText?.text.toString().toInt()
+        mPreferences.clearDataTime = mBinding?.clearCycleEditText?.text.toString().toInt()
 
         // bluetooth setting
         mPreferences.closeDoorTimeout = mBinding?.closeDoorEditText?.text.toString().toLong()

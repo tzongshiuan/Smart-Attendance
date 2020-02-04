@@ -9,6 +9,7 @@ import android.os.Build
 import com.gorilla.attendance.data.TestData
 import android.util.Base64
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gorilla.attendance.R
@@ -32,6 +33,7 @@ import io.reactivex.subscribers.DisposableSubscriber
 import kotlinx.android.synthetic.main.language_select_dialog.view.*
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.File
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
@@ -79,15 +81,23 @@ class MainViewModel @Inject constructor(
     private var listClockData: Array<ClockData>? = null
 
     private var clockEventJob: Job? = null
-    private var isClockSending = false
+    private var isEnableCoroutine = false
     private val listBufferClockData = ArrayList<ClockData>()
+
+    var isUpdateUser = false
+    private var isUpdateRecord = false
+    private var isUpdateOther = false
+    private var isClearData = false
 
     // toolbar
     val dateTimeData = SingleLiveEvent<ArrayList<String>>()
 
     val languageIdChangeEvent = SingleLiveEvent<Int>()
 
-    private var deviceInit = false
+    private var updateUserCountDown = 0
+    private var updateRecordCountDown = 0
+    private var updateOtherCountDown = 0
+    private var clearDataCountDown = 0
 
     /**
      * Composite four APIs, deviceLogin + getDeviceEmployees + getDeviceVisitors + getDeviceIdentities
@@ -98,7 +108,7 @@ class MainViewModel @Inject constructor(
             override fun onSuccess(value: List<AttendanceDeviceInfoData>) {
                 Timber.d("List<AttendanceDeviceInfoData> size = ${value.size}")
 
-                if (value.isNotEmpty() && deviceInit) {
+                if (value.isNotEmpty()) {
                     val data = value[0]
                     // simple choose the first entity, and update clockData
                     Timber.d("[deviceInit] find match info, to get the update identities, updateTime: ${data.updateTime}")
@@ -128,8 +138,6 @@ class MainViewModel @Inject constructor(
                 Timber.d("deviceInit onNext value = $value")
 
                 deviceLoginData.postValue(value.data)
-
-                deviceInit = true
             }
 
             override fun onError(e: Throwable) {
@@ -189,7 +197,7 @@ class MainViewModel @Inject constructor(
     fun getDeviceEmployees(deviceToken : String?) {
         val disposableObserver = object : DisposableObserver<DeviceEmployees>() {
             override fun onNext(value: DeviceEmployees) {
-                Timber.d("getDeviceEmployees onNext value = $value")
+                //Timber.d("getDeviceEmployees onNext value = $value")
             }
 
             override fun onError(e: Throwable) {
@@ -197,7 +205,7 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceEmployees onComplete")
+                //Timber.d("getDeviceEmployees onComplete")
             }
         }
 
@@ -209,7 +217,7 @@ class MainViewModel @Inject constructor(
     fun getDeviceVisitors(deviceToken: String?) {
         val disposableObserver = object : DisposableObserver<DeviceVisitors>() {
             override fun onNext(value: DeviceVisitors) {
-                Timber.d("getDeviceVisitors onNext value = $value")
+                //Timber.d("getDeviceVisitors onNext value = $value")
             }
 
             override fun onError(e: Throwable) {
@@ -217,7 +225,7 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceVisitors onComplete")
+                //Timber.d("getDeviceVisitors onComplete")
             }
         }
 
@@ -227,14 +235,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun getDeviceIdentities(deviceToken : String?) {
-        Timber.d("getDeviceIdentities()")
+        //Timber.d("getDeviceIdentities()")
 
         // to check whether the current device had downloaded identities before
         val disposableObserver = object : DisposableSingleObserver<List<AttendanceDeviceInfoData>>() {
             override fun onSuccess(value: List<AttendanceDeviceInfoData>) {
-                Timber.d("List<AttendanceDeviceInfoData> size = ${value.size}")
+                //Timber.d("List<AttendanceDeviceInfoData> size = ${value.size}")
 
-                if (value.isNotEmpty() && deviceInit) {
+                if (value.isNotEmpty()) {
                     // simple choose the first entity, and update clockData
                     val data = value[0]
                     Timber.d("[getDeviceIdentities] find match info, to get the update identities, updateTime: ${data.updateTime}")
@@ -248,6 +256,8 @@ class MainViewModel @Inject constructor(
             override fun onError(e: Throwable) {
                 Timber.d("getDeviceInfoData onError e = $e")
                 initialLoad.postValue(NetworkState.error(e.message))
+
+                isUpdateUser = false
             }
         }
 
@@ -271,6 +281,8 @@ class MainViewModel @Inject constructor(
 
             override fun onComplete() {
                 Timber.d("getDeviceIdentities onComplete")
+
+                isUpdateUser = false
             }
         }
 
@@ -280,11 +292,16 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getDeviceIdentitiesAfterTime(deviceToken : String?, updateTime: String?) {
-        Timber.d("getDeviceIdentitiesAfterTime(), updateTime: $updateTime")
+        //Timber.d("getDeviceIdentitiesAfterTime(), updateTime: $updateTime")
 
         val disposableObserver = object : DisposableObserver<DeviceIdentities>() {
-            override fun onNext(value: DeviceIdentities) {
-                Timber.d("getDeviceIdentities onNext value = $value")
+            override fun onNext(identities: DeviceIdentities) {
+                //Timber.d("getDeviceIdentities onNext value = identities")
+
+                if (identities.data?.employees?.size != 0 || identities.data?.visitors?.size != 0) {
+                    Timber.d("Detect device identities had changed.")
+                    mSharedViewModel.toastEvent.postValue(Constants.UPDATE_USER_SUCCESS_MAGIC)
+                }
             }
 
             override fun onError(e: Throwable) {
@@ -292,7 +309,9 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceIdentities onComplete")
+                //Timber.d("getDeviceIdentities onComplete")
+
+                isUpdateUser = false
             }
         }
 
@@ -304,7 +323,7 @@ class MainViewModel @Inject constructor(
     fun getDeviceMarquees(deviceToken : String?) {
         val disposableObserver = object : DisposableObserver<DeviceMarquees>() {
             override fun onNext(value: DeviceMarquees) {
-                Timber.d("getDeviceMarquees onNext value = $value")
+                //Timber.d("getDeviceMarquees onNext value = $value")
             }
 
             override fun onError(e: Throwable) {
@@ -312,7 +331,8 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceMarquees onComplete")
+                //Timber.d("getDeviceMarquees onComplete")
+                mScreenSaverViewModel.syncMarqueesEvent.postValue(true)
             }
         }
 
@@ -324,7 +344,7 @@ class MainViewModel @Inject constructor(
     fun getDeviceMarqueesFromDB(deviceToken : String?) {
         val disposableObserver = object: DisposableSubscriber<DeviceMarqueesData>() {
             override fun onNext(value: DeviceMarqueesData) {
-                Timber.d("getDeviceMarqueesFromDB onNext value = $value")
+                //Timber.d("getDeviceMarqueesFromDB onNext value = $value")
 
                 DeviceUtils.deviceMarquees = value.marquees
             }
@@ -334,7 +354,7 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceMarqueesFromDB onComplete")
+                //Timber.d("getDeviceMarqueesFromDB onComplete")
             }
         }
 
@@ -344,24 +364,30 @@ class MainViewModel @Inject constructor(
     }
 
     fun getDeviceVideos(deviceToken: String?, isFromWebSocket: Boolean = false) {
+        isUpdateOther = true
+
         val disposableObserver = object : DisposableObserver<DeviceVideos>() {
             override fun onNext(value: DeviceVideos) {
-                Timber.d("getDeviceVideos onNext value = $value")
+                //Timber.d("getDeviceVideos onNext value = $value")
 
                 if (isFromWebSocket) {
                     mScreenSaverViewModel.stopVideoEvent.postValue(true)
-                    mVideoManager.updateAllVideos()
+                    mVideoManager.updateAllVideos(mSharedViewModel, mScreenSaverViewModel)
                 } else {
-                    mVideoManager.downloadEmptyVideo()
+                    mVideoManager.downloadEmptyVideo(mSharedViewModel, mScreenSaverViewModel)
                 }
+
+                mScreenSaverViewModel.syncVideosEvent.postValue(true)
             }
 
             override fun onError(e: Throwable) {
                 Timber.d("getDeviceVideos onError e = $e")
+                isUpdateOther = false
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceVideos onComplete")
+                //Timber.d("getDeviceVideos onComplete")
+                isUpdateOther = false
             }
         }
 
@@ -373,7 +399,7 @@ class MainViewModel @Inject constructor(
     fun getDeviceVideosFromDB(deviceToken: String?) {
         val disposableObserver = object: DisposableSubscriber<DeviceVideosData>() {
             override fun onNext(value: DeviceVideosData) {
-                Timber.d("getDeviceVideosFromDB onNext value = $value")
+                //Timber.d("getDeviceVideosFromDB onNext value = $value")
 
                 DeviceUtils.deviceVideos = value.videos
             }
@@ -383,7 +409,7 @@ class MainViewModel @Inject constructor(
             }
 
             override fun onComplete() {
-                Timber.d("getDeviceVideosFromDB onComplete")
+                //Timber.d("getDeviceVideosFromDB onComplete")
             }
         }
 
@@ -428,16 +454,17 @@ class MainViewModel @Inject constructor(
         }
 
         listBufferClockData.clear()
-        isClockSending = false
+        isUpdateRecord = false
     }
 
     /**
      * Since app start, if network is enabled => send clock event to server periodically
      */
     private fun getClockDataFromDB() {
+        //Timber.d("getClockDataFromDB()")
         val disposableSubscriber = object : DisposableSingleObserver<Array<ClockData>>() {
             override fun onSuccess(value: Array<ClockData>) {
-                Timber.d("getClockDataFromDB onSuccess value.size = ${value.size}")
+                //Timber.d("getClockDataFromDB onSuccess value.size = ${value.size}")
                 listClockData = value
                 //clearClockDataFromDB()
                 clockAttendance()
@@ -445,11 +472,12 @@ class MainViewModel @Inject constructor(
 
             override fun onError(e: Throwable) {
                 Timber.d("getClockDataFromDB onError e = $e")
+                isUpdateRecord = false
             }
         }
 
         mCompositeDisposable.add(mMainRepository.getClockData()
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(Schedulers.io())
             .subscribeWith(disposableSubscriber))
     }
 
@@ -478,28 +506,20 @@ class MainViewModel @Inject constructor(
     }
 
     private fun clockAttendance() {
-        Timber.d("clockAttendance()")
+        //Timber.d("clockAttendance()")
 
         if (listClockData?.size == 0) {
             Timber.d("There are no clock data in database.")
+            isUpdateRecord = false
             return
         }
 
         if (!mNetworkChecker.isNetworkAvailable()) {
             Timber.d("Network is offline, do nothing")
+            isUpdateRecord = false
             return
         }
 
-        if (isClockSending) {
-            Timber.d("isClockSending = true, sending and clearing clock data from DB")
-            return
-        }
-
-        if (!MainActivity.SEND_CLOCK_EVENT) {
-            return
-        }
-
-        isClockSending = true
         listClockData?.let {
             val disposableSubscriber = object : DisposableObserver<Boolean>() {
                 override fun onNext(isSuccess: Boolean) {
@@ -518,13 +538,13 @@ class MainViewModel @Inject constructor(
                 }
 
                 override fun onComplete() {
-                    Timber.d("clockAttendance onComplete")
+                    //Timber.d("clockAttendance onComplete")
                 }
             }
 
             mCompositeDisposable.add(
                 mMainRepository.clockAttendance(it)
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(Schedulers.io())
                     .subscribeWith(disposableSubscriber)
             )
         }
@@ -552,7 +572,12 @@ class MainViewModel @Inject constructor(
         if (MainActivity.IS_SKIP_FDR) {
             mSharedViewModel.clockData.faceImg = TestData.FACE_IMAGE
         } else {
-            mSharedViewModel.clockData.faceImg = Base64.encodeToString(DeviceUtils.mFacePngList[0], Base64.DEFAULT)
+            if (DeviceUtils.mFacePngList.size > 0) {
+                mSharedViewModel.clockData.faceImg =
+                    Base64.encodeToString(DeviceUtils.mFacePngList[0], Base64.DEFAULT)
+            } else {
+                mSharedViewModel.clockData.faceImg = "Image Lost"
+            }
         }
         mSharedViewModel.clockData.mode = mSharedViewModel.clockMode
         mSharedViewModel.clockData.recordMode = Constants.RECORD_MODE_RECORD
@@ -572,7 +597,7 @@ class MainViewModel @Inject constructor(
         }
 
         // Save clock event into DB
-        if (isClockSending) {
+        if (isUpdateRecord) {
             Timber.d("Sending clock now...save data to temporary list")
             listBufferClockData.add(ClockData(mSharedViewModel.clockData))
         } else {
@@ -607,7 +632,7 @@ class MainViewModel @Inject constructor(
         mSharedViewModel.clockData.rfid = ""    // temporary set empty string
 
         // Save clock event into DB
-        if (isClockSending) {
+        if (isUpdateRecord) {
             Timber.d("Sending clock now...save data to temporary list")
             listBufferClockData.add(ClockData(mSharedViewModel.clockData))
         } else {
@@ -624,48 +649,171 @@ class MainViewModel @Inject constructor(
     }
 
     private fun showClockDataInfo() {
-        Timber.d("======================================================================")
-        Timber.d("clockData.serial: ${mSharedViewModel.clockData.serial}")
-        Timber.d("clockData.deviceToken: ${mSharedViewModel.clockData.deviceToken}")
-        Timber.d("clockData.id: ${mSharedViewModel.clockData.id}")
-        Timber.d("clockData.securityCode: ${mSharedViewModel.clockData.securityCode}")
-        Timber.d("clockData.deviceTime: ${mSharedViewModel.clockData.deviceTime}")
-        Timber.d("clockData.liveness: ${mSharedViewModel.clockData.liveness}")
-        Timber.d("clockData.faceVerify: ${mSharedViewModel.clockData.faceVerify}")
-        Timber.d("clockData.mode: ${mSharedViewModel.clockData.mode}")
-        Timber.d("clockData.type: ${mSharedViewModel.clockData.type}")
-        Timber.d("clockData.recordMode: ${mSharedViewModel.clockData.recordMode}")
-        Timber.d("clockData.firstName: ${mSharedViewModel.clockData.firstName}")
-        Timber.d("clockData.lastName: ${mSharedViewModel.clockData.lastName}")
-        Timber.d("clockData.intId: ${mSharedViewModel.clockData.intId}")
-        Timber.d("======================================================================")
+        Timber.i("======================================================================")
+        Timber.i("clockData.serial: ${mSharedViewModel.clockData.serial}")
+        Timber.i("clockData.deviceToken: ${mSharedViewModel.clockData.deviceToken}")
+        Timber.i("clockData.id: ${mSharedViewModel.clockData.id}")
+        Timber.i("clockData.securityCode: ${mSharedViewModel.clockData.securityCode}")
+        Timber.i("clockData.deviceTime: ${mSharedViewModel.clockData.deviceTime}")
+        Timber.i("clockData.liveness: ${mSharedViewModel.clockData.liveness}")
+        Timber.i("clockData.faceVerify: ${mSharedViewModel.clockData.faceVerify}")
+        Timber.i("clockData.mode: ${mSharedViewModel.clockData.mode}")
+        Timber.i("clockData.type: ${mSharedViewModel.clockData.type}")
+        Timber.i("clockData.recordMode: ${mSharedViewModel.clockData.recordMode}")
+        Timber.i("clockData.firstName: ${mSharedViewModel.clockData.firstName}")
+        Timber.i("clockData.lastName: ${mSharedViewModel.clockData.lastName}")
+        Timber.i("clockData.intId: ${mSharedViewModel.clockData.intId}")
+        Timber.i("======================================================================")
+    }
+
+    fun resetUpdateCounter() {
+        synchronized(updateUserCountDown) {
+            updateUserCountDown = mPreferences.updateUserTime
+            updateRecordCountDown = mPreferences.updateRecordTime
+            updateOtherCountDown = mPreferences.updateOtherTime
+            clearDataCountDown = mPreferences.clearDataTime * 60
+            Timber.d("restartUpdateCounter(), user: %s, record: %s, other: %s, clear: %s",
+                updateOtherCountDown, updateRecordCountDown, updateOtherCountDown, clearDataCountDown)
+        }
+    }
+
+    fun enableCoroutine() {
+        resetUpdateCounter()
+        isEnableCoroutine = true
+    }
+
+    fun disableCoroutine() {
+        resetUpdateCounter()
+        isEnableCoroutine = false
     }
 
     /**
      * Start the clock event sending coroutine which is sending clock event saved in DB to the server in every periodical time.
      */
     fun startClockEventSendingJob() = GlobalScope.launch(Dispatchers.IO) {
-        Timber.d("startClockEventSendingJob(), application mode: ${mPreferences.applicationMode}")
+        Timber.d("startClockEventSendingJob()")
 
-        if (mPreferences.applicationMode == Constants.VERIFICATION_MODE) {
-            clockEventJob = launch(Dispatchers.IO) {
-                try {
-                    while (true) {
-                        if (!isClockSending) {
-                            Timber.d("Get clock data from DB")
+        clockEventJob = launch(Dispatchers.IO) {
+            try {
+                while (true) {
+                    // control update cycle behaviors here
+                    delay(DeviceUtils.TIMER_DELAYED_TIME)
 
-
-                            getClockDataFromDB()
-                        } else {
-                            Timber.d("Sending clock data to server...")
-                        }
-                        delay(DeviceUtils.SEND_CLOCK_EVENT_TIME)
+                    if (!isEnableCoroutine) {
+                        continue
                     }
-                } catch (e: Exception) {
-                    Timber.d("cancelled clockEventJob, $e")
+
+                    synchronized(updateUserCountDown) {
+                        if (!isUpdateUser) {
+                            updateUserCountDown--
+                        }
+
+                        if (!isUpdateRecord) {
+                            updateRecordCountDown--
+                        }
+
+                        if (!isUpdateOther) {
+                            updateOtherCountDown--
+                        }
+
+                        if (!isClearData) {
+                            clearDataCountDown--
+                        }
+
+                        // Sync employees, visitors and identities
+                        if (updateUserCountDown <= 0) {
+                            if (!isUpdateUser) {
+                                isUpdateUser = true
+                                Timber.d("[UPDATE CYCLE] Update User")
+
+                                if (mNetworkChecker.isNetworkAvailable()) {
+                                    //deleteAllAcceptance()
+                                    getDeviceEmployees(mPreferences.tabletToken)
+                                    getDeviceVisitors(mPreferences.tabletToken)
+                                    getDeviceIdentities(mPreferences.tabletToken)
+                                } else {
+                                    Timber.d("Network is offline, do nothing")
+                                    isUpdateUser = false
+                                }
+                            } else {
+                                Timber.d("isUpdateUser = true, sync user info from server...")
+                            }
+
+                            updateUserCountDown = mPreferences.updateUserTime
+                        }
+
+                        // Sync clock records
+                        if (updateRecordCountDown <= 0) {
+                            if (!isUpdateRecord) {
+                                isUpdateRecord = true
+                                Timber.d("[UPDATE CYCLE] Update Record")
+                                getClockDataFromDB()
+                            } else {
+                                Timber.d("isUpdateRecord = true, Sending clock data to server...")
+                            }
+
+                            updateRecordCountDown = mPreferences.updateRecordTime
+                        }
+
+                        // Sync marquees, videos
+                        if (updateOtherCountDown <= 0) {
+                            if (mVideoManager.isDownloading) {
+                                Timber.d("VideoManager is downloading...")
+                            } else {
+                                if (!isUpdateOther) {
+                                    isUpdateOther = true
+                                    Timber.d("[UPDATE CYCLE] Update Other")
+
+                                    if (mNetworkChecker.isNetworkAvailable()) {
+                                        getDeviceMarquees(mPreferences.tabletToken)
+                                        getDeviceVideos(mPreferences.tabletToken)
+                                    } else {
+                                        Timber.d("Network is offline, do nothing")
+                                        isUpdateOther = false
+                                    }
+                                } else {
+                                    Timber.d("isUpdateOther = true, sync others data from server...")
+                                }
+                            }
+
+                            updateOtherCountDown = mPreferences.updateOtherTime
+                        }
+
+                        // clear local data, currently will clear face images
+                        if (clearDataCountDown <= 0) {
+                            if (!isClearData) {
+                                isClearData = true
+                                Timber.d("[UPDATE CYCLE] Clear Data")
+                                SimpleRxTask.onIoThread {
+                                    clearLocalFaceImages()
+                                }
+                            } else {
+                                Timber.d("isClearData = true, clear data in the local folder")
+                            }
+
+                            clearDataCountDown = mPreferences.clearDataTime * 60
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                Timber.d("cancelled clockEventJob, $e")
             }
         }
+    }
+
+    private fun clearLocalFaceImages() {
+        try {
+            val dir = File(DeviceUtils.SD_CARD_APP_FACE_IMAGE)
+            if (dir.exists()) {
+                val files = dir.listFiles()
+                for (file in files) {
+                    file.delete()
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+        isClearData = false
     }
 
     /**
@@ -676,34 +824,51 @@ class MainViewModel @Inject constructor(
         clockEventJob?.cancel()
     }
 
-    fun updateDateTime() {
-        //mDateTimeHandler.postDelayed(updateTimerThread, DeviceUtils.TIMER_DELAYED_TIME)
-        Completable.complete()
-            .delay(DeviceUtils.TIMER_DELAYED_TIME, TimeUnit.MILLISECONDS)
-            .doOnComplete {
-                //Timber.d("Update date time")
+    fun updateDateTime(isImmediate: Boolean = false) {
+        if (isImmediate) {
+            val listResult = ArrayList<String>()
+            val now = Calendar.getInstance().time
 
-                val listResult = ArrayList<String>()
-                val now = Calendar.getInstance().time
+            // Time
+            var sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+            listResult.add(sdf.format(now))
 
-                // Time
-                var sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-                listResult.add(sdf.format(now))
+            // Date
+            sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            listResult.add(sdf.format(now))
 
-                // Date
-                sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                listResult.add(sdf.format(now))
+            // Day of week
+            sdf = SimpleDateFormat("EEE", Locale.getDefault())
+            listResult.add(sdf.format(now))
 
-                // Day of week
-                sdf = SimpleDateFormat("EEE", Locale.getDefault())
-                listResult.add(sdf.format(now))
+            dateTimeData.postValue(listResult)
+        } else {
+            Completable.complete()
+                .delay(DeviceUtils.TIMER_DELAYED_TIME, TimeUnit.MILLISECONDS)
+                .doOnComplete {
+                    //Timber.d("Update date time")
 
-                dateTimeData.postValue(listResult)
+                    val listResult = ArrayList<String>()
+                    val now = Calendar.getInstance().time
 
-                // continue to update date time
-                updateDateTime()
+                    // Time
+                    var sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    listResult.add(sdf.format(now))
 
-                // TODO customize with different locale
+                    // Date
+                    sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    listResult.add(sdf.format(now))
+
+                    // Day of week
+                    sdf = SimpleDateFormat("EEE", Locale.getDefault())
+                    listResult.add(sdf.format(now))
+
+                    dateTimeData.postValue(listResult)
+
+                    // continue to update date time
+                    updateDateTime()
+
+                    // TODO customize with different locale
 //                if (DeviceUtils.mLocale != null) {
 //                    when {
 //                        DeviceUtils.mLocale.equals(Constants.LOCALE_EN) -> {
@@ -718,8 +883,9 @@ class MainViewModel @Inject constructor(
 //                        else -> sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 //                    }
 //                }
-            }
-            .subscribe()
+                }
+                .subscribe()
+        }
     }
 
     /*******************************************************************************************************************
@@ -729,16 +895,16 @@ class MainViewModel @Inject constructor(
         ImageUtils.saveImages(DeviceUtils.mFacePngList.size, DeviceUtils.mFacePngList, "face-success")
         mSharedViewModel.clockData.faceVerify = Constants.FACE_VERIFY_SUCCEED
 
-        Timber.d("sharedViewModel.clockModule= ${mSharedViewModel.clockModule}")
-        Timber.d("sharedViewModel.clockMode = ${mSharedViewModel.clockMode}")
+        Timber.i("sharedViewModel.clockModule= ${mSharedViewModel.clockModule}")
+        Timber.i("sharedViewModel.clockMode = ${mSharedViewModel.clockMode}")
 
         if (MainActivity.IS_SKIP_FDR) {
             DeviceUtils.mFacePngList.add(TestData.FACE_BYTE_ARRAY)
         }
 
-        initialLoad.value = NetworkState.LOADING
-
         if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
+            initialLoad.value = NetworkState.LOADING
+
             // Registration
             if (mNetworkChecker.isNetworkAvailable()) {
                 userRegistration()
@@ -757,7 +923,9 @@ class MainViewModel @Inject constructor(
                 onlineFaceVerification()
             } else {
                 // Do offline verification (through ROOM database)
-                offlineFaceVerification()
+                SimpleRxTask.onIoThread {
+                    offlineFaceVerification()
+                }
             }
         }
     }
@@ -1059,6 +1227,15 @@ class MainViewModel @Inject constructor(
             }
 
             if (mSharedViewModel.clockAcceptances?.intId != null) {
+//                while (mIdentifyManager.isInitSingleIdentifier) {
+//                    Timber.d("still init visitor single identify")
+//                    Thread.sleep(1000)
+//                }
+//                mIdentifyManager.mSingleVisitorIdentify?.search(faceList, candidateList, decision)
+
+                val array = IntArray(1)
+                array[0] = mSharedViewModel.clockAcceptances?.intId!!
+                mIdentifyManager.mIdentifyVisitors?.identifyActiveID(1, array)
                 mIdentifyManager.mIdentifyVisitors?.search(
                     faceList, mSharedViewModel.clockAcceptances?.intId!!, candidateList, decision
                 )
@@ -1074,7 +1251,17 @@ class MainViewModel @Inject constructor(
                 return
             }
 
-            if (mSharedViewModel.clockAcceptances?.intId != null) {
+            if (mSharedViewModel.clockMode != SharedViewModel.MODE_FACE_IDENTIFICATION
+                && mSharedViewModel.clockAcceptances?.intId != null) {
+//                while (mIdentifyManager.isInitSingleIdentifier) {
+//                    Timber.d("still init employee single identify")
+//                    Thread.sleep(300)
+//                }
+//                mIdentifyManager.mSingleEmployeeIdentify?.search(faceList, candidateList, decision)
+
+                val array = IntArray(1)
+                array[0] = mSharedViewModel.clockAcceptances?.intId!!
+                mIdentifyManager.mIdentifyEmployees?.identifyActiveID(1, array)
                 mIdentifyManager.mIdentifyEmployees?.search(
                     faceList, mSharedViewModel.clockAcceptances?.intId!!, candidateList, decision
                 )
@@ -1099,21 +1286,21 @@ class MainViewModel @Inject constructor(
                 && candidateList[0]?.template_id != null) {
                 getAcceptanceFromIntId(candidateList[0]?.template_id!!)
             } else {
-                if (mSharedViewModel.clockAcceptances?.intId == candidateList[0]?.template_id) {
+//                if (mSharedViewModel.clockAcceptances?.intId == candidateList[0]?.template_id) {
                     Timber.d("Offline face verification success")
                     onReceiveFdrResult(Constants.FDR_VERIFY_SUCCESS)
-                    initialLoad.value = NetworkState.LOADED
-                } else {
-                    Timber.d("Offline face verification failed, unmatch intId !!")
-                    onReceiveFdrResult(Constants.FDR_VERIFY_FAILED)
-                    initialLoad.value = NetworkState.LOADED
-                }
+                    initialLoad.postValue(NetworkState.LOADED)
+//                } else {
+//                    Timber.d("Offline face verification failed, unmatch intId !!")
+//                    onReceiveFdrResult(Constants.FDR_VERIFY_FAILED)
+//                    initialLoad.value = NetworkState.LOADED
+//                }
             }
         } else {
             // verify failed
             Timber.d("Offline face verification failed")
             onReceiveFdrResult(Constants.FDR_VERIFY_FAILED)
-            initialLoad.value = NetworkState.LOADED
+            initialLoad.postValue(NetworkState.LOADED)
         }
     }
 
@@ -1155,6 +1342,7 @@ class MainViewModel @Inject constructor(
                     mSharedViewModel.clockAcceptances = value[0]
                     onReceiveFdrResult(Constants.FDR_VERIFY_SUCCESS)
                 } else {
+                    mIdentifyManager.removeEmployee(intId)
                     onReceiveFdrResult(Constants.FDR_VERIFY_FAILED)
                 }
 
@@ -1249,36 +1437,53 @@ class MainViewModel @Inject constructor(
 
         RxView.clicks(view.chSimText)
             .debounce(500, TimeUnit.MILLISECONDS)
+            .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
             .subscribe {
                 if (mPreferences.languageId != LANGUAGE_CH_SIM) {
                     Timber.d("[Language Change] Simplified Chinese")
                     changeLanguageConfig(context, LANGUAGE_CH_SIM)
                     languageIdChangeEvent.postValue(LANGUAGE_CH_SIM)
                     dialog.dismiss()
+
+                    showChangeLanguageHint(context)
                 }
             }
 
         RxView.clicks(view.chTraText)
             .debounce(500, TimeUnit.MILLISECONDS)
+            .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
             .subscribe {
                 if (mPreferences.languageId != LANGUAGE_CH_TRA) {
                     Timber.d("[Language Change] Traditional Chinese")
                     changeLanguageConfig(context, LANGUAGE_CH_TRA)
                     languageIdChangeEvent.postValue(LANGUAGE_CH_TRA)
                     dialog.dismiss()
+
+                    showChangeLanguageHint(context)
                 }
             }
 
         RxView.clicks(view.enText)
             .debounce(500, TimeUnit.MILLISECONDS)
+            .observeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
             .subscribe {
                 if (mPreferences.languageId != LANGUAGE_EN) {
                     Timber.d("[Language Change] English")
                     changeLanguageConfig(context, LANGUAGE_EN)
                     languageIdChangeEvent.postValue(LANGUAGE_EN)
                     dialog.dismiss()
+
+                    showChangeLanguageHint(context)
                 }
             }
+    }
+
+    private fun showChangeLanguageHint(context: Context) {
+        Toast.makeText(context, context.getString(R.string.restart_from_language_hint), Toast.LENGTH_LONG).show()
+
+        SimpleRxTask.after(2000L) {
+            mSharedViewModel.restartAppEvent.postValue(true)
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -1316,7 +1521,7 @@ class MainViewModel @Inject constructor(
             context.applicationContext.resources.updateConfiguration(config, context.resources.displayMetrics)
         }
 
-        //(context as Activity).recreate()    // if need to update language immediately
+        //mSharedViewModel.updateLanguageEvent.postValue(true)    // if need to update language immediately
     }
 
     override fun onCleared() {

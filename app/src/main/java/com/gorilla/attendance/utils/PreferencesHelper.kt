@@ -12,12 +12,12 @@ interface PreferencesHelper {
 
     // connection setting
     var serverIp: String
-    var ftpIp: String
     var webSocketIp: String
     var ftpAccount: String
     var ftpPassword: String
     var tabletName: String
     var tabletToken: String
+    var isLoginFinish: Boolean
 
     // function setting
     var idleTime: Long
@@ -34,10 +34,18 @@ interface PreferencesHelper {
     var webcamUrl: String
     var webcamUsername: String
     var webcamPassword: String
+
+    // linked setting 2
     var doorModule: Int
+    var closeDoorTimeout: Long
+
+    // update cycle setting
+    var updateUserTime: Int
+    var updateRecordTime: Int
+    var updateOtherTime: Int
+    var clearDataTime: Int
 
     // bluetooth setting
-    var closeDoorTimeout: Long
     var bluetoothPassword: String
     var bluetoothAddress: String
     var bluetoothDeviceName: String

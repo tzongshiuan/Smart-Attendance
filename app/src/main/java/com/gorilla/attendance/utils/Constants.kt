@@ -15,6 +15,8 @@ object Constants {
 
     const val PERMISSION_DENY_CLOSE_TIME = 3000L
 
+    const val UPDATE_USER_SUCCESS_MAGIC = "000001"
+
     /**
      * Default values
      */
@@ -100,6 +102,12 @@ object Constants {
     // linked setting
     const val DEFAULT_WEB_CAM = ANDROID_BUILD_IN_LENS
     const val DEFAULT_DOOR_MODULE = BLUETOOTH
+
+    // update cycle setting
+    const val DEFAULT_UPDATE_USER_TIME = 60     // secs
+    const val DEFAULT_UPDATE_RECORD_TIME = 10   // secs
+    const val DEFAULT_UPDATE_OTHER_TIME = 60    // secs
+    const val DEFAULT_CLEAR_DATA_TIME = 5   // min
 
     // bluetooth setting
     const val DEFAULT_CLOSE_DOOR_TIMEOUT = 5L

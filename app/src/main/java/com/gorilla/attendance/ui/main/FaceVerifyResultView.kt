@@ -13,7 +13,7 @@ import com.gorilla.attendance.utils.*
 import com.gorilla.attendance.utils.rxCountDownTimer.RxCountDownTimer
 import com.jakewharton.rxbinding.view.RxView
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_main.view.*
+import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,7 +43,7 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
 
     private var mBinding: FaceVerifyResultLayoutBinding? = null
 
-    private var countDownDisposoble: Disposable? = null
+    private var countDownDisposable: Disposable? = null
     private var isCountDownStart = false
 
     private lateinit var mPreferences: PreferencesHelper
@@ -80,6 +80,16 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         set(value) {
             if (value != null) {
                 mBinding?.userImage?.setImageBitmap(
+                    ImageUtils.getBitmapFromBytes(value)
+                )
+            }
+            field = value
+        }
+
+    var registerUserImage: ByteArray? = null
+        set(value) {
+            if (value != null) {
+                mBinding?.registerUserImage?.setImageBitmap(
                     ImageUtils.getBitmapFromBytes(value)
                 )
             }
@@ -141,43 +151,14 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         initListeners()
     }
 
-    private fun updateLayoutUI() {
-        // Change margin
-        when (mPreferences.applicationMode) {
-            Constants.REGISTER_MODE -> {
-                val newLayoutParams1 = mBinding?.unknownResultLayout?.layoutParams as LayoutParams
-                newLayoutParams1.topMargin = resources.getDimension(R.dimen.fdr_result_margin).toInt()
-                mBinding?.unknownResultLayout?.layoutParams = newLayoutParams1
-
-                val newLayoutParams2 = mBinding?.successResultLayout?.layoutParams as LayoutParams
-                newLayoutParams2.topMargin = resources.getDimension(R.dimen.fdr_result_margin).toInt()
-                mBinding?.successResultLayout?.layoutParams = newLayoutParams2
-
-                mBinding?.dateTimeGroup?.visibility = View.GONE
-            }
-
-            Constants.VERIFICATION_MODE -> {
-                val newLayoutParams1 = mBinding?.unknownResultLayout?.layoutParams as LayoutParams
-                newLayoutParams1.topMargin = 0
-                mBinding?.unknownResultLayout?.layoutParams = newLayoutParams1
-
-                val newLayoutParams2 = mBinding?.successResultLayout?.layoutParams as LayoutParams
-                newLayoutParams2.topMargin = 0
-                mBinding?.successResultLayout?.layoutParams = newLayoutParams2
-
-                mBinding?.dateTimeGroup?.visibility = View.VISIBLE
-            }
-        }
-    }
-
     fun setRetrainModeUI(sharedViewModel: SharedViewModel, preferences: PreferencesHelper) {
-        Timber.d("setRetrainModeUI()")
+        Timber.d("setRetrainModeUI(), module: ${sharedViewModel.clockModule}")
+
         mPreferences = preferences
-        updateLayoutUI()
 
         mBinding?.unknownResultLayout?.visibility = View.GONE
+        mBinding?.registerLayout?.visibility = View.GONE
         mBinding?.successResultLayout?.visibility = View.GONE
-        mBinding?.checkOptionLayout?.visibility = View.GONE
         mBinding?.retrainLayout?.visibility = View.VISIBLE
     }
 
@@ -185,11 +166,9 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         Timber.d("setFailedUI(), module: ${sharedViewModel.clockModule}, check mode: ${preferences.checkMode}")
         mPreferences = preferences
 
-        updateLayoutUI()
-
         mBinding?.unknownResultLayout?.visibility = View.VISIBLE
+        mBinding?.registerLayout?.visibility = View.GONE
         mBinding?.successResultLayout?.visibility = View.GONE
-        mBinding?.checkOptionLayout?.visibility = View.GONE
         mBinding?.retrainLayout?.visibility = View.GONE
 
         startHoldResultCountDown()
@@ -199,9 +178,8 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         Timber.d("setVerifySuccessUI(), module: ${sharedViewModel.clockModule}, check mode: ${preferences.checkMode}")
         mPreferences = preferences
 
-        updateLayoutUI()
-
         mBinding?.unknownResultLayout?.visibility = View.GONE
+        mBinding?.registerLayout?.visibility = View.GONE
         mBinding?.successResultLayout?.visibility = View.VISIBLE
         mBinding?.retrainLayout?.visibility = View.GONE
 
@@ -211,23 +189,20 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
              */
             when (preferences.checkMode) {
                 Constants.CHECK_IN -> {
-                    mBinding?.checkOptionLayout?.visibility = View.GONE
                     mBinding?.timeoutTextView?.visibility = View.INVISIBLE
                     clockTypeLiveEvent.postValue(CLOCK_ARRIVE)
                     startHoldResultCountDown()
                 }
 
                 Constants.CHECK_OUT -> {
-                    mBinding?.checkOptionLayout?.visibility = View.GONE
                     mBinding?.timeoutTextView?.visibility = View.INVISIBLE
                     clockTypeLiveEvent.postValue(CLOCK_LEAVE)
                     startHoldResultCountDown()
                 }
 
                 Constants.CHECK_OPTION -> {
-                    mBinding?.checkOptionLayout?.visibility = View.VISIBLE
-                    mBinding?.employeeOptionGroup?.visibility = View.GONE
-                    mBinding?.visitorOptionGroup?.visibility = View.VISIBLE
+                    mBinding?.isShowEmployeeBtn = false
+                    mBinding?.isShowVisitorBtn = true
 
                     // start user clock timeout
                     mBinding?.timeoutTextView?.visibility = View.VISIBLE
@@ -240,23 +215,20 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
              */
             when (preferences.checkMode) {
                 Constants.CHECK_IN -> {
-                    mBinding?.checkOptionLayout?.visibility = View.GONE
                     mBinding?.timeoutTextView?.visibility = View.INVISIBLE
                     clockTypeLiveEvent.postValue(CLOCK_CHECK_IN)
                     startHoldResultCountDown()
                 }
 
                 Constants.CHECK_OUT -> {
-                    mBinding?.checkOptionLayout?.visibility = View.GONE
                     mBinding?.timeoutTextView?.visibility = View.INVISIBLE
                     clockTypeLiveEvent.postValue(CLOCK_CHECK_OUT)
                     startHoldResultCountDown()
                 }
 
                 Constants.CHECK_OPTION -> {
-                    mBinding?.checkOptionLayout?.visibility = View.VISIBLE
-                    mBinding?.employeeOptionGroup?.visibility = View.VISIBLE
-                    mBinding?.visitorOptionGroup?.visibility = View.GONE
+                    mBinding?.isShowEmployeeBtn = true
+                    mBinding?.isShowVisitorBtn = false
 
                     // start user clock timeout
                     mBinding?.timeoutTextView?.visibility = View.VISIBLE
@@ -268,32 +240,32 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
 
     fun setRegisterSuccessUI(sharedViewModel: SharedViewModel, registerViewModel: RegisterViewModel
                              , preferences: PreferencesHelper) {
-        Timber.d("setVerifySuccessUI(), module: ${sharedViewModel.clockModule}")
+        Timber.d("setRegisterSuccessUI(), module: ${sharedViewModel.clockModule}")
         mPreferences = preferences
-
-        updateLayoutUI()
 
         when (sharedViewModel.clockModule) {
             SharedViewModel.MODULE_VISITOR -> {
-                mBinding?.userNameText?.text = String.format("%s: %s",
+                mBinding?.registerUserNameText?.text = String.format("%s: %s",
                     resources.getString(R.string.result_visitor_name), registerViewModel.visitorRegisterData?.name)
-                mBinding?.welcomeLabel?.text = String.format("%s: %s",
+                mBinding?.registerWelcomeLabel?.text = String.format("%s: %s",
                     resources.getString(R.string.result_visitor_phone), registerViewModel.visitorRegisterData?.mobileNo)
             }
 
             else -> {
-                mBinding?.userNameText?.text = String.format("%s: %s",
+                mBinding?.registerUserNameText?.text = String.format("%s: %s",
                     resources.getString(R.string.result_employee_name), registerViewModel.employeeRegisterData?.name)
-                mBinding?.welcomeLabel?.text = String.format("%s: %s",
+                mBinding?.registerWelcomeLabel?.text = String.format("%s: %s",
                     resources.getString(R.string.result_employee_id), registerViewModel.employeeRegisterData?.employeeId)
             }
         }
 
         mBinding?.unknownResultLayout?.visibility = View.GONE
-        mBinding?.successResultLayout?.visibility = View.VISIBLE
-        mBinding?.checkOptionLayout?.visibility = View.GONE
-        mBinding?.timeoutTextView?.visibility = View.INVISIBLE
+        mBinding?.successResultLayout?.visibility = View.GONE
         mBinding?.retrainLayout?.visibility = View.GONE
+        mBinding?.isShowEmployeeBtn = false
+        mBinding?.isShowVisitorBtn = false
+
+        mBinding?.registerLayout?.visibility = View.VISIBLE
 
         startHoldResultCountDown()
     }
@@ -304,10 +276,10 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
     private fun startHoldResultCountDown() {
         Timber.d("startHoldResultCountDown()")
 
-        countDownDisposoble = RxCountDownTimer.create(mPreferences.holdResultTime, mPreferences.holdResultTime)
+        countDownDisposable = RxCountDownTimer.create(mPreferences.holdResultTime, mPreferences.holdResultTime)
             .subscribe {millisUntilFinished ->
                 if (millisUntilFinished == 0L) {
-                    Timber.d("CountDown: $millisUntilFinished (milli-secs)")
+                    Timber.i("CountDown: $millisUntilFinished (milli-secs)")
                     clockTypeLiveEvent.postValue(CLOCK_HOLD_RESULT_TIMEOUT)
                 }
             }
@@ -320,9 +292,9 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         Timber.d("startInterActionCountDown()")
 
         isCountDownStart = true
-        countDownDisposoble = RxCountDownTimer.create(DeviceUtils.CHOOSE_CLOCK_TYPE_TIME, 500)
+        countDownDisposable = RxCountDownTimer.create(DeviceUtils.CHOOSE_CLOCK_TYPE_TIME, 500)
             .subscribe {millisUntilFinished ->
-                Timber.d("CountDown: $millisUntilFinished (milli-secs)")
+                Timber.i("CountDown: $millisUntilFinished (milli-secs)")
 
                 val text = String.format(context.getString(R.string.face_timeout_str_fmt), millisUntilFinished/1000)
                 mBinding?.timeoutTextView?.text = text
@@ -343,11 +315,12 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         mBinding?.checkInBtn?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     synchronized(isCountDownStart) {
                         if (isCountDownStart) {
                             isCountDownStart = false
-                            countDownDisposoble?.dispose()
+                            countDownDisposable?.dispose()
                             clockTypeLiveEvent.postValue(CLOCK_CHECK_IN)
                             hideFaceResultView.postValue(true)
                         }
@@ -358,11 +331,12 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         mBinding?.checkOutBtn?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     synchronized(isCountDownStart) {
                         if (isCountDownStart) {
                             isCountDownStart = false
-                            countDownDisposoble?.dispose()
+                            countDownDisposable?.dispose()
                             clockTypeLiveEvent.postValue(CLOCK_CHECK_OUT)
                             hideFaceResultView.postValue(true)
                         }
@@ -373,11 +347,12 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         mBinding?.passBtn?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     synchronized(isCountDownStart) {
                         if (isCountDownStart) {
                             isCountDownStart = false
-                            countDownDisposoble?.dispose()
+                            countDownDisposable?.dispose()
                             clockTypeLiveEvent.postValue(CLOCK_PASS)
                             hideFaceResultView.postValue(true)
                         }
@@ -388,11 +363,12 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         mBinding?.arriveBtn?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     synchronized(isCountDownStart) {
                         if (isCountDownStart) {
                             isCountDownStart = false
-                            countDownDisposoble?.dispose()
+                            countDownDisposable?.dispose()
                             clockTypeLiveEvent.postValue(CLOCK_ARRIVE)
                             hideFaceResultView.postValue(true)
                         }
@@ -403,11 +379,12 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         mBinding?.leaveBtn?.let {
             RxView.clicks(it)
                 .debounce(300, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     synchronized(isCountDownStart) {
                         if (isCountDownStart) {
                             isCountDownStart = false
-                            countDownDisposoble?.dispose()
+                            countDownDisposable?.dispose()
                             clockTypeLiveEvent.postValue(CLOCK_LEAVE)
                             hideFaceResultView.postValue(true)
                         }
@@ -420,7 +397,7 @@ open class FaceVerifyResultView(context: Context, attrs: AttributeSet) : Constra
         super.setVisibility(visibility)
 
         if (visibility == View.GONE) {
-            countDownDisposoble?.dispose()
+            countDownDisposable?.dispose()
         }
     }
 }

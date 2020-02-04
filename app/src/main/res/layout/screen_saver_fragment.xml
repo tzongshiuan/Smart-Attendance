@@ -81,21 +81,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintVertical_bias="0.48"/>
 
-        <com.gorilla.attendance.ui.common.MarqueeTextView
-                android:id="@+id/marqueeText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                tools:text="marquee test marquee test marquee test marquee test marquee test marquee test"
-                android:elevation="16dp"
-                android:textSize="@dimen/toolbar_subtitle_text_size"
-                android:textColor="@color/toolbar_text_color"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/splitLine"/>
-
         <TextView
                 android:id="@+id/touchHintText"
                 android:layout_width="wrap_content"
@@ -114,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 tools:visibility="visible"
-                app:constraint_referenced_ids="commonLayout, splitLine, marqueeText, touchHintText"/>
+                app:constraint_referenced_ids="commonLayout,splitLine,touchHintText"/>
 
         <!--Video screen saver, show this when there are video file in the SD card path -->
         <RelativeLayout
@@ -122,6 +107,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
+
+        <ImageView
+                android:id="@+id/marqueeLine"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:src="@mipmap/marquee_line"
+                app:layout_constraintBottom_toTopOf="@+id/marqueeBackground"/>
+
+        <View
+                android:id="@+id/marqueeBackground"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="10dp"
+                android:alpha="0.2"
+                android:background="@drawable/marquee_bg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.gorilla.attendance.ui.common.MarqueeTextView
+                android:id="@+id/marqueeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="marquee test marquee test marquee test marquee test marquee test marquee test"
+                android:elevation="16dp"
+                android:textSize="@dimen/toolbar_title_text_size"
+                android:textColor="@color/marquee"
+                android:alpha="0.6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/marqueeBackground"
+                app:layout_constraintBottom_toBottomOf="@+id/marqueeBackground"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

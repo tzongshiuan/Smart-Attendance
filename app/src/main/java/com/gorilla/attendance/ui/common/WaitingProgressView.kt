@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import com.gorilla.attendance.R
+import com.gorilla.attendance.databinding.WaitingProgressLayoutBinding
 import kotlin.math.abs
 
 /**
@@ -22,7 +23,6 @@ open class WaitingProgressView(context: Context, attrs: AttributeSet) : Constrai
         private const val STATUS_FADE_OUT = 1
         private const val STATUS_NORMAL = 2
 
-        private var mInflater: LayoutInflater? = null
         private var mLock: Any? = null
         private var mStatus = STATUS_NORMAL
         private var mBaseAlpha: Float = 0.toFloat()
@@ -33,9 +33,11 @@ open class WaitingProgressView(context: Context, attrs: AttributeSet) : Constrai
         this.initView(context)
     }
 
+    private var mBinding: WaitingProgressLayoutBinding? = null
+
     open fun initView(context: Context) {
-        mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        mInflater?.inflate(R.layout.waiting_progress_layout, this)
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        mBinding = WaitingProgressLayoutBinding.inflate(inflater, this, true)
     }
 
     fun setVisibleImmediate(visibility: Int) {
@@ -127,6 +129,10 @@ open class WaitingProgressView(context: Context, attrs: AttributeSet) : Constrai
             })
             startAnimation(ani)
         }
+    }
+
+    fun setWaitingText(text: String) {
+        mBinding?.waitingText?.text = text
     }
 
     open inner class MyAnimation(context: Context, attributeSet: AttributeSet?) : Animation(context, attributeSet) {

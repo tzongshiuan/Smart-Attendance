@@ -58,6 +58,7 @@ class RFIDViewModel @Inject constructor(
                         }
                         if (employee.isNotEmpty()) {
                             mSharedViewModel.clockAcceptances = employee[0]
+                            mSharedViewModel.initSingleIdentifier()
                             verifyCodeResult.postValue(VERIFY_RFID_SUCCESS)
                         } else {
                             Timber.d("[Employee] user not found")

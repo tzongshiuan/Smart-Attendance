@@ -25,8 +25,6 @@ import java.util.*
 object DeviceUtils {
     const val TIMER_DELAYED_TIME = 1000L  // 1 second
 
-    const val SEND_CLOCK_EVENT_TIME = 120000L   // 2 minutes
-
     const val ENTER_SETTING_CLICK_NUM = 5   // 5 times
     const val ENTER_SETTING_INTERVAL_TIME = 3000L  // 3 seconds
 
@@ -58,14 +56,13 @@ object DeviceUtils {
     const val BLUETOOTH_CHECK_INTERVAL_TIME = 5000L
 
 
-    val SD_CARD_APP = Environment.getExternalStorageDirectory().absolutePath + "/AttendanceEnterprise"
+    val SD_CARD_APP = Environment.getExternalStorageDirectory().absolutePath + "/SmartAttendance"
     val SD_CARD_APP_CONTENT = "$SD_CARD_APP/content"
     val SD_CARD_APP_APK = "$SD_CARD_APP/Apk"
     val SD_CARD_APP_LOG = "$SD_CARD_APP/log"
     val SD_CARD_APP_FACE_IMAGE = "$SD_CARD_APP/FACE_Images"
 
 
-    var mIsLivenessOn = false
     val mFacePngList: ArrayList<ByteArray> = ArrayList()
     val VERIFIED_CANDIDATE_NUMBER = 1
     var mFdrRange = 80
@@ -132,6 +129,7 @@ object DeviceUtils {
         createFolder(APP_OBB_FOLDER)
         createFolder(APP_INTERNAL_BIN_FOLDER)
         createFolder(APP_PHOTO_FOLDER)
+        createFolder(SD_CARD_APP_CONTENT)
         Timber.log(Log.DEBUG, "APP_FOLDER, path: $APP_FOLDER")
         Timber.log(Log.DEBUG, "APP_OBB_FOLDER, path: $APP_OBB_FOLDER")
         Timber.log(Log.DEBUG, "APP_INTERNAL_BIN_FOLDER, path: $APP_INTERNAL_BIN_FOLDER")

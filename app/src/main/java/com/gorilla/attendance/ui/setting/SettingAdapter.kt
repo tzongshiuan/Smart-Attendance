@@ -29,7 +29,7 @@ class SettingAdapter(val context: Context) : RecyclerView.Adapter<SettingAdapter
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Timber.d("onCreateViewHolder()")
+        //Timber.d("onCreateViewHolder()")
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = SettingOptionItemBinding.inflate(layoutInflater, parent, false)
         return ViewHolder(binding)
@@ -60,7 +60,7 @@ class SettingAdapter(val context: Context) : RecyclerView.Adapter<SettingAdapter
                 binding.optionLayout.background = null
             }
 
-            if (position == 3 && !isShowBluetoothSetting) {
+            if (position == 5 && !isShowBluetoothSetting) {
                 binding.optionLayout.visibility = View.GONE
             } else {
                 binding.optionLayout.visibility = View.VISIBLE

@@ -40,6 +40,9 @@ class WebSocket: WebSocketClient {
     val stateEventSubject = PublishSubject.create<Int>() ?: null
     val syncEventSubject = PublishSubject.create<String>() ?: null
 
+    private var isEnableCounter = false
+    private var connectCounter = 0
+
     constructor(serverUri: URI, draft: Draft, headers: Map<String, String>?, timeOut: Long, context: Context, deviceToken: String)
             : super(serverUri, draft, headers, timeOut.toInt()) {
 
@@ -69,7 +72,6 @@ class WebSocket: WebSocketClient {
 
     private fun sendMessage(message: String) {
         //Timber.d("sendMessage(), message: $message")
-        //send("deviceToken $mDeviceToken")
         send(message)
     }
 
@@ -77,13 +79,11 @@ class WebSocket: WebSocketClient {
         Timber.d("onOpen(), handshakeData: $handshakeData, deviceToken: $mDeviceToken")
 
         sendMessage("deviceToken $mDeviceToken")
-        sendMessage("deviceToken $mDeviceToken")
-        sendMessage("deviceToken $mDeviceToken")
-        sendMessage("deviceToken $mDeviceToken")
-        sendMessage("deviceToken $mDeviceToken")
 
         SimpleRxTask.cancelSubscriber(disconnectSubscriber)
-        stateEventSubject?.onNext(STATE_WEB_SOCKET_CONNECT)
+
+        // must send CONNECT event after receive valid socket message from server
+        startConnectCounter()
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -102,23 +102,32 @@ class WebSocket: WebSocketClient {
         }
 
         if (!message.contains("map_session_id")) {
-            Timber.d("onMessage(), web socket message: $message")
+            Timber.i("onMessage(), web socket message: $message")
         }
 
         if (message.contains("map_session_id")) {
             if (message.contains("0")) {
-                sendMessage("deviceToken $mDeviceToken")
-                sendMessage("deviceToken $mDeviceToken")
                 sendMessage("map_session_id ok")
             } else {
                 // Disconnect
                 sendDisconnectEvent()
             }
+
+            if (isEnableCounter) {
+//                connectCounter--
+//                if (connectCounter <= 0) {
+                    isEnableCounter = false
+                    stateEventSubject?.onNext(STATE_WEB_SOCKET_CONNECT)
+//                }
+            }
         } else {
-            sendMessage("deviceToken $mDeviceToken")
-            sendMessage("deviceToken $mDeviceToken")
             sendMessage("$message ok")
             syncEventSubject?.onNext(message)
         }
+    }
+
+    private fun startConnectCounter() {
+        isEnableCounter = true
+        connectCounter = 5
     }
 }

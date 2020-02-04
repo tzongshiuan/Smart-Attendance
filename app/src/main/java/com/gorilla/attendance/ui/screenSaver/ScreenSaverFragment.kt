@@ -13,7 +13,7 @@ import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.common.BaseFragment
 import com.gorilla.attendance.ui.common.FootBarBaseInterface
 import com.gorilla.attendance.ui.main.MainActivity
-import com.gorilla.attendance.utils.Constants
+import com.gorilla.attendance.ui.main.MainViewModel
 import com.gorilla.attendance.utils.DeviceUtils
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -30,6 +30,8 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             R.mipmap.bg_screen_saver_1,
             R.mipmap.bg_screen_saver_2
         )
+
+        var isScreenSaverActive = false
     }
 
     private var mBinding: ScreenSaverFragmentBinding? = null
@@ -41,6 +43,8 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     private var mVideoFilePath: String? = null
 
     private var mMediaPlayer: MediaPlayer? = null
+
+    private var preMarqueeText: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,31 +72,35 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         initUI()
 
         initViewModelObservers()
+
+        mFdrManager.stopFdr()
+        (activity as MainActivity).setToolbarVisible(false)
     }
 
     override fun onStart() {
         super.onStart()
         Timber.d("onStart()")
-
-        (activity as MainActivity).setToolbarVisible(false)
     }
 
     override fun onResume() {
         super.onResume()
         Timber.d("onResume()")
+
+        isScreenSaverActive = true
     }
 
     override fun onStop() {
         super.onStop()
         Timber.d("onStop()")
-
-        destroyMediaPlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("onDestroy()")
 
+        destroyMediaPlayer()
+
+        isScreenSaverActive = false
         (activity as MainActivity).setToolbarVisible(true)
     }
 
@@ -119,6 +127,45 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 stopVideo()
             }
         })
+
+        screenSaverViewModel.syncMarqueesEvent.observe(this, Observer {
+            if (mBinding?.videoLayout?.visibility == View.VISIBLE) {
+                showMarquees()
+            }
+        })
+
+        screenSaverViewModel.syncVideosEvent.observe(this, Observer {
+            try {
+                if (screenSaverViewModel.isAllVideosExist()) {
+                    if (mBinding?.videoLayout?.visibility == View.GONE) {
+                        mVideoFilePath = screenSaverViewModel.getVideoFilePath()
+                        if (mVideoFilePath != null) {
+                            showVideoScreenSaverUI()
+                        }
+                    } else {
+                        // change video dynamically
+                        updatePlayingVideo()
+                    }
+                } else {
+                    if (mBinding?.videoLayout?.visibility == View.VISIBLE) {
+                        showCommonScreenSaverUI()
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        })
+    }
+
+    private fun updatePlayingVideo() {
+        val videoFilePath = screenSaverViewModel.getVideoFilePath()
+        if (mVideoFilePath != videoFilePath && videoFilePath != null) {
+            mMediaPlayer?.stop()
+            mMediaPlayer?.reset()
+            mMediaPlayer?.setDataSource(videoFilePath)
+            mMediaPlayer?.prepareAsync()
+            mVideoFilePath = videoFilePath
+        }
     }
 
     private fun stopVideo() {
@@ -132,8 +179,6 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         destroyMediaPlayer()
 
         showCommonScreenSaverUI()
-
-        mIsVideoPlaying = false
     }
 
     /**
@@ -148,6 +193,9 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
 
         mBinding?.commonGroup?.visibility = View.GONE
         mBinding?.videoLayout?.visibility = View.VISIBLE
+        mBinding?.marqueeBackground?.visibility = View.VISIBLE
+        mBinding?.marqueeLine?.visibility = View.VISIBLE
+        mBinding?.marqueeText?.visibility = View.VISIBLE
         mIsVideoPlaying = true
 
         /**
@@ -192,6 +240,39 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         })
 
         mBinding?.videoLayout?.addView(surfaceView)
+
+        showMarquees()
+    }
+
+    private fun showMarquees() {
+        //Timber.d("showMarquees()")
+
+        if (DeviceUtils.deviceMarquees != null && DeviceUtils.deviceMarquees?.size ?: 0 > 0) {
+            var marqueeText = ""
+            for (marquee in DeviceUtils.deviceMarquees!!) {
+                marqueeText += when (mPreferences.languageId) {
+                    MainViewModel.LANGUAGE_CH_SIM -> marquee.text?.zh_CN
+                    MainViewModel.LANGUAGE_CH_TRA -> marquee.text?.zh_TW
+                    else -> marquee.text?.en_US
+                }
+
+                marqueeText += " "
+            }
+
+            if (!preMarqueeText.isNullOrEmpty() && preMarqueeText == marqueeText) {
+                Timber.d("preMarqueeText = $preMarqueeText")
+                return
+            }
+
+            mBinding?.marqueeText?.text = marqueeText
+            mBinding?.marqueeText?.speed = 1
+            mBinding?.marqueeText?.startScroll()
+            preMarqueeText = marqueeText
+            Timber.d("preMarqueeText = $preMarqueeText")
+        } else {
+            preMarqueeText = null
+            mBinding?.marqueeText?.text = ""
+        }
     }
 
     /**
@@ -201,6 +282,10 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         Timber.d("showCommonScreenSaverUI()")
         mBinding?.commonGroup?.visibility = View.VISIBLE
         mBinding?.videoLayout?.visibility = View.GONE
+        mBinding?.marqueeBackground?.visibility = View.GONE
+        mBinding?.marqueeLine?.visibility = View.GONE
+        mBinding?.marqueeText?.visibility = View.GONE
+        mIsVideoPlaying = false
 
         val bg = ContextCompat.getDrawable(context!!, commonScreenSaverList[commonScreenSaverIndex++])
         bg?.let {
@@ -221,19 +306,7 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         mBinding?.weekDayText?.text = sdf.format(now)
         screenSaverViewModel.updateDateTime()
 
-        if (DeviceUtils.deviceMarquees?.size ?: 0 > 0) {
-            val marquee = DeviceUtils.deviceMarquees?.get(0)
-            mBinding?.marqueeText?.text =
-                when (DeviceUtils.mLocale) {
-                    Constants.LOCALE_TW -> marquee?.text?.zh_TW
-                    Constants.LOCALE_EN -> marquee?.text?.en_US
-                    Constants.LOCALE_CN -> marquee?.text?.zh_CN
-                    else -> ""
-                }
-            mBinding?.marqueeText?.speed = marquee?.speed ?: 1
-
-            mBinding?.marqueeText?.startScroll()
-        }
+        destroyMediaPlayer()
     }
 
     private fun createMediaPlayer() {
@@ -268,6 +341,7 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                         // play next video file
                         mediaPlayer.stop()
                         mediaPlayer.reset()
+                        screenSaverViewModel.addVideoIndex()
                         mVideoFilePath = screenSaverViewModel.getVideoFilePath()
                         mediaPlayer.setDataSource(mVideoFilePath)
                         mediaPlayer.prepareAsync()
@@ -291,6 +365,10 @@ class ScreenSaverFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             it.release()
         }
         mMediaPlayer = null
+
+        mBinding?.videoLayout?.removeAllViews()
+
+        mIsVideoPlaying = false
     }
 
     override fun changeFootBarUI() {

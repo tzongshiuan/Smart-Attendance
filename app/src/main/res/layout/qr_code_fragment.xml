@@ -9,6 +9,10 @@
                 type="com.gorilla.attendance.ui.qrCode.QrCodeViewModel"/>
 
         <variable name="registerState" type="int"/>
+
+        <variable name="isStateLayoutDarkness" type="boolean" />
+
+        <variable name="isRegisterMode" type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,8 +22,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/stateLayout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@{isStateLayoutDarkness ? @drawable/state_dark_background : @drawable/state_null_background}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -42,8 +47,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:paddingBottom="8dp"
                     android:text="@string/form_state_scan_qr_code"
-                    android:textSize="@dimen/state_text_size"
+                    android:textSize="@dimen/state_icon_text_size"
                     android:textColor="@color/white"
                     app:layout_constraintTop_toBottomOf="@+id/stateOne"
                     app:layout_constraintStart_toStartOf="@+id/stateOne"
@@ -80,8 +86,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:paddingBottom="8dp"
                     android:text="@string/fill_in_form"
-                    android:textSize="@dimen/state_text_size"
+                    android:textSize="@dimen/state_icon_text_size"
                     android:textColor="@color/white"
                     tools:alpha="0.3"
                     app:updateStateTwoText="@{registerState}"
@@ -123,8 +130,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:paddingBottom="8dp"
                     android:text="@string/face_enrollment"
-                    android:textSize="@dimen/state_text_size"
+                    android:textSize="@dimen/state_icon_text_size"
                     android:textColor="@color/white"
                     tools:alpha="0.3"
                     app:updateStateThreeText="@{registerState}"
@@ -165,8 +173,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:paddingBottom="8dp"
                     android:text="@string/completed"
-                    android:textSize="@dimen/state_text_size"
+                    android:textSize="@dimen/state_icon_text_size"
                     android:textColor="@color/white"
                     tools:alpha="0.3"
                     app:updateStateFourText="@{registerState}"
@@ -175,54 +184,20 @@
                     app:layout_constraintEnd_toEndOf="@+id/stateFour"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--                android:paddingTop="@{isRegisterMode ? @dimen/qr_scan_padding_vertical : @dimen/qr_scan_padding_vertical_tune}"-->
+<!--                android:paddingBottom="@{isRegisterMode ? @dimen/qr_scan_padding_vertical : @dimen/qr_scan_padding_vertical_tune}"-->
+<!--                android:paddingStart="@{isRegisterMode ? @dimen/qr_scan_padding_horizontal_tune : @dimen/qr_scan_padding_horizontal}"-->
+<!--                android:paddingEnd="@{isRegisterMode ? @dimen/qr_scan_padding_horizontal_tune : @dimen/qr_scan_padding_horizontal}"-->
         <com.journeyapps.barcodescanner.DecoratedBarcodeView
                 android:id="@+id/barcodeScanner"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="8dp"
+                android:background="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/stateLayout"
                 app:layout_constraintBottom_toTopOf="@+id/footerBar"
                 android:visibility="gone"/>
-
-<!--        <SurfaceView-->
-<!--                android:id="@+id/rtspSurfaceView"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="0dp"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/footerBar"-->
-<!--                android:visibility="gone"/>-->
-
-<!--        <ImageView-->
-<!--                android:id="@+id/rtspImage"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_marginTop="8dp"-->
-<!--                android:scaleType="center"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/stateLayout"-->
-<!--                app:layout_constraintBottom_toTopOf="@+id/footerBar"-->
-<!--                android:background="@color/black"-->
-<!--                android:visibility="gone"-->
-<!--                tools:ignore="ContentDescription"/>-->
-
-        <ImageView
-                android:id="@+id/scanBackgroundImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="8dp"
-                android:src="@mipmap/qr_scan_bg"
-                android:scaleType="fitXY"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/stateLayout"
-                app:layout_constraintBottom_toTopOf="@+id/footerBar"
-                android:visibility="gone"
-                tools:visibility="visible" tools:ignore="ContentDescription"/>
 
         <TextView
                 android:id="@+id/exitProfileText1"
@@ -282,12 +257,23 @@
                 android:id="@+id/fdrFrame"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="8dp"
+                android:paddingTop="@dimen/qr_scan_padding_vertical"
+                android:paddingBottom="@dimen/qr_scan_padding_vertical"
+                android:paddingStart="@dimen/qr_scan_padding_horizontal"
+                android:paddingEnd="@dimen/qr_scan_padding_horizontal"
+                android:background="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/stateLayout"
                 app:layout_constraintBottom_toTopOf="@+id/footerBar"
                 android:visibility="gone"/>
+
+        <View
+                android:id="@+id/settingTrigger"
+                android:layout_width="200dp"
+                android:layout_height="100dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
 
         <include
                 android:id="@+id/footerBar"

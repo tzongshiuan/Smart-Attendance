@@ -1,5 +1,7 @@
 package com.gorilla.attendance.ui.securityCode
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -12,8 +14,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import com.gorilla.attendance.R
+import com.gorilla.attendance.data.model.NetworkState
 import com.gorilla.attendance.data.model.RegisterFormState
-import com.gorilla.attendance.data.model.Status
 import com.gorilla.attendance.databinding.SecurityCodeFragmentBinding
 import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.common.BaseFragment
@@ -37,6 +39,8 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     private lateinit var securityCodeViewModel: SecurityCodeViewModel
 
     private var isCheckedCode = false
+
+    private var isRetrain = false
 
     private var countDownDisposoble: Disposable? = null
 
@@ -78,21 +82,16 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         super.onResume()
         Timber.d("onResume()")
 
-        if (mPreferences.applicationMode == Constants.VERIFICATION_MODE) {
-            sharedViewModel.changeTitleEvent.postValue(getString(R.string.security_verification_title))
-        } else {
-            when (sharedViewModel.clockModule) {
-                SharedViewModel.MODULE_VISITOR -> sharedViewModel.changeTitleEvent.postValue(
-                    getString(R.string.visitor_registration_form)
-                )
-                else -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.employee_registration_form))
-            }
-        }
+        mBinding?.fdrFrame?.foreground = null
+
+        changeTitle()
     }
 
     override fun onStop() {
         super.onStop()
         Timber.d("onStop()")
+
+        mBinding?.fdrFrame?.foreground = ColorDrawable(Color.BLACK)
 
         DeviceUtils.stopFdrOnDestroyTime = System.currentTimeMillis()
     }
@@ -103,6 +102,25 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
 
         countDownDisposoble?.dispose()
         stopFdr()
+
+        isStartRegister = false
+    }
+
+    private fun changeTitle() {
+        if (mPreferences.applicationMode == Constants.VERIFICATION_MODE) {
+            mBinding?.securityCodeEditText?.hint = getString(R.string.security_hint)
+            sharedViewModel.changeTitleEvent.postValue(getString(R.string.security_verification_title))
+        } else {
+            mBinding?.securityCodeEditText?.hint = getString(R.string.security_hint_register)
+            when (sharedViewModel.clockModule) {
+                SharedViewModel.MODULE_VISITOR -> sharedViewModel.changeTitleEvent.postValue(
+                    getString(R.string.visitor_registration_form)
+                )
+                else -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.employee_registration_form))
+            }
+
+            isStartRegister = true
+        }
     }
 
     private fun initUI() {
@@ -122,12 +140,12 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    Timber.d("Click foot bar right button")
+                    Timber.i("Click foot bar right button")
                     onClickRightBtn()
                 }
         }
 
-        mBinding?.securityCodeEditText?.setOnEditorActionListener { v, actionId, event ->
+        mBinding?.securityCodeEditText?.setOnEditorActionListener { _, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                 actionId == EditorInfo.IME_ACTION_DONE ||
                 event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP
@@ -138,6 +156,10 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             false
         }
 
+        mBinding?.settingTrigger?.setOnClickListener {
+            (activity as MainActivity).softClickTimeText()
+        }
+
         startDecode()
 
         if (sharedViewModel.isSingleMode()) {
@@ -145,14 +167,19 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         }
     }
 
-    private fun startDecode() {
+    private fun startDecode(isUserAgree: Boolean = false) {
+        if (!isUserAgree && sharedViewModel.isNeedUserAgreement()) {
+            sharedViewModel.userAgreeEvent.postValue(true)
+            return
+        }
+
         updateStateUI(Constants.REGISTER_STATE_SCAN_CODE)
 
         /**
          * Employee and Visitor's watershed
          */
         if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
-            mBinding?.footerBar?.rightBtnText = getString(R.string.submit)
+            mBinding?.footerBar?.rightBtnText = getString(R.string.verification)
             mBinding?.stateLayout?.visibility = View.VISIBLE
             mBinding?.securityGroup?.visibility = View.VISIBLE
 
@@ -175,19 +202,11 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     }
 
     private fun initViewModelObservers() {
-        securityCodeViewModel.initialLoad.observe(this, Observer { networkState ->
-            when (networkState?.status) {
-                Status.RUNNING -> {
-
-                }
-
-                Status.SUCCESS -> {
-
-                }
-
-                Status.FAILED -> {
-                    Timber.d("onError, message: ${networkState.msg}")
-                }
+        securityCodeViewModel.initialLoad.observe(this, Observer { state ->
+            when (state) {
+                NetworkState.LOADING -> {}
+                NetworkState.LOADED -> {}
+                is NetworkState.error -> {}
             }
         })
 
@@ -236,27 +255,36 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                     //Timber.d("Observe fdrManager status: STATUS_IDENTIFYING_FACE | STATUS_FACE_FORWARD_CAMERA")
                 }
 
-                FdrManager.STATUS_GET_FACE_FAILED -> {
-                    Timber.d("Observe fdrManager status: STATUS_GET_FACE_FAILED")
-                    stopFdr()
-
-                    // show fail message, related to liveness verification
-                    Toast.makeText(context!!, "Get face failed", Toast.LENGTH_SHORT).show()
-                }
+                FdrManager.STATUS_GET_FACE_FAILED -> {}
 
                 FdrManager.STATUS_GET_FACE_SUCCESS -> {
                     Timber.d("Observe fdrManager status: STATUS_GET_FACE_SUCCESS")
-                    stopFdr()
-                }
 
-                FdrManager.STATUS_GET_FACE_TIMEOUT -> {
-                    Timber.d("Observe fdrManager status: STATUS_GET_FACE_TIMEOUT")
-                    stopFdr()
-
-                    if (sharedViewModel.isSingleModuleMode()) {
+                    if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
+                        mBinding?.isStateLayoutDarkness = false
+                        stopFdr()
                         mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
                     }
                 }
+
+                FdrManager.STATUS_GET_FACE_OCCUR -> {}
+            }
+        })
+
+        sharedViewModel.bottomFaceResultEvent.observe(this, Observer { faceResult ->
+            if (faceResult.isSuccess) {
+                if (sharedViewModel.isOptionClockMode()) {
+                    stopFdr()
+                } else {
+                    mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                    mBinding?.footerBar?.successTextView?.visibility = View.VISIBLE
+                    mBinding?.footerBar?.successText = faceResult.result
+                }
+            } else {
+                currentState = VERIFY_FACE_FINISH_STATE
+                mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                mBinding?.footerBar?.failTextView?.visibility = View.VISIBLE
+                mBinding?.footerBar?.failText = faceResult.result
             }
         })
 
@@ -266,12 +294,29 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             }
         })
 
+        sharedViewModel.userHadAgreeEvent.observe(this, Observer {
+            startDecode(true)
+        })
+
         sharedViewModel.verifyFinishEvent.observe(this, Observer {
+            currentState = VERIFY_FACE_FINISH_STATE
             updateStateUI(Constants.REGISTER_STATE_COMPLETE)
         })
 
         sharedViewModel.registerFinishEvent.observe(this, Observer {
             updateStateUI(Constants.REGISTER_STATE_COMPLETE)
+
+            if (sharedViewModel.isSingleModuleMode()) {
+                when (sharedViewModel.clockModule) {
+                    SharedViewModel.MODULE_VISITOR -> {
+                        mBinding?.visitorRegisterForm?.clearUI()
+                    }
+
+                    else -> {
+                        mBinding?.employeeRegisterForm?.clearUI()
+                    }
+                }
+            }
         })
 
         /**
@@ -433,8 +478,11 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     }
 
     private fun startRetrain() {
+        isRetrain = true
+
         mBinding?.exitProfileText1?.visibility = View.VISIBLE
         mBinding?.exitProfileText2?.visibility = View.VISIBLE
+        mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
 
         countDownDisposoble = RxCountDownTimer.create(DeviceUtils.EXIST_PROFILE_SKIP_TIME, 1000)
             .subscribe {millisUntilFinished ->
@@ -442,6 +490,7 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 if (millisUntilFinished == 0L) {
                     mBinding?.exitProfileText1?.visibility = View.GONE
                     mBinding?.exitProfileText2?.visibility = View.GONE
+                    mBinding?.footerBar?.btnLeft?.visibility = View.VISIBLE
 
                     // information should get before start FDR
                     startFdr()
@@ -475,8 +524,8 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         super.stopFdr()
         changeFootBarUI()
 
-        mBinding?.fdrFrame?.removeAllViews()
         mBinding?.fdrFrame?.visibility = View.GONE
+        mBinding?.fdrFrame?.removeAllViews()
 
         mFdrManager.stopFdr()
     }
@@ -498,17 +547,23 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 }
 
                 mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                mBinding?.footerBar?.successTextView?.visibility = View.GONE
+                mBinding?.footerBar?.failTextView?.visibility = View.GONE
             }
         }
     }
 
     private fun doSelfRestart() {
+        stopFdr()
         startDecode()
         mBinding?.securityCodeEditText?.text?.clear()
         mBinding?.footerBar?.btnRight?.visibility = View.VISIBLE
         currentState = VERIFY_SECURITY_CODE_STATE
 
         isCheckedCode = false
+
+        mBinding?.footerBar?.successTextView?.visibility = View.GONE
+        mBinding?.footerBar?.failTextView?.visibility = View.GONE
     }
 
     override fun onClickLeftBtn() {
@@ -516,32 +571,87 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
 
         sharedViewModel.fdrResultVisibilityEvent.postValue(View.GONE)
 
-        if (sharedViewModel.isSingleModuleMode()) {
-            stopFdr()
-            doSelfRestart()
-        } else {
-            try {
-                when (currentState) {
-                    VERIFY_SECURITY_CODE_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
-                    }
+        if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
+            when (mBinding?.registerState) {
+                Constants.REGISTER_STATE_SCAN_CODE -> {
+                    (activity as MainActivity).navBack()
+                }
 
-                    VERIFY_FACE_RUNNING_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
-                    }
+                Constants.REGISTER_STATE_FILL_FORM -> {
+                    isCheckedCode = false
+                    mBinding?.securityGroup?.visibility = View.VISIBLE
+                    mBinding?.securityCodeEditText?.text?.clear()
+                    mBinding?.employeeRegisterForm?.visibility = View.GONE
+                    mBinding?.visitorRegisterForm?.visibility = View.GONE
+                    mBinding?.footerBar?.btnRight?.visibility = View.VISIBLE
+                    mBinding?.footerBar?.rightBtnText = getString(R.string.submit)
+                    updateStateUI(Constants.REGISTER_STATE_SCAN_CODE)
+                }
 
-                    VERIFY_FACE_FINISH_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
+                Constants.REGISTER_STATE_FACE_GET -> {
+                    stopFdr()
+                    currentState = VERIFY_SECURITY_CODE_STATE
+                    if (isRetrain) {
+                        isCheckedCode = false
+                        // back to scan code stage
+                        mBinding?.securityGroup?.visibility = View.VISIBLE
+                        mBinding?.securityCodeEditText?.text?.clear()
+                        mBinding?.footerBar?.btnRight?.visibility = View.VISIBLE
+                        mBinding?.footerBar?.rightBtnText = getString(R.string.submit)
+                        updateStateUI(Constants.REGISTER_STATE_SCAN_CODE)
+                    } else {
+                        // back to enter register info stage
+                        when (sharedViewModel.clockModule) {
+                            SharedViewModel.MODULE_VISITOR -> {
+                                mBinding?.visitorRegisterForm?.visibility = View.VISIBLE
+                            }
+
+                            else -> {
+                                mBinding?.employeeRegisterForm?.visibility = View.VISIBLE
+                            }
+                        }
+                        mBinding?.footerBar?.btnRight?.visibility = View.VISIBLE
+                        updateStateUI(Constants.REGISTER_STATE_FILL_FORM)
                     }
                 }
-            } catch (e: KotlinNullPointerException) {
-                e.printStackTrace()
+
+                Constants.REGISTER_STATE_COMPLETE -> {
+                    if (sharedViewModel.isSingleModuleMode()) {
+                        doSelfRestart()
+                    } else {
+                        (activity as MainActivity).backToPreviousPage()
+                    }
+                }
+            }
+            isRetrain = false
+        } else {
+            if (sharedViewModel.isSingleModuleMode()) {
+                stopFdr()
+                doSelfRestart()
+            } else {
+                try {
+                    when (currentState) {
+                        VERIFY_SECURITY_CODE_STATE -> {
+                            (activity as MainActivity).navBack()
+                        }
+
+                        VERIFY_FACE_RUNNING_STATE -> {
+                            (activity as MainActivity).navBack()
+                        }
+
+                        VERIFY_FACE_FINISH_STATE -> {
+                            (activity as MainActivity).backToPreviousPage()
+                        }
+                    }
+                } catch (e: KotlinNullPointerException) {
+                    e.printStackTrace()
+                }
             }
         }
     }
 
     override fun onClickRightBtn() {
-        Timber.d("Click right button on state: $currentState")
+        Timber.i("Click right button on state: $currentState")
 
         when(currentState) {
             VERIFY_SECURITY_CODE_STATE -> {
@@ -558,6 +668,7 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                             return
                         }
 
+                        hideSoftwareKeyboard()
                         registerViewModel.checkSecurityCode(securityCode)
                     } else {
                         val isValid = when (sharedViewModel.clockModule) {
@@ -582,6 +693,9 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             VERIFY_FACE_RUNNING_STATE -> {}
 
             VERIFY_FACE_FINISH_STATE -> {
+                // protected machanism
+                currentState = VERIFY_SECURITY_CODE_STATE
+
                 if (AppFeatureManager.IS_SUPPORT_RETRAIN_FEATURE) {
                     (activity as MainActivity).showRetrainPage()
                 }
@@ -600,16 +714,28 @@ class SecurityCodeFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             } else {
                 mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
             }
+        }
 
-            when (state) {
-                Constants.REGISTER_STATE_FILL_FORM,
-                Constants.REGISTER_STATE_FACE_GET -> {
-                    mBinding?.footerBar?.leftBtnText = getString(R.string.cancel)
-                }
+        when (state) {
+            Constants.REGISTER_STATE_SCAN_CODE -> {
+                mBinding?.isStateLayoutDarkness = false
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
 
-                Constants.REGISTER_STATE_COMPLETE -> {
-                    mBinding?.footerBar?.leftBtnText = getString(R.string.confirm)
-                }
+            Constants.REGISTER_STATE_FILL_FORM -> {
+                mBinding?.isStateLayoutDarkness = false
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
+
+            Constants.REGISTER_STATE_FACE_GET -> {
+                mBinding?.isStateLayoutDarkness = true
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
+
+            Constants.REGISTER_STATE_COMPLETE -> {
+                mBinding?.isStateLayoutDarkness = false
+                //mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
+                //mBinding?.footerBar?.leftBtnText = getString(R.string.confirm)
             }
         }
     }

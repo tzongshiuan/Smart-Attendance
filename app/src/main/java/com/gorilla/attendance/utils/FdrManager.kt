@@ -1,6 +1,7 @@
 package com.gorilla.attendance.utils
 
 import android.content.Context
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.gorilla.attendance.R
@@ -45,15 +46,23 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         private const val SAMPLING_TIME = 1000
         private const val MAX_IMAGE_WIDTH = 320
 
+        private const val MAX_OCCUR_NUM = 3
+
         //private const val MAX_FACE_DETECTION = 1
-        private const val MAX_LIVENESS_FAIL = 3
+        //private const val MAX_LIVENESS_FAIL = 3
 
         const val STATUS_DEFAULT = -1
         const val STATUS_IDENTIFYING_FACE = 0
         const val STATUS_FACE_FORWARD_CAMERA = 1
         const val STATUS_GET_FACE_FAILED = 2
         const val STATUS_GET_FACE_SUCCESS = 3
-        const val STATUS_GET_FACE_TIMEOUT = 4
+        const val STATUS_GET_FACE_OCCUR = 4
+        const val STATUS_GET_FACE_TIMEOUT = 5
+
+        const val FACE_DETECT_COLOR_NORMAL  = 0x7FFFFFFF
+        const val FACE_DETECT_COLOR_VALID   = Color.GREEN    // means verified success
+        const val FACE_DETECT_COLOR_INVALID = Color.BLUE    // means verified failed
+        const val FACE_DETECT_COLOR_FAILED  = Color.RED    // means occlusive / non-live face
     }
 
     val fdrMainEvent = SingleLiveEvent<Int>()
@@ -73,11 +82,17 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
 
     private var countDownDisposoble: Disposable? = null
 
-//    fun resetFdr() {
-//        if (mActivity != null && mFactory != null) {
-//            initFdr(mActivity!!, mFactory!!)
-//        }
-//    }
+    private var occurNum = 0
+
+    fun restartScan() {
+        mIsOnPause = false
+        changeFaceColor(FACE_DETECT_COLOR_NORMAL)
+        occurNum = MAX_OCCUR_NUM
+    }
+
+    fun changeFaceColor(color: Int) {
+        mFdrCtrl?.setFaceViewColor(color)
+    }
 
     fun initFdr(activity: AppCompatActivity, factory: AttendanceViewModelFactory) {
         sharedViewModel = ViewModelProviders.of(activity, factory).get(SharedViewModel::class.java)
@@ -85,6 +100,9 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         Timber.d("init FDR, controller = $mFdrCtrl")
         if (mFdrCtrl != null) {
             Timber.d("controller had already been initialized")
+//            mFdrCtrl?.stopIdentify()
+//            mFdrCtrl?.logoutFDRService()
+//            mFdrCtrl?.release()
             mFdrCtrl = null
         }
 
@@ -118,7 +136,7 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         mFdrCtrl?.setIODTriggerResponseListener(iodTriggerResponseListener)
         mFdrCtrl?.setCameraPreviewCallback(camPreviewCallback)
 
-        mFdrCtrl?.setIODLivenessEnable(true)
+        mFdrCtrl?.setIODLivenessEnable(mPreferences.isEnableHumanDetection)
         mFdrCtrl?.setIODObjWidth(IOD_OBJ_WIDTH_MIN, IOD_OBJ_WIDTH_MAX,
             IOD_OBJ_WIDTH_MIN_BEST, IOD_OBJ_WIDTH_MAX_BEST)
 
@@ -126,7 +144,6 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         setFdrRange(DeviceUtils.mFdrRange)
         mFdrCtrl?.setIODFRSuitableEnable(true)
         mFdrCtrl?.setIODOcclusionEnable(true)
-
         mFdrCtrl?.setFaceListParam(SAMPLING_NUM, SAMPLING_TIME, FDRControl.CaptureMode.ByQuality, MAX_IMAGE_WIDTH)
     }
 
@@ -135,9 +152,13 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
             return
         }
 
+        if (mPreferences.faceVerifyTime == 0L) {
+            return
+        }
+
         countDownDisposoble = RxCountDownTimer.create(mPreferences.faceVerifyTime, 500)
             .subscribe {millisUntilFinished ->
-                Timber.d("CountDown: $millisUntilFinished (milli-secs)")
+                Timber.i("CountDown: $millisUntilFinished (milli-secs)")
 
                 if (millisUntilFinished == 0L) {
                     synchronized(isVerifyTimeout) {
@@ -152,7 +173,7 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
             }
     }
 
-    private fun stopVerifyCountDown() {
+    fun stopVerifyCountDown() {
         countDownDisposoble?.dispose()
         countDownDisposoble = null
         isVerifyTimeout = false
@@ -166,12 +187,20 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         }
 
         if (isRunning) {
+//            if (!isForQrCode) {
+//                if (mPreferences.faceVerifyTime != 0L) {
+//                    // start countdown
+//                    isVerifyTimeout = false
+//                    startVerifyCountDown()
+//                }
+//            }
             return
         }
         isRunning = true
 
-        Timber.d("startFdr()")
-        mIsOnPause = false
+        Timber.d("startFdr(), isForQrCode: $isForQrCode")
+
+        occurNum = MAX_OCCUR_NUM
 
         if (!isForQrCode) {
             if (mPreferences.faceVerifyTime != 0L) {
@@ -180,14 +209,16 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
                 startVerifyCountDown()
             }
 
+            mIsOnPause = false
+            mFdrCtrl?.hideFaceView(false)
+            changeFaceColor(FACE_DETECT_COLOR_NORMAL)
+            mFdrCtrl?.startFaceDetection()
+            mFdrCtrl?.setHideFaceDetectBox(false)
+        } else {
+            mIsOnPause = true
             mFdrCtrl?.hideFaceView(false)
             mFdrCtrl?.startFaceDetection()
-        } else {
-            mFdrCtrl?.startFaceDetection()
-
-            SimpleRxTask.afterOnMain(1000L) {
-                mFdrCtrl?.stopFaceDetection()
-            }
+            mFdrCtrl?.setHideFaceDetectBox(true)
         }
 
         if (mPreferences.webcamType == Constants.RTSP_WEB_CAM) {
@@ -210,8 +241,6 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         }
         Timber.d("stopFdr()")
 
-        mIsOnPause = true
-
         if (!isForQrCode) {
             stopVerifyCountDown()
             mFdrCtrl?.stopFaceDetection()
@@ -219,15 +248,15 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
             fdrStatusLiveData.postValue(STATUS_DEFAULT)
         }
 
-        mFdrCtrl?.releaseCamera(CAMERA_ID)
-
-
         if (mPreferences.webcamType == Constants.RTSP_WEB_CAM) {
             mFdrCtrl?.disconnectRTSP()
-            //mFdrCtrl?.release()
+        } else {
+            mFdrCtrl?.releaseCamera(CAMERA_ID)
         }
 
         isRunning = false
+
+        mIsOnPause = true
     }
 
     private fun setFdrRange(fdrRange: Int) {
@@ -238,20 +267,20 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
         val widthDp = (widthPx / mContext.resources.displayMetrics.density).toInt()
         val heightDp = (heightPx / mContext.resources.displayMetrics.density).toInt()
 
-        Timber.d("widthPx = $widthPx")
-        Timber.d("heightPx = $heightPx")
-        Timber.d("widthDp = $widthDp")
-        Timber.d("heightDp = $heightDp")
+        Timber.i("widthPx = $widthPx")
+        Timber.i("heightPx = $heightPx")
+        Timber.i("widthDp = $widthDp")
+        Timber.i("heightDp = $heightDp")
 
         val topX = widthDp * (((100.0 - fdrRange) / 2).toFloat() / 100)
         val topY = heightDp * (((100.0 - fdrRange) / 2).toFloat() / 100)
         val bottomX = widthDp.toFloat() - topX
         val bottomY = heightDp.toFloat() - topY
 
-        Timber.d("topX = $topX")
-        Timber.d("topY = $topY")
-        Timber.d("bottomX = $bottomX")
-        Timber.d("bottomY = $bottomY")
+        Timber.i("topX = $topX")
+        Timber.i("topY = $topY")
+        Timber.i("bottomX = $bottomX")
+        Timber.i("bottomY = $bottomY")
 
         mFdrCtrl?.setBestObjLoc(topX, topY, bottomX, bottomY)
     }
@@ -278,12 +307,12 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
 
     private val iodTriggerResponseListener =
         MyFDRControl.IODTriggerResponseListener { trigger, iodInfo ->
-            Timber.d("onIODTriggerResponse11 trigger = $trigger")
-            Timber.d("onIODTriggerResponse iodInfo.width = %s", iodInfo.width)
-            Timber.d("onIODTriggerResponse iodInfo.height = %s", iodInfo.height)
-            Timber.d("onIODTriggerResponse iodInfo.x = %s", iodInfo.x)
-            Timber.d("onIODTriggerResponse iodInfo.y = %s", iodInfo.y)
-            Timber.d("onIODTriggerResponse iodInfo.liveness_result = %s", iodInfo.liveness_result)
+            Timber.d("onIODTriggerResponse trigger = $trigger")
+            Timber.i("onIODTriggerResponse iodInfo.width = %s", iodInfo.width)
+            Timber.i("onIODTriggerResponse iodInfo.height = %s", iodInfo.height)
+            Timber.i("onIODTriggerResponse iodInfo.x = %s", iodInfo.x)
+            Timber.i("onIODTriggerResponse iodInfo.y = %s", iodInfo.y)
+            Timber.i("onIODTriggerResponse iodInfo.liveness_result = %s", iodInfo.liveness_result)
 
             /**
              * liveness_result
@@ -293,7 +322,7 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
              * 2: UNKNOWN
              * 3: REAL
              */
-            // TODO about video fragment
+            // about video fragment
 //            Timber.d("mMainActivity.getSupportFragmentManager().findFragmentByTag(VideoFragment.TAG) = "
 //                    + mMainActivity.getSupportFragmentManager().findFragmentByTag(VideoFragment.TAG)
 //            )
@@ -315,7 +344,7 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
                 val iniList = ArrayList<String>()
 
                 val r = mFdrCtrl?.getRecognizedFaceList(currentPngList, iniList, iodFeature)
-                Timber.d("mFaceDetectThread start r = $r")
+                Timber.i("mFaceDetectThread start r = $r")
 
                 //GG TEST DATA, test live fail
 //                if (r != 0){
@@ -333,18 +362,44 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
 //                    return;
 //                }
 
+                // 註冊時略過被判斷為遮蔽與非活體的人臉物件
+                val applicationMode = mPreferences.applicationMode
+
                 if (r != 0) {
-                    Timber.d("mFaceDetectThread DeviceUtils.mIsLivenessOn = %s", DeviceUtils.mIsLivenessOn)
+                    Timber.d("mFaceDetectThread mPreferences.isEnableHumanDetection = %s", mPreferences.isEnableHumanDetection)
                     Timber.d("mFaceDetectThread iodfeature.frSuitableType = %s", iodFeature.frSuitableType)
                     Timber.d("mFaceDetectThread iodfeature.occlusionType = %s", iodFeature.occlusionType)
 
                     if (iodFeature.occlusionType == IntelligentObjectDetector.Face_Occlusion_Type.GORILLA_FACE_OCCLUSION_UNKNOWN
                         || iodFeature.occlusionType == IntelligentObjectDetector.Face_Occlusion_Type.GORILLA_FACE_OCCLUSION_DETECTED) {
                         //mask on face
+                        if (applicationMode == Constants.VERIFICATION_MODE) {
+                            if (occurNum != 0) {
+                                occurNum--
+                            } else {
+                                synchronized(isVerifyTimeout) {
+                                    if (!mIsOnPause && !isVerifyTimeout) {
+                                        // stop count down
+                                        stopVerifyCountDown()
+                                        fdrMainEvent.postValue(STATUS_GET_FACE_OCCUR)
+                                        fdrStatusLiveData.postValue(STATUS_GET_FACE_OCCUR)
+                                        changeFaceColor(FACE_DETECT_COLOR_FAILED)
+                                        mIsOnPause = true
+                                    }
+                                }
+                            }
+                        } else {
+                            changeFaceColor(FACE_DETECT_COLOR_FAILED)
+                        }
+
                         return@IODTriggerResponseListener
                     }
 
-                    if (DeviceUtils.mIsLivenessOn) {
+                    if (iodFeature.frSuitableType == IntelligentObjectDetector.FR_Suitable_Type.GORILLA_FR_NOT_SUITABLE) {
+                        return@IODTriggerResponseListener
+                    }
+
+                    if (mPreferences.isEnableHumanDetection) {
                         Timber.d("mFaceDetectThread start iodfeature.liveness = %s", iodFeature.liveness)
                         if (iodFeature.liveness == IntelligentObjectDetector.Liveness_Type.IOD_LIVENESS_REAL) {
                             for (i in currentPngList.indices) {
@@ -353,25 +408,37 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
                                 }
                             }
 
-                            if (mLivenessCount >= MAX_LIVENESS_FAIL) {
-                                sharedViewModel.clockData.liveness = Constants.LIVENESS_FAILED
-                            } else {
+//                            if (mLivenessCount >= MAX_LIVENESS_FAIL) {
+//                                sharedViewModel.clockData.liveness = Constants.LIVENESS_FAILED
+//                            } else {
                                 sharedViewModel.clockData.liveness = Constants.LIVENESS_SUCCEED
-                            }
+//                            }
 
                             mLivenessCount = 0
                         } else {
-                            for (i in currentPngList.indices) {
-                                if (i == currentPngList.size - 1) {
-                                    DeviceUtils.mFacePngList.add(currentPngList[i])
-                                }
-                            }
+                            //for (i in currentPngList.indices) {
+                            //    if (i == currentPngList.size - 1) {
+                            //        DeviceUtils.mFacePngList.add(currentPngList[i])
+                            //    }
+                            //}
                             //mLivenessCount++;
                             sharedViewModel.clockData.liveness = Constants.LIVENESS_FAILED
 
-                            fdrMainEvent.postValue(STATUS_GET_FACE_FAILED)
-                            fdrStatusLiveData.postValue(STATUS_GET_FACE_FAILED)
-                            mIsOnPause = true
+                            if (applicationMode == Constants.VERIFICATION_MODE) {
+                                synchronized(isVerifyTimeout) {
+                                    if (!mIsOnPause && !isVerifyTimeout) {
+                                        // stop count down
+                                        stopVerifyCountDown()
+                                        fdrMainEvent.postValue(STATUS_GET_FACE_FAILED)
+                                        fdrStatusLiveData.postValue(STATUS_GET_FACE_FAILED)
+                                        changeFaceColor(FACE_DETECT_COLOR_FAILED)
+                                        mIsOnPause = true
+                                    }
+                                }
+                            } else {
+                                changeFaceColor(FACE_DETECT_COLOR_FAILED)
+                            }
+                            return@IODTriggerResponseListener
                         }
                     } else {
                         for (i in currentPngList.indices) {
@@ -403,23 +470,22 @@ class FdrManager @Inject constructor(context: Context, preferences: PreferencesH
                 } else {
                     //no get face
                 }
-                //end determine
             } else {
                 // show face forward
-                fdrMainEvent.postValue(STATUS_FACE_FORWARD_CAMERA)
-                fdrStatusLiveData.postValue(STATUS_FACE_FORWARD_CAMERA)
+                //fdrMainEvent.postValue(STATUS_FACE_FORWARD_CAMERA)
+                //fdrStatusLiveData.postValue(STATUS_FACE_FORWARD_CAMERA)
             }
         }
 
     private val camPreviewCallback = object: MyFDRControl.cameraPreviewCallback {
         override fun onCameraStarted() {
-            Timber.d("onCameraStarted()")
+            Timber.i("onCameraStarted()")
 
-            Timber.d("onCameraStarted %s", mFdrCtrl?.maxExposure)
-            Timber.d("onCameraStarted %s", mFdrCtrl?.minExposure)
-            Timber.d("onCameraStarted %s", mFdrCtrl?.exposure)
-            Timber.d("onCameraStarted %s", mFdrCtrl?.exposureStep)
-            Timber.d("onCameraStarted %s", mFdrCtrl?.exposure)
+            Timber.i("onCameraStarted %s", mFdrCtrl?.maxExposure)
+            Timber.i("onCameraStarted %s", mFdrCtrl?.minExposure)
+            Timber.i("onCameraStarted %s", mFdrCtrl?.exposure)
+            Timber.i("onCameraStarted %s", mFdrCtrl?.exposureStep)
+            Timber.i("onCameraStarted %s", mFdrCtrl?.exposure)
             //fdrCtrl.setExposure(10);
         }
 

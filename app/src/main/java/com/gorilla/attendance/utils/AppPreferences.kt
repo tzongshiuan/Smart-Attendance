@@ -23,12 +23,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
 
         // connection setting
         private const val SETTING_SERVER_IP = "server_ip"
-        private const val SETTING_FTP_IP = "ftp_ip"
         private const val SETTING_WEB_SOCKET_IP = "web_socket_ip"
         private const val SETTING_FTP_ACCOUNT = "ftp_account"
         private const val SETTING_FTP_PASSWORD = "ftp_password"
         private const val SETTING_TABLET_NAME = "tablet_name"
         private const val SETTING_TABLET_TOKEN = "tablet_token"
+        private const val SETTING_IS_LOGIN_FINISH = "is_login_finish"
 
         // function setting
         private const val SETTING_IDLE_TIME = "idle_time"
@@ -45,10 +45,18 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
         private const val SETTING_WEB_CAM_URL = "web_cam_url"
         private const val SETTING_WEB_CAM_USERNAME = "web_cam_username"
         private const val SETTING_WEB_CAM_PASSOWRD = "web_cam_password"
+
+        // linked setting 2
         private const val SETTING_DOOR_MODULE = "door_module"
+        private const val SETTING_CLOSE_DOOR_TIMEOUT = "close_door_timeout"
+
+        // update cycle setting
+        private const val SETTING_UPDATE_USER = "update_user"
+        private const val SETTING_UPDATE_RECORD = "update_record"
+        private const val SETTING_UPDATE_OTHER = "update_other"
+        private const val SETTING_CLEAR_DATA = "clear_data"
 
         // bluetooth setting
-        private const val SETTING_CLOSE_DOOR_TIMEOUT = "close_door_timeout"
         private const val SETTING_BLUETOOTH_PASSWORD = "bluetooth_password"
         private const val SETTING_BLUETOOTH_ADDRESS = "bluetooth_address"
         private const val SETTING_BLUETOOTH_DEVICE_NAME = "bluetooth_device_name"
@@ -62,12 +70,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
 
     // connection setting
     override var serverIp: String = ""
-    override var ftpIp: String = ""
     override var webSocketIp: String = ""
     override var ftpAccount: String = ""
     override var ftpPassword: String = ""
     override var tabletName: String = ""
     override var tabletToken: String = ""
+    override var isLoginFinish: Boolean = false
 
     // function setting
     override var idleTime: Long = 0
@@ -84,10 +92,18 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
     override lateinit var webcamUrl: String
     override lateinit var webcamUsername: String
     override lateinit var webcamPassword: String
+
+    // linked setting 2
     override var doorModule: Int = 0
+    override var closeDoorTimeout: Long = 0
+
+    // update cycle setting
+    override var updateUserTime: Int = 60
+    override var updateRecordTime: Int = 10
+    override var updateOtherTime: Int = 60
+    override var clearDataTime: Int = 5
 
     // bluetooth setting
-    override var closeDoorTimeout: Long = 0
     override lateinit var bluetoothPassword: String
     override lateinit var bluetoothAddress: String
     override lateinit var bluetoothDeviceName: String
@@ -109,12 +125,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
 
         // connection setting
         jSetting.put(SETTING_SERVER_IP, serverIp)
-        jSetting.put(SETTING_FTP_IP, ftpIp)
         jSetting.put(SETTING_WEB_SOCKET_IP, webSocketIp)
         jSetting.put(SETTING_FTP_ACCOUNT, ftpAccount)
         jSetting.put(SETTING_FTP_PASSWORD, ftpPassword)
         jSetting.put(SETTING_TABLET_NAME, tabletName)
         jSetting.put(SETTING_TABLET_TOKEN, tabletToken)
+        jSetting.put(SETTING_IS_LOGIN_FINISH, isLoginFinish)
 
         // function setting
         jSetting.put(SETTING_IDLE_TIME, idleTime)
@@ -132,6 +148,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
         jSetting.put(SETTING_WEB_CAM_USERNAME, webcamUsername)
         jSetting.put(SETTING_WEB_CAM_PASSOWRD, webcamPassword)
         jSetting.put(SETTING_DOOR_MODULE, doorModule)
+
+        // update cycle setting
+        jSetting.put(SETTING_UPDATE_USER, updateUserTime)
+        jSetting.put(SETTING_UPDATE_RECORD, updateRecordTime)
+        jSetting.put(SETTING_UPDATE_OTHER, updateOtherTime)
+        jSetting.put(SETTING_CLEAR_DATA, clearDataTime)
 
         // bluetooth setting
         jSetting.put(SETTING_CLOSE_DOOR_TIMEOUT, closeDoorTimeout)
@@ -168,6 +190,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
         webcamUsername = ""
         webcamPassword = ""
         doorModule = Constants.DEFAULT_DOOR_MODULE
+
+        // update cycle setting
+        updateUserTime = Constants.DEFAULT_UPDATE_USER_TIME
+        updateRecordTime = Constants.DEFAULT_UPDATE_RECORD_TIME
+        updateOtherTime = Constants.DEFAULT_UPDATE_OTHER_TIME
+        clearDataTime = Constants.DEFAULT_CLEAR_DATA_TIME
 
         // bluetooth setting
         closeDoorTimeout = Constants.DEFAULT_CLOSE_DOOR_TIMEOUT
@@ -209,12 +237,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
 
             // connection setting
             serverIp = jSettings.getString(SETTING_SERVER_IP)
-            ftpIp = jSettings.getString(SETTING_FTP_IP)
             webSocketIp = jSettings.getString(SETTING_WEB_SOCKET_IP)
             ftpAccount = jSettings.getString(SETTING_FTP_ACCOUNT)
             ftpPassword = jSettings.getString(SETTING_FTP_PASSWORD)
             tabletName = jSettings.getString(SETTING_TABLET_NAME)
             tabletToken = jSettings.getString(SETTING_TABLET_TOKEN)
+            isLoginFinish = jSettings.getBoolean(SETTING_IS_LOGIN_FINISH)
 
             // function setting
             idleTime = jSettings.getLong(SETTING_IDLE_TIME)
@@ -232,6 +260,12 @@ class AppPreferences @Inject constructor(val context: Context) : PreferencesHelp
             webcamUsername = jSettings.getString(SETTING_WEB_CAM_USERNAME)
             webcamPassword = jSettings.getString(SETTING_WEB_CAM_PASSOWRD)
             doorModule = jSettings.getInt(SETTING_DOOR_MODULE)
+
+            // update cycle setting
+            updateUserTime = jSettings.getInt(SETTING_UPDATE_USER)
+            updateRecordTime = jSettings.getInt(SETTING_UPDATE_RECORD)
+            updateOtherTime = jSettings.getInt(SETTING_UPDATE_OTHER)
+            clearDataTime = jSettings.getInt(SETTING_CLEAR_DATA)
 
             // bluetooth setting
             closeDoorTimeout = jSettings.getLong(SETTING_CLOSE_DOOR_TIMEOUT)

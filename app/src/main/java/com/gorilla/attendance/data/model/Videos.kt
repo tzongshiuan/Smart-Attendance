@@ -20,4 +20,15 @@ class Videos {
 
     @SerializedName("fileSize")
     var fileSize: Long? = null
+
+    override fun equals(other: Any?): Boolean {
+        return (other as Videos).name == this.name
+                && (other as Videos).fileSize == this.fileSize
+    }
+
+    override fun hashCode(): Int {
+        var result = name?.hashCode() ?: 0
+        result = 31 * result + (fileSize?.hashCode() ?: 0)
+        return result
+    }
 }

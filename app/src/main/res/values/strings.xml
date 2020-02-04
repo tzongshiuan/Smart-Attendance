@@ -1,13 +1,5 @@
 <resources>
-    <string name="app_name">Attendance</string>
-
-    <string name="days_ago">day(s) ago</string>
-    <string name="weeks_ago">week(s) ago</string>
-    <string name="months_ago">month(s) ago</string>
-    <string name="years_ago">year(s) ago</string>
-
-    <string name="recent">recent</string>
-    <string name="popular">popular</string>
+    <string name="app_name">Smart Attendance</string>
 
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -19,14 +11,15 @@
     <string name="account">Account</string>
     <string name="password">Password</string>
 
-    <string name="todo">TODO</string>
-
+    <string name="no_role_option">No role option available</string>
     <string name="device_login_error">*Device login failed, please check setting and network.</string>
 
     <string name="employee_registration_form">Employee Registration Form</string>
     <string name="visitor_registration_form">Visitor Registration Form</string>
 
     <string name="empty_login_info">Server IP or device token is empty, please check setting</string>
+
+    <string name="restart_from_language_hint">The app must be restarted because of the language switching</string>
 
 
     <!--Top ToolBar-->
@@ -62,9 +55,12 @@
     <string name="choose_mode_employee_registration_title">Employee Registration Mode</string>
     <string name="choose_mode_visitor_verification_title">Visitor Verification Mode</string>
     <string name="choose_mode_visitor_registration_title">Visitor Registration Mode</string>
-    <string name="id_card">ID card</string>
+    <string name="id_card">Card ID</string>
     <string name="security_code">Security Code</string>
     <string name="qr_code">QR Code</string>
+    <string name="id_card_register">Card ID</string>
+    <string name="security_code_register">Security Code</string>
+    <string name="qr_code_register">QR Code</string>
     <string name="facial_recognition">Facial Recognition</string>
     <string name="fingerprint_recognition">Fingerprint Recognition</string>
     <string name="choose_registration_mode">Please select an register mode</string>
@@ -74,12 +70,14 @@
     <!--RFID-->
     <string name="rfid_verification_title">ID Card Verification (Employee)</string>
     <string name="please_swipe_id_card">Please Swipe the ID Card</string>
+    <string name="rfid_init_fail">Failed to init reader</string>
     <string name="rfid_verification_error">*Invalid card, please try again</string>
     <string name="rfid_toast_no_result">Incorrect RFID. Please try again.</string>
 
     <!-- SecurityCode -->
     <string name="security_verification_title">Security Code Verification</string>
     <string name="security_hint">Please enter your unique identifier</string>
+    <string name="security_hint_register">Please fill in your ID card or mobile number as your unique identifier</string>
     <string name="security_verification_error">* Invalid security code, please try again</string>
     <string name="empty_security_code_msg">Security code can not be empty.</string>
 
@@ -99,8 +97,8 @@
     <string name="face_timeout_str_fmt">Timeout: %1$d (sec)</string>
     <string name="clock_check_in">Check In</string>
     <string name="clock_check_out">Check Out</string>
-    <string name="clock_pass">Pass</string>
-    <string name="clock_arrive">Arrive</string>
+    <string name="clock_pass">Access Allowed</string>
+    <string name="clock_arrive">Arrival</string>
     <string name="clock_leave">Leave</string>
     <string name="clock_timeout">Clock timeout, please try again.</string>
     <string name="registration_fail">Registration failed</string>
@@ -110,44 +108,49 @@
     <string name="result_employee_id">ID</string>
     <string name="result_visitor_name">Visitor Name</string>
     <string name="result_visitor_phone">Phone Number</string>
+    <string name="result_recognition_failed">Face recognition failed</string>
+    <string name="result_recognition_occur">Occlusion Detected</string>
+    <string name="result_not_living_face">Not living face</string>
 
 
     <!--Setting-->
     <string name="setting_title">Endpoint Setting</string>
-    <string name="connection_setting">Connection Setting</string>
-    <string name="function_setting">Function Setting</string>
-    <string name="linked_device">Linked Device</string>
-    <string name="bluetooth_setting">Bluetooth Setting</string>
+    <string name="connection_setting">Backend</string>
+    <string name="function_setting">Endpoint</string>
+    <string name="linked_device">Camera</string>
+    <string name="linked_device2">Door Lock</string>
+    <string name="update_cycle">Update Cycle</string>
+    <string name="bluetooth_setting">Bluetooth</string>
     <string name="server_ip">Server IP</string>
     <string name="ftp_ip">FTP IP</string>
     <string name="web_socket_ip">Web Socket IP</string>
     <string name="ftp_account">FTP Account</string>
     <string name="ftp_password">FTP Password</string>
-    <string name="tablet_phone_name">Device Name</string>
-    <string name="tablet_phone_token">Device Token</string>
+    <string name="tablet_phone_name">Tablet/Phone Name</string>
+    <string name="tablet_phone_token">Tablet/Phone Token</string>
     <string name="idle_time">Idle Time (secs)</string>
-    <string name="hold_verify_result">Hold Result (ms)</string>
-    <string name="face_verify_time">Face Detect (ms)</string>
+    <string name="hold_verify_result">Verified Result Time (ms)</string>
+    <string name="face_verify_time">Face Detect Time (ms)</string>
     <string name="application_mode">Application Mode</string>
-    <string name="select_clock_in_out">Clock In/Out</string>
+    <string name="select_clock_in_out">Select Clock In/Out</string>
     <string name="human_detection">Human Detection</string>
     <string name="fdr_online_mode">FDR Online Mode</string>
     <string name="screen_saver">Enable Idle Screen</string>
-    <string name="webcam">Webcam</string>
+    <string name="webcam">WebCam</string>
     <string name="webcam_url">RTSP URL</string>
     <string name="webcam_username">RTSP Account</string>
     <string name="webcam_passowrd">RTSP Password</string>
     <string name="door_module">Door Module</string>
-    <string name="close_door_timeout">Close Door (secs)</string>
+    <string name="close_door_timeout">Close Door Timeout (secs)</string>
     <string name="device_available">Available Devices</string>
     <string name="register_mode">Register Mode</string>
-    <string name="verification_mode">Verification Mode</string>
+    <string name="verification_mode">Verify Mode</string>
     <string name="check_in">Clock In</string>
     <string name="check_out">Clock Out</string>
     <string name="check_option">Clock Optional</string>
     <string name="switch_on">On</string>
     <string name="switch_off">Off</string>
-    <string name="bluetooth_refresh">Refresh</string>
+    <string name="bluetooth_refresh">Search</string>
     <string name="bluetooth_open">Open</string>
     <string name="bluetooth_close">Close</string>
     <string name="invalid_server_ip">Server IP can not be empty</string>
@@ -161,22 +164,27 @@
     <string name="setting_account_hint">Enter Account</string>
     <string name="setting_password_hint">Enter Password</string>
     <string name="setting_invalid_account_hint">* Invalid account or password, please try again</string>
+    <string name="setting_refresh_cycle_users">Refresh Cycle of Users(secs)</string>
+    <string name="setting_refresh_cycle_records">Refresh Cycle of Records(secs)</string>
+    <string name="setting_refresh_cycle_others">Refresh Cycle of Others(secs)</string>
+    <string name="clear_cycle_data">Clear Cycle of Synced Data(min)</string>
+    <string name="setting_refresh_users_finish">The list of all users has been updated</string>
 
 
     <!--Registration-->
     <string name="necessary_prefix_str"><![CDATA[<b><font color=#FF0000>* </b>]]></string>
     <string name="form_valid_security_code"><![CDATA[<b><font color=#95E37B>* Valid security code</b>]]></string>
     <string name="form_invalid_security_code"><![CDATA[<b><font color=#FF0000>* Invalid security code</b>]]></string>
-    <string name="fill_in_form">Fill In the Form</string>
+    <string name="fill_in_form">Fill in a form</string>
     <string name="face_enrollment">Facial Enrollment</string>
     <string name="completed">Completed</string>
-    <string name="form_employee_id">Employee ID</string>
-    <string name="form_employee_name">Employee Name</string>
-    <string name="form_visitor_name">Visitor Name</string>
-    <string name="form_email">E-mail</string>
+    <string name="form_employee_id">ID</string>
+    <string name="form_employee_name">Name</string>
+    <string name="form_visitor_name">Name</string>
+    <string name="form_email">E-Mail</string>
     <string name="form_title">Job Title</string>
     <string name="form_password">Password</string>
-    <string name="form_phone_number">Mobile Phone</string>
+    <string name="form_phone_number">Phone Number</string>
     <string name="form_rfid">Card ID</string>
     <string name="form_security_code">Security Code</string>
     <string name="form_check">Check</string>
@@ -210,7 +218,47 @@
     <string name="back">Back</string>
     <string name="registration">Registration</string>
     <string name="verification">Verification</string>
+    <string name="login">Login</string>
     <string name="submit">Submit</string>
+    <string name="decline">Decline</string>
+    <string name="agree">Agree</string>
 
+
+    <!-- User Agreement-->
+    <string name="user_agreement_title">User Agreement</string>
+    <string name="user_agreement_content">
+        Please note that Gorilla Technology Group Inc. (hereinafter referred to as “the Company”) will collect, process and use your personal information in accordance with Paragraph 1, Article 8 of the Personal Information Protection Act. If you click the option of “Agree”, it shall be deemed that you have reviewed, understand, and agree to the following:\n\n
+
+        I. The purpose of collecting personal information\n\n The Company may collect, process, and use your personal information for security management for entrance and exit or for software demonstration and other legitimate purposes. According to the classification of the Ministry of Justice in “The Specific Purpose and the Classification of Personal Information of the Personal Information Protection Act”, the Company may collect your personal information for purposes of “site safety management” (116).\n\n
+
+        II. Categories of Personal Information\n\n Your personal information to be collected by the Company will include your name in Chinese and English, ID card number, telephone, email, face image, and personal identification document. According to the classification of “The Specific Purpose and the Classification of Personal Information of the Personal Information Protection Act” of the Ministry of Justice, the Company collects your personal information for purposes of “personal identification” (C001).\n\n
+
+        III. The duration, region, target, and means of using personal information\n\n
+
+         (I) Duration: your personal information will be used by the Company with immediate effect to the second anniversary of the last day of admission to the office, trade show or worksite. You agree that at the expiration of the use of your personal information, the Company may stop processing or using your personal information in lieu of removing or deleting it.\n\n
+
+         (II) Region: The Company will use your personal information within the Republic of China, the location of the server where personal information is stored, the place of the Company or the subsidiaries and affiliates.\n\n
+
+         (III) Targets: The Company may transmit your personal information to the subsidiaries and affiliates of the Company or server service providers or any third parties responsible for the processing and use of your personal information under the appointment and direction of the Company.\n\n
+
+         (IV) Means: Automated machinery or other non-automated means in compliance with the Personal Protection Act and other applicable laws.\n\n
+
+        IV. Supply of personal information:\n\n
+         (I) You shall provide accurate, updated, and complete personal information. In the event of changes in your personal information, you shall request for a corresponding change with the Company voluntarily to ensure your personal information accurate, updated, and completed.\n\n
+
+         (II) If the personal information you provided is erroneous, untrue, outdated, or incomplete or even misleading, your rights and privileges may be jeopardized and you shall be responsible for the consequences thereof.\n\n
+
+         (III) You may exercise your rights with regard your personal information under the “Personal Information Protection Act” to:\n\n
+
+          1. Request for inquiry, viewing, or reproduction of your personal information but a fee may be applied by the Company for the service rendered.\n\n
+
+          2. Request for supplement or correction if provided with the appropriate explanations.\n\n
+
+          3. Request us to stop collecting, processing and using, or for a removal of your personal information. The Company may turn down your request if your personal information is necessary for the performance of duties by the Company or as dictated by business needs.\n\n
+
+        V. The effect on your rights and privileges for not providing your personal information\n\n
+
+         You may choose not to provide your personal information and you shall understand if you so choose, the Company may reject your admission to the office or worksite. Thanks for your time and we regret any inconvenience caused.
+    </string>
 
 </resources>

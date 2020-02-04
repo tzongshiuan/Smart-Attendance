@@ -25,8 +25,14 @@
 
     <color name="error_color">#f98a83</color>
 
+    <color name="marquee">#FFFFFF</color>
+
     <!--Switch Button-->
     <color name="switch_btn_on">#489CE7</color>
     <color name="switch_btn_off">#FFFFFF</color>
+
+    <!--Register State Background-->
+    <drawable name="state_dark_background">#000000</drawable>
+    <drawable name="state_null_background">#00000000</drawable>
 
 </resources>

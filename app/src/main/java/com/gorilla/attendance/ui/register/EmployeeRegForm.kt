@@ -59,7 +59,7 @@ class EmployeeRegForm (context: Context, attrs: AttributeSet) : ConstraintLayout
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         mBinding = EmployeeRegisterLayoutBinding.inflate(inflater, this, true)
 
-        initNecessaryHintUI()
+        //initNecessaryHintUI()
     }
 
     private fun initNecessaryHintUI() {
@@ -127,6 +127,14 @@ class EmployeeRegForm (context: Context, attrs: AttributeSet) : ConstraintLayout
         mBinding.employeeSecurityEditText.isEnabled = false
     }
 
+    fun clearUI() {
+        mBinding.idEditText.text.clear()
+        mBinding.nameEditText.text.clear()
+        mBinding.emailEditText.text.clear()
+        mBinding.passwordEditText.text.clear()
+        mBinding.employeeSecurityEditText.text.clear()
+    }
+
     fun checkRegistrationForm(): Boolean {
         when {
             mBinding.idEditText.text.toString().isEmpty() -> {
@@ -154,10 +162,11 @@ class EmployeeRegForm (context: Context, attrs: AttributeSet) : ConstraintLayout
                 return false
             }
 
-            !isValidPassword(mBinding.passwordEditText.text.toString()) -> {
-                mRegisterViewModel.registerStateEvent.postValue(RegisterFormState.INVALID_PASSWORD_FORMAT)
-                return false
-            }
+            // No longer restrict password format
+//            !isValidPassword(mBinding.passwordEditText.text.toString()) -> {
+//                mRegisterViewModel.registerStateEvent.postValue(RegisterFormState.INVALID_PASSWORD_FORMAT)
+//                return false
+//            }
 
             mBinding.employeeSecurityEditText.text.toString().isEmpty() -> {
                 mRegisterViewModel.registerStateEvent.postValue(RegisterFormState.EMPTY_SECURITY_CODE)

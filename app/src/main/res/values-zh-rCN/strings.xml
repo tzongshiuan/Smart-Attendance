@@ -1,13 +1,5 @@
 <resources>
-    <string name="app_name">Attendance</string>
-
-    <string name="days_ago">day(s) ago</string>
-    <string name="weeks_ago">week(s) ago</string>
-    <string name="months_ago">month(s) ago</string>
-    <string name="years_ago">year(s) ago</string>
-
-    <string name="recent">recent</string>
-    <string name="popular">popular</string>
+    <string name="app_name">Smart Attendance</string>
 
     <string name="cancel">取消</string>
     <string name="save">保存</string>
@@ -19,14 +11,15 @@
     <string name="account">帐号</string>
     <string name="password">密码</string>
 
-    <string name="todo">TODO</string>
-
+    <string name="no_role_option">缺少可以使用的角色</string>
     <string name="device_login_error">装置登入失败，请确认设定是否正确</string>
 
     <string name="employee_registration_form">员工注册</string>
     <string name="visitor_registration_form">访客注册</string>
 
     <string name="empty_login_info">伺服器位址或是裝置注册碼為空，请前往设定頁面進行设定</string>
+
+    <string name="restart_from_language_hint">由于语言切换，必须重新启动应用程序</string>
 
 
     <!--Top ToolBar-->
@@ -65,6 +58,9 @@
     <string name="id_card">门卡验证</string>
     <string name="security_code">密码验证</string>
     <string name="qr_code">QR Code验证</string>
+    <string name="id_card_register">卡片号码</string>
+    <string name="security_code_register">安全码</string>
+    <string name="qr_code_register">QR Code</string>
     <string name="facial_recognition">人脸验证</string>
     <string name="fingerprint_recognition">指纹验证</string>
     <string name="choose_registration_mode">请选择注册模式</string>
@@ -74,12 +70,14 @@
     <!--RFID-->
     <string name="rfid_verification_title">门卡验证</string>
     <string name="please_swipe_id_card">请将卡片靠近读卡机上方感应</string>
+    <string name="rfid_init_fail">无法初始读卡机，请检查设定</string>
     <string name="rfid_verification_error">卡号错误，请重新刷卡</string>
     <string name="rfid_toast_no_result">卡号错误，请重新刷卡</string>
 
     <!-- SecurityCode -->
     <string name="security_verification_title">密码验证</string>
     <string name="security_hint">请输入您的唯一识别码</string>
+    <string name="security_hint_register">建议您填入身分证或手机号码做为您的唯一识别</string>
     <string name="security_verification_error">安全码错误，请重新输入</string>
     <string name="empty_security_code_msg">安全码不能为空白</string>
 
@@ -100,31 +98,36 @@
     <string name="clock_check_in">上班</string>
     <string name="clock_check_out">下班</string>
     <string name="clock_pass">开门</string>
-    <string name="clock_arrive">到访</string>
-    <string name="clock_leave">离开</string>
+    <string name="clock_arrive">签到</string>
+    <string name="clock_leave">签退</string>
     <string name="clock_timeout">验证时间过期，请重新尝试</string>
     <string name="registration_fail">注册失败</string>
     <string name="registration_complete">注册完成</string>
     <string name="face_verify_time_expire">人脸識別超時</string>
-    <string name="result_employee_name">性别</string>
+    <string name="result_employee_name">姓名</string>
     <string name="result_employee_id">ID</string>
     <string name="result_visitor_name">访客姓名</string>
     <string name="result_visitor_phone">电话号码</string>
+    <string name="result_recognition_failed">人脸辨识失败</string>
+    <string name="result_recognition_occur">脸部遮蔽</string>
+    <string name="result_not_living_face">非活体</string>
 
 
     <!--Setting-->
     <string name="setting_title">终端设定</string>
     <string name="connection_setting">后台设定</string>
     <string name="function_setting">操作设定</string>
-    <string name="linked_device">连结设备</string>
+    <string name="linked_device">镜头设定</string>
+    <string name="linked_device2">门锁设定</string>
+    <string name="update_cycle">更新周期</string>
     <string name="bluetooth_setting">蓝芽设定</string>
     <string name="server_ip">Server IP</string>
     <string name="ftp_ip">FTP IP</string>
     <string name="web_socket_ip">Web Socket IP</string>
     <string name="ftp_account">FTP 帐号</string>
     <string name="ftp_password">FTP 密码</string>
-    <string name="tablet_phone_name">装置名称</string>
-    <string name="tablet_phone_token">装置注册码</string>
+    <string name="tablet_phone_name">平板/手机编号</string>
+    <string name="tablet_phone_token">平板/手机注册码</string>
     <string name="idle_time">閒置时间(秒)</string>
     <string name="hold_verify_result">验证讯息提示时间 (ms)</string>
     <string name="face_verify_time">人脸辨识时间 (ms)</string>
@@ -147,7 +150,7 @@
     <string name="check_option">画面选择</string>
     <string name="switch_on">On</string>
     <string name="switch_off">Off</string>
-    <string name="bluetooth_refresh">重新整理</string>
+    <string name="bluetooth_refresh">寻找</string>
     <string name="bluetooth_open">开门</string>
     <string name="bluetooth_close">关门</string>
     <string name="invalid_server_ip">Server IP不能為空白</string>
@@ -161,6 +164,11 @@
     <string name="setting_account_hint">请输入帐号</string>
     <string name="setting_password_hint">请输入密码</string>
     <string name="setting_invalid_account_hint">帐号或密码错误，请重新输入</string>
+    <string name="setting_refresh_cycle_users">使用者清单更新周期(秒)</string>
+    <string name="setting_refresh_cycle_records">使用者纪录更新周期(秒)</string>
+    <string name="setting_refresh_cycle_others">其他资讯更新周期(秒)</string>
+    <string name="clear_cycle_data">已同步资料删除周期(分)</string>
+    <string name="setting_refresh_users_finish">使用者清单已更新</string>
 
 
     <!--Registration-->
@@ -170,13 +178,13 @@
     <string name="fill_in_form">基本资料填写</string>
     <string name="face_enrollment">脸部注册</string>
     <string name="completed">注册完成</string>
-    <string name="form_employee_id">员工编号</string>
-    <string name="form_employee_name">员工姓名</string>
-    <string name="form_visitor_name">访客姓名</string>
-    <string name="form_email">E-mail</string>
+    <string name="form_employee_id">ID</string>
+    <string name="form_employee_name">姓名</string>
+    <string name="form_visitor_name">姓名</string>
+    <string name="form_email">E-Mail</string>
     <string name="form_title">职称</string>
     <string name="form_password">密码</string>
-    <string name="form_phone_number">电话</string>
+    <string name="form_phone_number">电话号码</string>
     <string name="form_rfid">卡片号码</string>
     <string name="form_security_code">安全码</string>
     <string name="form_check">确认</string>
@@ -207,10 +215,55 @@
 
 
     <!-- FooterBar -->
-    <string name="back">回前页</string>
+    <string name="back">返回</string>
     <string name="registration">注册</string>
     <string name="verification">验证</string>
-    <string name="submit">下一步</string>
+    <string name="login">登入</string>
+    <string name="submit">确定</string>
+    <string name="decline">拒绝</string>
+    <string name="agree">我同意</string>
 
+
+    <!-- User Agreement-->
+    <string name="user_agreement_title">个人资料蒐集、处理及利用告知事项</string>
+    <string name="user_agreement_content">
+        大猩猩科技集团有限公司（以下简称本公司）依个人资料保护法第八条第一项之规定，向台端告知本公司对于个人资料之蒐集、处理及利用等相关事项，请详阅以下内容。当台端点选「同意」时，即视为台端已经阅读、了解并同意以下内容:\n\n
+
+        一、个人资料蒐集之目的\n\n
+
+         本公司基于场所进出安全管理或软体演示及其他合于法令规定之目的，将蒐集、处理、利用台端之个人资料。依据法务部「个人资料保护法之特定目的及个人资料之类别」之分类，本公司蒐集台端个人资料之目的为「场所进出安全管理」(116)\n\n
+
+        二、个人资料之类别\n\n
+
+         本公司蒐集台端之个人资料包括中英文姓名、身分证统一编号、电话、email、脸部影像、个人身分证明文件等。依据法务部「个人资料保护法之特定目的及个人资料之类别」之分类，本公司蒐集您的个人资料之类别为「辨识个人者」(C001)。\n\n
+
+        三、个人资料利用之期间、地区、对象及方式\n\n
+
+         (一) 期间：本公司利用台端之个人资料期间为即日起至台端最后入办公室，贸易展或工地日后2年。于期限届满后，台端同意本公司得不删除台端之个人资料，而以停止处理或利用替代之。\n\n
+
+         (二) 地区：本公司利用台端个人资料地区为中华民国、个人资料主机或相关服务器所在地、本公司及子公司、关系企业所在地。\n\n
+
+         (三) 对象：本公司得传输台端个人资料予本公司之子公司、关系企业或服务器提供者等受本公司委讬处理、利用台端个人资料之第三人。\n\n
+
+         (四) 方式: 符合个人资料保护相关法令以自动化机器或其他非自动化之利用方式。\n\n
+
+        四、个人资料之提供\n\n
+
+         (一) 请台端提供正确、最新及完整的个人资料。若台端之个人资料有任何异动，请主动向本公司申请更正，使其保持正确、最新及完整。\n\n
+
+         (二) 若台端提供错误、不实、过时或不完整或具误导性的资料而损及台端之权益，台端须自行负责。\n\n
+
+         (三) 台端可依「个人资料保护法」就台端之个人资料行使以下权利：\n\n
+
+          1. 请求查询、阅览，或制给复制本，惟本公司得酌收必要成本费用。\n\n
+
+          2. 请求补充或更正，惟应提出适当之释明。\n\n
+
+          3. 请求停止蒐集、处理及利用或请求删除，但因本公司执行职务或业务所必须者，本公司得拒绝之。
+
+        五、台端不提供个人资料所致权益之影响：\n\n
+
+         台端得自由选择是否提供台端之个人资料，惟台端亦了解如拒绝提供，本公司得拒绝让台端进入本公司办公室或工地日后，敬请见谅。
+    </string>
 
 </resources>

@@ -50,7 +50,7 @@ class VisitorRegForm (context: Context, attrs: AttributeSet) : ConstraintLayout(
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         mBinding = VisitorRegisterLayoutBinding.inflate(inflater, this, true)
 
-        initNecessaryHintUI()
+        //initNecessaryHintUI()
     }
 
     private fun initNecessaryHintUI() {
@@ -115,6 +115,15 @@ class VisitorRegForm (context: Context, attrs: AttributeSet) : ConstraintLayout(
         mBinding.securityLabel.alpha = 0.5F
         mBinding.visitorSecurityEditText.alpha = 0.5F
         mBinding.visitorSecurityEditText.isEnabled = false
+    }
+
+    fun clearUI() {
+        mBinding.nameEditText.text.clear()
+        mBinding.titleEditText.text.clear()
+        mBinding.companyEditText.text.clear()
+        mBinding.phoneEditText.text.clear()
+        mBinding.emailEditText.text.clear()
+        mBinding.visitorSecurityEditText.text.clear()
     }
 
     fun checkRegistrationForm(): Boolean {

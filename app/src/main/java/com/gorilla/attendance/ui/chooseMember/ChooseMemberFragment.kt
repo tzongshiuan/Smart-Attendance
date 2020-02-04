@@ -2,6 +2,7 @@ package com.gorilla.attendance.ui.chooseMember
 
 import android.os.Bundle
 import android.view.*
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import com.gorilla.attendance.R
@@ -9,6 +10,8 @@ import com.gorilla.attendance.databinding.ChooseMemberFragmentBinding
 import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.common.BaseFragment
 import com.gorilla.attendance.ui.common.SharedViewModel
+import com.gorilla.attendance.ui.main.MainActivity
+import com.gorilla.attendance.ui.screenSaver.ScreenSaverFragment
 import com.gorilla.attendance.utils.Constants
 import timber.log.Timber
 
@@ -68,6 +71,10 @@ class ChooseMemberFragment : BaseFragment(), Injectable {
                 mBinding?.hintText?.text = getString(R.string.choose_member_hint_text)
             }
         }
+
+//        sharedViewModel.updateLanguageEvent.observe(this, Observer {
+//            setTitle()
+//        })
     }
 
     override fun onStart() {
@@ -79,6 +86,14 @@ class ChooseMemberFragment : BaseFragment(), Injectable {
         super.onResume()
         Timber.d("onResume()")
 
+        setTitle()
+
+        if (ScreenSaverFragment.isScreenSaverActive) {
+            (activity as MainActivity).setToolbarVisible(true)
+        }
+    }
+
+    private fun setTitle() {
         when (mPreferences.applicationMode) {
             Constants.REGISTER_MODE -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.choose_member_register_title))
             Constants.VERIFICATION_MODE -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.choose_member_title))

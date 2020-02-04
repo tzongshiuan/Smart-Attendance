@@ -34,7 +34,6 @@ import com.gorillatechnology.fdrcontrol.FDRServiceClient.FaceEventResponseListen
 import com.gorillatechnology.fdrcontrol.FDRServiceClient.ResponseListener;
 import com.gorillatechnology.fdrcontrol.FaceEvent;
 import com.gorillatechnology.fdrcontrol.FaceSelectionGrid;
-import com.gorillatechnology.fdrcontrol.FaceView;
 import com.gorillatechnology.fdrcontrol.IODImage;
 import com.gorillatechnology.fdrcontrol.IODObject;
 import com.gorillatechnology.fdrcontrol.IODObjectSet;
@@ -55,6 +54,8 @@ import gorilla.iod.IntelligentObjectDetector.Type_IODInfo;
 import gorilla.iod.IntelligentObjectDetector.Type_LivenessMotion;
 import gorilla.iod.IntelligentObjectDetector.Type_LivenessMotionRequest;
 import gorilla.iod.IntelligentObjectDetector.Type_RectInfo;
+import timber.log.Timber;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,22 +78,25 @@ import java.util.Random;
 @SuppressLint({"ViewConstructor", "DefaultLocale", "LogNotTimber"})
 public class MyFDRControl extends RelativeLayout {
     private static final String TAG = "FDRControl";
-    private static final double extendedFaceRatio = 1.5D;
+    //private static final double extendedFaceRatio = 1.5D;
     private static int maxFaceWidthForFDRService = 160;
     private static FDRControl.CaptureMode captureMode;
-    private static final int enrollSamplingPeriod = 500;
-    private static final int enrollMaxImageNumber = 10;
-    private static final int recognizeSamplingPeriod = 1000;
-    private static final int recognizeMaxImageNumber = 1;
-    private static final int identifyRequestPeriod = 5000;
+    //private static final int enrollSamplingPeriod = 500;
+    //private static final int enrollMaxImageNumber = 10;
+    //private static final int recognizeSamplingPeriod = 1000;
+    //private static final int recognizeMaxImageNumber = 1;
+    //private static final int identifyRequestPeriod = 5000;
+    private static final Boolean bTriggerLock = false;
+    private static final Boolean recognizeObjLock = false;
+    private static final Boolean enrollObjLock = false;
     private static Boolean bIsTriggerAgain;
-    private static final String defIODImageLogPath = "/Gorilla/FDRControl/IODImageLog";
+    //private static final String defIODImageLogPath = "/Gorilla/FDRControl/IODImageLog";
     private Boolean isTouchFocus = true;
     private FDRControl.Mode opMode;
     private FDRControl.FaceSource faceSource;
     private CameraPreview cameraPreview;
     private RTSPClient rtspClient;
-    private FaceView faceView;
+    private MyFaceView faceView;
     private FaceSelectionGrid faceSelectionGrid;
     private Bitmap faceBitmap;
     private ByteBuffer rgbBuffer;
@@ -103,8 +107,8 @@ public class MyFDRControl extends RelativeLayout {
     private int detectionLevel;
     private int scanningLevel;
     private int delayTimeMS;
-    private static final double defMinObjWidthRatioOfShortEdge = 0.16666666666666666D;
-    private static final double defMaxObjWidthRatioOfShortEdge = 0.6666666666666666D;
+    //private static final double defMinObjWidthRatioOfShortEdge = 0.16666666666666666D;
+    //private static final double defMaxObjWidthRatioOfShortEdge = 0.6666666666666666D;
     private int minObjWidth;
     private int maxObjWidth;
     private int bestMinObjWidth;
@@ -162,6 +166,10 @@ public class MyFDRControl extends RelativeLayout {
     private Runnable doIdentifyTarget;
     private FRResponseListener frListenerForCtrl;
 
+    private boolean hideFaceDetectBox = false;
+
+    /**
+     * Unused constructors
     public MyFDRControl(Context context, FDRControl.Mode mode, FDRControl.FaceSource source) {
         super(context);
         this.opMode = FDRControl.Mode.IOD;
@@ -390,6 +398,11 @@ public class MyFDRControl extends RelativeLayout {
         this.init(mode, source, cameraId, maxObjNumber, (String)null);
     }
 
+    public MyFDRControl(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
+     */
+
     public MyFDRControl(Context context, FDRControl.Mode mode, FDRControl.FaceSource source, int cameraId, int maxObjNumber, String libPath) {
         super(context);
         this.opMode = FDRControl.Mode.IOD;
@@ -432,7 +445,7 @@ public class MyFDRControl extends RelativeLayout {
         this.livenessMotionInfo = null;
         this.livenessMotionRequest = null;
         this.faceDetectMode = 1;
-        this.iodTriggerTimeArray = new SparseArray();
+        this.iodTriggerTimeArray = new SparseArray<>();
         this.enrollObjectSet = new IODObjectSet(500, 10, captureMode);
         this.selectedObjId = 0;
         this.sourceId = "";
@@ -478,10 +491,6 @@ public class MyFDRControl extends RelativeLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    public MyFDRControl(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
     public boolean setLivenessMotionRequestNum(int num) {
         if (this.faceDetector == null) {
             return false;
@@ -516,7 +525,7 @@ public class MyFDRControl extends RelativeLayout {
         this.libPath = libPath;
         this.setBackgroundColor(-16777216);
         if (this.faceSource == FDRControl.FaceSource.CAMERA || this.faceSource == FDRControl.FaceSource.RTSP) {
-            this.faceView = new FaceView(this.getContext());
+            this.faceView = new MyFaceView(this.getContext());
             this.faceView.setZOrderMediaOverlay(true);
             this.addView(this.faceView);
         }
@@ -558,13 +567,13 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     private static int convertDpToPixel(int dp, Context context) {
-        int px = Math.round((float)dp * getDensity(context));
-        return px;
+        // return = px
+        return Math.round((float)dp * getDensity(context));
     }
 
     private static float convertPixelToDp(float px, Context context) {
-        float dp = px / getDensity(context);
-        return dp;
+        // return = dp
+        return px / getDensity(context);
     }
 
     private Rect getPixelRect(float left, float top, float right, float bottom) {
@@ -572,8 +581,8 @@ public class MyFDRControl extends RelativeLayout {
         int topPixel = convertDpToPixel(Math.round(top), this.getContext());
         int rightPixel = convertDpToPixel(Math.round(right), this.getContext());
         int bottomPixel = convertDpToPixel(Math.round(bottom), this.getContext());
-        Rect rect = new Rect(leftPixel, topPixel, rightPixel, bottomPixel);
-        return rect;
+
+        return new Rect(leftPixel, topPixel, rightPixel, bottomPixel);
     }
 
     public void hideFaceView(boolean isHide) {
@@ -732,10 +741,10 @@ public class MyFDRControl extends RelativeLayout {
         if (rawImg.data != null) {
             this.numberOfFaceDetected = this.faceDetector.exec(rawImg.data, this.faceDetected);
         } else {
-            Log.i("FDRControl", String.format("rawImg.data = null."));
+            Log.i("FDRControl", "rawImg.data = null.");
         }
 
-        Log.i("FDRControl", String.format("%d faces detected.", this.numberOfFaceDetected));
+        //Log.i("FDRControl", String.format("%d faces detected.", this.numberOfFaceDetected));
     }
 
     private static IOD_CAMERA_DIRECTION degreeToIODCamDirt(int degree, boolean mirror) {
@@ -802,19 +811,19 @@ public class MyFDRControl extends RelativeLayout {
     public FDRControl.FocusMode getFocusMode() {
         if (this.cameraPreview != null) {
             String focusMode = this.cameraPreview.getFocusMode();
-            if (focusMode == "auto") {
+            if (focusMode.equals("auto")) {
                 return FDRControl.FocusMode.AUTO;
-            } else if (focusMode == "infinity") {
+            } else if (focusMode.equals("infinity")) {
                 return FDRControl.FocusMode.INFINITY;
-            } else if (focusMode == "macro") {
+            } else if (focusMode.equals("macro")) {
                 return FDRControl.FocusMode.MACRO;
-            } else if (focusMode == "fixed") {
+            } else if (focusMode.equals("fixed")) {
                 return FDRControl.FocusMode.FIXED;
-            } else if (focusMode == "edof") {
+            } else if (focusMode.equals("edof")) {
                 return FDRControl.FocusMode.EDOF;
-            } else if (focusMode == "continuous-video") {
+            } else if (focusMode.equals("continuous-video")) {
                 return FDRControl.FocusMode.CONTINUOUS_VIDEO;
-            } else if (focusMode == "continuous-picture") {
+            } else if (focusMode.equals("continuous-picture")) {
                 return FDRControl.FocusMode.CONTINUOUS_PICTURE;
             } else {
                 Log.i("FDRControl", focusMode + "not identified by FDRControl.");
@@ -877,9 +886,10 @@ public class MyFDRControl extends RelativeLayout {
         }
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
     public void updateFaceView(ImageRawData rawImg) {
-        int bitmapWidth = 0;
-        int bitmapHeight = 0;
+        int bitmapWidth;
+        int bitmapHeight;
         this.faceView.setVisibility(View.VISIBLE);
         if (rawImg.degree != 90 && rawImg.degree != 270) {
             bitmapWidth = rawImg.width;
@@ -897,7 +907,7 @@ public class MyFDRControl extends RelativeLayout {
             }
 
             Log.i("FDRControl", String.format("video size: %d * %d", rawImg.width, rawImg.height));
-            this.faceBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Config.ARGB_8888);
+            this.faceBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Config.ARGB_4444);
             this.faceBitmap.setHasAlpha(false);
             if (rawImg.format == IOD_SRC_IMG_FORMAT.IOD_SRC_IMG_FORMAT_YUV) {
                 this.rgbBuffer = ByteBuffer.allocate(this.faceBitmap.getByteCount());
@@ -928,7 +938,7 @@ public class MyFDRControl extends RelativeLayout {
 
                     Log.d("FDRControl", String.format("parentView size: %d * %d,videoAspect:%1.2f", parentView.getWidth(), parentView.getHeight(), videoAspect));
                 } else {
-                    Log.d("FDRControl", String.format("parentView null"));
+                    Log.d("FDRControl", "parentView null");
                 }
             }
 
@@ -968,78 +978,103 @@ public class MyFDRControl extends RelativeLayout {
             }
         }
 
-        if (!this.isHideFace) {
+        if (!this.isHideFace && !hideFaceDetectBox) {
             this.faceView.draw(this.faceBitmap, this.faceDetected, this.numberOfFaceDetected, this.selectedObjId);
-        }
 
-        for (i = 0; i < this.numberOfFaceDetected; ++i) {
-            boolean isNeedTrigger = false;
-            TriggerType triggerType = TriggerType.NONE;
-            Type_IODInfo face = this.faceDetected[i];
-            IODTriggerInfo triggerInfo;
-            if (face.triggerState == 1) {
-                triggerInfo = new IODTriggerInfo();
-                triggerInfo.trigger = TriggerType.OCCUR;
-                this.iodTriggerTimeArray.put(face.objId, triggerInfo);
-                triggerType = TriggerType.OCCUR;
-                isNeedTrigger = true;
-            } else if (face.triggerState == 2) {
-                this.iodTriggerTimeArray.remove(face.objId);
-                triggerType = TriggerType.CLEAR;
-                isNeedTrigger = true;
-            } else {
-                triggerInfo = (IODTriggerInfo)this.iodTriggerTimeArray.get(face.objId);
-                if (triggerInfo != null) {
-                    synchronized(bIsTriggerAgain) {
-                        if (triggerInfo.trigger != TriggerType.DETERMINED || bIsTriggerAgain) {
-                            int scaleFaceX = Math.round((float)face.x * this.bitmapScaleRatioX);
-                            int scaleFaceY = Math.round((float)face.y * this.bitmapScaleRatioY);
-                            int scaleFaceW = Math.round((float)face.width * this.bitmapScaleRatioX);
-                            int scaleFaceH = Math.round((float)face.height * this.bitmapScaleRatioY);
-                            int sizeStatus = this.checkObjectSize(scaleFaceW, scaleFaceH);
-                            int locationStatus = this.checkObjectLocation(new Rect(scaleFaceX, scaleFaceY, scaleFaceX + scaleFaceW, scaleFaceY + scaleFaceH));
-                            if (sizeStatus != 0) {
-                                if (sizeStatus == -1) {
-                                    triggerType = TriggerType.TOO_FAR;
-                                } else if (sizeStatus == 1) {
-                                    triggerType = TriggerType.TOO_CLOSE;
-                                }
-
-                                triggerInfo.readyTimestamp = 0L;
-                                bIsTriggerAgain = true;
-                            } else if (locationStatus != 0) {
-                                if (locationStatus == -1) {
-                                    triggerType = TriggerType.TOO_LEFT;
-                                } else if (locationStatus == 1) {
-                                    triggerType = TriggerType.TOO_RIGHT;
-                                } else if (locationStatus == -2) {
-                                    triggerType = TriggerType.TOO_HIGH;
-                                } else if (locationStatus == 2) {
-                                    triggerType = TriggerType.TOO_LOW;
-                                }
-
-                                triggerInfo.readyTimestamp = 0L;
-                                bIsTriggerAgain = true;
-                            } else {
-                                triggerType = TriggerType.READY;
-                                if (triggerInfo.readyTimestamp != 0L) {
-                                    long peroid = System.currentTimeMillis() - triggerInfo.readyTimestamp;
-                                    if (peroid >= (long)this.delayTimeMS) {
-                                        triggerType = TriggerType.DETERMINED;
+            for (i = 0; i < this.numberOfFaceDetected; ++i) {
+                boolean isNeedTrigger = false;
+                TriggerType triggerType = TriggerType.NONE;
+                Type_IODInfo face = this.faceDetected[i];
+                IODTriggerInfo triggerInfo;
+                if (face.triggerState == 1) {
+                    triggerInfo = new IODTriggerInfo();
+                    triggerInfo.trigger = TriggerType.OCCUR;
+                    this.iodTriggerTimeArray.put(face.objId, triggerInfo);
+                    triggerType = TriggerType.OCCUR;
+                    isNeedTrigger = true;
+                } else if (face.triggerState == 2) {
+                    this.iodTriggerTimeArray.remove(face.objId);
+                    triggerType = TriggerType.CLEAR;
+                    isNeedTrigger = true;
+                } else {
+                    triggerInfo = this.iodTriggerTimeArray.get(face.objId);
+                    if (triggerInfo != null) {
+                        synchronized(bTriggerLock) {
+                            if (triggerInfo.trigger != TriggerType.DETERMINED || bIsTriggerAgain) {
+                                int scaleFaceW = Math.round((float)face.width * this.bitmapScaleRatioX);
+                                int scaleFaceH = Math.round((float)face.height * this.bitmapScaleRatioY);
+                                int sizeStatus = this.checkObjectSize(scaleFaceW, scaleFaceH);
+                                //int scaleFaceX = Math.round((float)face.x * this.bitmapScaleRatioX);
+                                //int scaleFaceY = Math.round((float)face.y * this.bitmapScaleRatioY);
+                                //int locationStatus = this.checkObjectLocation(new Rect(scaleFaceX, scaleFaceY, scaleFaceX + scaleFaceW, scaleFaceY + scaleFaceH));
+                                if (sizeStatus != 0) {
+                                    if (sizeStatus == -1) {
+                                        triggerType = TriggerType.TOO_FAR;
+                                    } else if (sizeStatus == 1) {
+                                        triggerType = TriggerType.TOO_CLOSE;
                                     }
-                                } else {
-                                    triggerInfo.readyTimestamp = System.currentTimeMillis();
-                                }
-                            }
 
-                            if (triggerInfo.trigger != triggerType && triggerInfo.trigger != TriggerType.DETERMINED || bIsTriggerAgain) {
-                                triggerInfo.trigger = triggerType;
-                                isNeedTrigger = true;
-                                if (bIsTriggerAgain) {
-                                    bIsTriggerAgain = false;
+                                    triggerInfo.readyTimestamp = 0L;
+                                    bIsTriggerAgain = true;
+                                }
+                                /*
+                                 * Hsuan:
+                                 * do not check TOO_LEFT, TOO_RIGHT, TOO_HIGH, TOO_LOW four states
+                                 * => for better face recognized efficiency
+                                 */
+//                                else if (locationStatus != 0) {
+//                                    if (locationStatus == -1) {
+//                                        triggerType = TriggerType.TOO_LEFT;
+//                                    } else if (locationStatus == 1) {
+//                                        triggerType = TriggerType.TOO_RIGHT;
+//                                    } else if (locationStatus == -2) {
+//                                        triggerType = TriggerType.TOO_HIGH;
+//                                    } else if (locationStatus == 2) {
+//                                        triggerType = TriggerType.TOO_LOW;
+//                                    }
+//
+//                                    triggerInfo.readyTimestamp = 0L;
+//                                    bIsTriggerAgain = true;
+//                                }
+                                /*
+                                 * Hsuan:
+                                 * skip READY state for better face recognized efficiency
+                                 */
+                                else {
+                                    triggerType = TriggerType.DETERMINED;
+                                }
+//                                else {
+//                                    triggerType = TriggerType.READY;
+//                                    if (triggerInfo.readyTimestamp != 0L) {
+//                                        long peroid = System.currentTimeMillis() - triggerInfo.readyTimestamp;
+//                                        if (peroid >= (long)this.delayTimeMS) {
+//                                            triggerType = TriggerType.DETERMINED;
+//                                        }
+//                                    } else {
+//                                        triggerInfo.readyTimestamp = System.currentTimeMillis();
+//                                    }
+//                                }
+
+                                if (triggerInfo.trigger != triggerType && triggerInfo.trigger != TriggerType.DETERMINED || bIsTriggerAgain) {
+                                    triggerInfo.trigger = triggerType;
+                                    isNeedTrigger = true;
+                                    if (bIsTriggerAgain) {
+                                        bIsTriggerAgain = false;
+                                    }
+
+//                                    if (triggerType == TriggerType.DETERMINED) {
+//                                        this.writeIODImageLog(face);
+//                                        this.iodTriggerTimeArray.remove(face.objId);
+//                                        triggerInfo.readyTimestamp = 0L;
+//                                        triggerInfo.trigger = TriggerType.DETERMINED;
+//                                        this.iodTriggerTimeArray.put(face.objId, triggerInfo);
+//                                    }
                                 }
 
                                 if (triggerType == TriggerType.DETERMINED) {
+                                    triggerInfo.trigger = triggerType;
+                                    isNeedTrigger = true;
+
                                     this.writeIODImageLog(face);
                                     this.iodTriggerTimeArray.remove(face.objId);
                                     triggerInfo.readyTimestamp = 0L;
@@ -1050,19 +1085,22 @@ public class MyFDRControl extends RelativeLayout {
                         }
                     }
                 }
-            }
 
-            if (isNeedTrigger) {
-                synchronized(this.recognizeObjectSet) {
-                    this.recognizeObjectSet.setIODObjectIsDetermined(face.objId, triggerType == TriggerType.DETERMINED);
-                }
+                if (isNeedTrigger) {
+                    synchronized(recognizeObjLock) {
+                        this.recognizeObjectSet.setIODObjectIsDetermined(face.objId, triggerType == TriggerType.DETERMINED);
+                    }
 
-                if (this.iodTrigerRespListener != null) {
-                    this.iodTrigerRespListener.onIODTriggerResponse(triggerType, face);
+                    if (this.iodTrigerRespListener != null) {
+                        this.iodTrigerRespListener.onIODTriggerResponse(triggerType, face);
+                    } else {
+                        Timber.d("iodTrigerRespListener is NULL, triggerType = %s", triggerType);
+                    }
                 }
             }
+        } else {
+            this.faceView.draw(this.faceBitmap, this.faceDetected, 0, this.selectedObjId);
         }
-
     }
 
     private int checkObjectSize(int width, int height) {
@@ -1129,7 +1167,6 @@ public class MyFDRControl extends RelativeLayout {
                     out.close();
                 } catch (Exception var9) {
                     var9.printStackTrace();
-                    return;
                 }
             }
         }
@@ -1146,11 +1183,11 @@ public class MyFDRControl extends RelativeLayout {
             if (face.triggerState != 0 && face.triggerState != 1) {
                 if (face.triggerState == 2) {
                     if (this.opMode == FDRControl.Mode.ENROLL) {
-                        synchronized(this.enrollObjectSet) {
+                        synchronized(enrollObjLock) {
                             this.enrollObjectSet.removeIODObjectById(face.objId);
                         }
                     } else if (this.opMode == FDRControl.Mode.RECOGNIZE || this.opMode == FDRControl.Mode.IOD) {
-                        synchronized(this.recognizeObjectSet) {
+                        synchronized(recognizeObjLock) {
                             this.recognizeObjectSet.removeIODObjectById(face.objId);
                         }
                     }
@@ -1204,18 +1241,18 @@ public class MyFDRControl extends RelativeLayout {
                     iodImage.roi = new Rect(roiX, roiY, roiX + face.width, roiY + face.height);
                     iodImage.bitmap = null;
                     if (this.opMode == FDRControl.Mode.IOD) {
-                        synchronized(this.recognizeObjectSet) {
+                        synchronized(recognizeObjLock) {
                             this.recognizeObjectSet.addIODImage(face.objId, iodImage);
                         }
                     } else {
                         iodImage.bitmap = Bitmap.createBitmap(this.faceBitmap, extRect.left, extRect.top, extRect.width(), extRect.height());
                         IODImage iodImageDS = new IODImage(iodImage, maxFaceWidthForFDRService);
                         if (this.opMode == FDRControl.Mode.ENROLL) {
-                            synchronized(this.enrollObjectSet) {
+                            synchronized(enrollObjLock) {
                                 this.enrollObjectSet.addIODImage(face.objId, iodImageDS);
                             }
                         } else if (this.opMode == FDRControl.Mode.RECOGNIZE) {
-                            synchronized(this.recognizeObjectSet) {
+                            synchronized(recognizeObjLock) {
                                 this.recognizeObjectSet.addIODImage(face.objId, iodImageDS);
                             }
                         }
@@ -1396,11 +1433,11 @@ public class MyFDRControl extends RelativeLayout {
         }
 
         this.opMode = mode;
-        synchronized(this.enrollObjectSet) {
+        synchronized(enrollObjLock) {
             this.enrollObjectSet.clear();
         }
 
-        synchronized(this.recognizeObjectSet) {
+        synchronized(recognizeObjLock) {
             this.recognizeObjectSet.clear();
             return true;
         }
@@ -1408,6 +1445,8 @@ public class MyFDRControl extends RelativeLayout {
 
     public boolean releaseCamera(int cameraId) {
         Log.i("FDRControl", String.format("releaseCamera:%d", cameraId));
+        hideFaceDetectBox = false;
+
         if (this.cameraPreview != null) {
             this.cameraPreview.releaseCamera();
             return true;
@@ -1432,7 +1471,7 @@ public class MyFDRControl extends RelativeLayout {
 
     public boolean switchCamera(int cameraId) {
         Log.i("FDRControl", String.format("switchCamera:%d", cameraId));
-        return this.cameraPreview != null ? this.cameraPreview.switchCamera(cameraId) : false;
+        return this.cameraPreview != null && this.cameraPreview.switchCamera(cameraId);
     }
 
     public void setIODTriggerResponseListener(IODTriggerResponseListener listener) {
@@ -1468,11 +1507,12 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     public void disconnectRTSP() {
+        hideFaceDetectBox = false;
+
         if (this.rtspClient != null) {
             this.rtspClient.stop();
             this.rtspClient.close();
         }
-
     }
 
     public void playRTSP() {
@@ -1514,7 +1554,7 @@ public class MyFDRControl extends RelativeLayout {
         boolean ret = false;
         if (this.opMode == FDRControl.Mode.ENROLL && this.faceSource != FDRControl.FaceSource.EVENT && this.selectedObjId != 0) {
             IODObject object = null;
-            synchronized(this.enrollObjectSet) {
+            synchronized(enrollObjLock) {
                 object = this.enrollObjectSet.getIODObjectById(this.selectedObjId);
             }
 
@@ -1528,6 +1568,10 @@ public class MyFDRControl extends RelativeLayout {
         }
 
         return ret;
+    }
+
+    public void setHideFaceDetectBox(boolean isHide) {
+        hideFaceDetectBox = isHide;
     }
 
     public void cancelFaceSelection() {
@@ -1605,7 +1649,7 @@ public class MyFDRControl extends RelativeLayout {
     public void startIdentify(String sourceId, int regLevel) {
         if (this.opMode == FDRControl.Mode.RECOGNIZE) {
             this.isStartIdentify = true;
-            synchronized(this.recognizeObjectSet) {
+            synchronized(recognizeObjLock) {
                 this.recognizeObjectSet.clear();
             }
 
@@ -1623,7 +1667,7 @@ public class MyFDRControl extends RelativeLayout {
     public void stopIdentify() {
         if (this.opMode == FDRControl.Mode.RECOGNIZE) {
             this.isStartIdentify = false;
-            synchronized(this.recognizeObjectSet) {
+            synchronized(recognizeObjLock) {
                 this.recognizeObjectSet.clear();
             }
         }
@@ -1656,7 +1700,7 @@ public class MyFDRControl extends RelativeLayout {
 
     private boolean identifyTargetByObjId(String sourceId, int regLevel, boolean isSingleMode, int objId) {
         boolean ret = false;
-        synchronized(this.recognizeObjectSet) {
+        synchronized(recognizeObjLock) {
             IODObject object = this.recognizeObjectSet.getIODObjectById(objId);
             if (object != null) {
                 int imageNum = 0;
@@ -1686,7 +1730,7 @@ public class MyFDRControl extends RelativeLayout {
     public boolean verifyTarget(String sourceId, String targetId, int regLevel) {
         boolean ret = false;
         if (this.selectedObjId != 0) {
-            synchronized(this.recognizeObjectSet) {
+            synchronized(recognizeObjLock) {
                 IODObject object = this.recognizeObjectSet.getIODObjectById(this.selectedObjId);
                 if (object != null) {
                     int imageNum = 0;
@@ -1714,10 +1758,10 @@ public class MyFDRControl extends RelativeLayout {
 
     public int getRecognizedFaceList(List<byte[]> pngList, List<String> iniList, FDRControl.IODfeature iodfeature) {
         int ret = 0;
-        synchronized(bIsTriggerAgain) {
+        synchronized(bTriggerLock) {
             bIsTriggerAgain = true;
             if (this.selectedObjId != 0) {
-                synchronized(this.recognizeObjectSet) {
+                synchronized(recognizeObjLock) {
                     IODObject object = this.recognizeObjectSet.getIODObjectById(this.selectedObjId);
                     if (object != null) {
                         iodfeature.liveness = object.liveness;
@@ -1756,12 +1800,17 @@ public class MyFDRControl extends RelativeLayout {
         this.isAutoSelectLargestFace = enable;
     }
 
+    public void setFaceViewColor(int color) {
+        this.faceView.setPaintColor(color);
+    }
+
     public void startFaceDetection() {
         this.isDoIOD = true;
         this.faceView.setVisibility(View.VISIBLE);
     }
 
     public void stopFaceDetection() {
+        this.hideFaceDetectBox = true;
         this.waitingPreviewData.data = null;
         this.previewData.data = null;
         this.isDoIOD = false;
@@ -1785,11 +1834,11 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     public boolean setExposure(int exposure) {
-        return this.cameraPreview != null ? this.cameraPreview.setExposure(exposure) : false;
+        return this.cameraPreview != null && this.cameraPreview.setExposure(exposure);
     }
 
     public boolean lockExposure(boolean isLock) {
-        return this.cameraPreview != null ? this.cameraPreview.lockExposure(isLock) : false;
+        return this.cameraPreview != null && this.cameraPreview.lockExposure(isLock);
     }
 
     public void setCameraVisibility(int cameraVisibility) {
@@ -1829,28 +1878,43 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     public void release() {
-        Log.d("FDRControl", String.format("fdrCtrl release"));
+        Log.d("FDRControl", "fdrCtrl release");
         this.stopIdentify();
         this.removeView(this.cameraPreview);
 
         try {
             this.exit = true;
+            this.vaThread.interrupt();
             this.vaThread.join();
+            this.setObjThread.interrupt();
             this.setObjThread.join();
         } catch (InterruptedException var2) {
             Log.e("FDRControl", var2.toString());
         }
 
-        if (this.cameraPreview != null) {
-            this.cameraPreview.release();
-            this.cameraPreview = null;
-            this.firstCameraStart = false;
+        if (this.faceSource == FDRControl.FaceSource.CAMERA) {
+            if (this.cameraPreview != null) {
+                this.cameraPreview.release();
+                this.cameraPreview = null;
+                this.firstCameraStart = false;
+            }
+        } else if (this.faceSource == FDRControl.FaceSource.RTSP) {
+            if (this.rtspClient != null) {
+                this.rtspClient.release();
+                this.rtspClient = null;
+            }
         }
 
-        if (this.rtspClient != null) {
-            this.rtspClient.release();
-            this.rtspClient = null;
-        }
+//        if (this.cameraPreview != null) {
+//            this.cameraPreview.release();
+//            this.cameraPreview = null;
+//            this.firstCameraStart = false;
+//        }
+//
+//        if (this.rtspClient != null) {
+//            this.rtspClient.release();
+//            this.rtspClient = null;
+//        }
 
         if (this.faceDetector != null) {
             Log.i("FDRControl", "free IOD");
@@ -1864,7 +1928,7 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     public ImageRawData getRtspPreview() {
-        return MyFDRControl.this.rtspPreview;
+        return MyFDRControl.this.previewData;
     }
 
     static {
@@ -1883,9 +1947,9 @@ public class MyFDRControl extends RelativeLayout {
     }
 
     private class UpdateFaceViewRunnable implements Runnable {
-        ImageRawData rawImg = null;
+        ImageRawData rawImg;
 
-        public UpdateFaceViewRunnable(ImageRawData rawImg) {
+        UpdateFaceViewRunnable(ImageRawData rawImg) {
             this.rawImg = rawImg;
         }
 
@@ -1918,7 +1982,9 @@ public class MyFDRControl extends RelativeLayout {
                     } else {
                         boolean isImageUpdated = false;
                         synchronized(MyFDRControl.this.waitingPreviewData) {
-                            if (MyFDRControl.this.waitingPreviewData.data != null && MyFDRControl.this.isDoIOD && (MyFDRControl.this.previewData.data == null || !Arrays.equals(MyFDRControl.this.waitingPreviewData.data, MyFDRControl.this.previewData.data))) {
+                            if (MyFDRControl.this.waitingPreviewData.data != null && MyFDRControl.this.isDoIOD
+                                    && (MyFDRControl.this.previewData.data == null
+                                        || !Arrays.equals(MyFDRControl.this.waitingPreviewData.data, MyFDRControl.this.previewData.data))) {
                                 MyFDRControl.this.previewData = MyFDRControl.this.waitingPreviewData.clone();
                                 isImageUpdated = true;
                             }
@@ -1960,7 +2026,7 @@ public class MyFDRControl extends RelativeLayout {
         int status = 0;
         int error = 0;
 
-        public OnRTSPStatusRunnable(int status, int error) {
+        OnRTSPStatusRunnable(int status, int error) {
             this.status = status;
             this.error = error;
         }
@@ -2000,7 +2066,7 @@ public class MyFDRControl extends RelativeLayout {
         double cameraScaleY;
         int waitCounter = 0;
 
-        public SetBestObjRunnable(float left, float top, float right, float bottom) {
+        SetBestObjRunnable(float left, float top, float right, float bottom) {
             this.bestLeft = left;
             this.bestTop = top;
             this.bestRight = right;
@@ -2062,7 +2128,7 @@ public class MyFDRControl extends RelativeLayout {
         void onIODTriggerResponse(TriggerType var1, Type_IODInfo var2);
     }
 
-    public static enum TriggerType {
+    public enum TriggerType {
         NONE,
         OCCUR,
         TOO_FAR,
@@ -2075,7 +2141,7 @@ public class MyFDRControl extends RelativeLayout {
         DETERMINED,
         CLEAR;
 
-        private TriggerType() {
+        TriggerType() {
         }
     }
 

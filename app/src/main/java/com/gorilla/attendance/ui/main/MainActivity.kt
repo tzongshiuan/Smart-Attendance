@@ -1,5 +1,7 @@
 package com.gorilla.attendance.ui.main
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -13,6 +15,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -28,9 +32,9 @@ import androidx.navigation.fragment.NavHostFragment
 import com.gorilla.attendance.AttendanceApp
 import com.gorilla.attendance.R
 import com.gorilla.attendance.api.HostSelectionInterceptor
+import com.gorilla.attendance.data.model.BottomFaceResult
 import com.gorilla.attendance.data.model.DeviceLoginData
 import com.gorilla.attendance.data.model.NetworkState
-import com.gorilla.attendance.data.model.Status
 import com.gorilla.attendance.databinding.ActivityMainBinding
 import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.chooseMember.ChooseMemberFragment
@@ -53,8 +57,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
-import java.util.Locale
-import java.util.Date
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.system.exitProcess
@@ -72,54 +75,28 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
         var IS_SKIP_FDR = false
             get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
+                return if (IS_DEBUG_GOGO) {
+                    field
                 } else {
-                    return false
+                    false
                 }
             }
         var USE_TEST_FACE = false
             get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
+                return if (IS_DEBUG_GOGO) {
+                    field
                 } else {
-                    return false
-                }
-            }
-
-        var SEND_CLOCK_EVENT = false
-            get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
-                } else {
-                    return true
-                }
-            }
-        var GET_DEVICE_IDENTITIES = false
-            get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
-                } else {
-                    return true
-                }
-            }
-
-        var IS_ENABLE_SCREEN_SAVER = false
-            get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
-                } else {
-                    return true
+                    false
                 }
             }
 
         var testSecurityCode = "07121234"
         var IS_SKIP_SCAN_CODE = false
             get() {
-                if (IS_DEBUG_GOGO) {
-                    return field
+                return if (IS_DEBUG_GOGO) {
+                    field
                 } else {
-                    return false
+                    false
                 }
             }
     }
@@ -190,9 +167,15 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         android.Manifest.permission.ACCESS_FINE_LOCATION
     )
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate()")
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
 
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(mBinding?.toolbar as Toolbar)
@@ -221,6 +204,8 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
             isHaveSensor = true
             mSensorManager.registerListener(this, sensors[0], SensorManager.SENSOR_DELAY_NORMAL)
         }
+
+        mainViewModel.startClockEventSendingJob()
 
         // test
 //        Crashlytics.setInt("priority", Log.ERROR)
@@ -306,11 +291,13 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         mBtLeManager.onActivityDestroy()
 
         mUsbRelayManager.stop()
+
+        mainViewModel.stopClockEventSendingJob()
     }
 
     override fun onUserInteraction() {
         super.onUserInteraction()
-        //Timber.d("onUserInteraction()")
+//        Timber.d("onUserInteraction()")
 
         //if (mPreferences.isDeviceDbExist) {
             startSubscriber()
@@ -325,24 +312,24 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
     }
 
     private fun startScreenSaverSubscriber() {
-        if (!mPreferences.isScreenSaverEnable || !IS_ENABLE_SCREEN_SAVER) {
+        if (!mPreferences.isScreenSaverEnable) {
             SimpleRxTask.cancelSubscriber(screenSaverSubscriber)
             return
         }
         //Timber.d("startScreenSaverSubscriber()")
+
+        if (mPreferences.idleTime == 0L) {
+            return
+        }
 
         screenSaverSubscriber = SimpleRxTask.createDelaySubscriber(mPreferences.idleTime * 1000) {
             /**
              * If not in screen saver page
              */
             if (navController.currentDestination?.label != ScreenSaverFragment::class.java.simpleName) {
-                // back home first
-                if (BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE) {
-                    startSubscriber()
-                    return@createDelaySubscriber
-                }
-
-                if (navController.currentDestination?.id == R.id.settingFragment) {
+                if (BaseFragment.isStartRegister
+                    || navController.currentDestination?.id == R.id.settingFragment
+                    || mainViewModel.initialLoad.value == NetworkState.LOADING) {
                     startSubscriber()
                     return@createDelaySubscriber
                 }
@@ -352,18 +339,21 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                     if (navController.currentDestination?.label != navHomeLabel) {
                         Timber.d("Navigate to home page !!")
                         navController.popBackStack(id, false)
-                        SimpleRxTask.onMain {
-                            mBinding?.faceVerifyResultView?.visibility = View.GONE
-                        }
                     }
                 }
+
+                SimpleRxTask.onMain {
+                    mBinding?.faceVerifyResultView?.visibility = View.GONE
+                    mBinding?.userAgreement?.agreeLayout?.visibility = View.GONE
+                }
+
                 startSubscriber()
 
                 try {
                     // Navigate to screen saver page
                     val navBuilder = NavOptions.Builder()
-                    navBuilder.setEnterAnim(R.anim.fade_in)
-                    navBuilder.setPopExitAnim(R.anim.fade_out)
+//                    navBuilder.setEnterAnim(R.anim.fade_in)
+//                    navBuilder.setPopExitAnim(R.anim.fade_out)
                     navController.navigate(R.id.screenSaverFragment, null, navBuilder.build())
                 } catch (e: Exception) {
                     Timber.e("Navigate to screen saver page exception, message: ${e.message}")
@@ -372,36 +362,9 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         }
     }
 
-    private fun startBackHomeSubscriber() {
-        if (!mPreferences.isScreenSaverEnable || !IS_ENABLE_SCREEN_SAVER) {
-            SimpleRxTask.cancelSubscriber(screenSaverSubscriber)
-            return
-        }
-        Timber.d("startBackHomeSubscriber()")
-
-        screenSaverSubscriber = SimpleRxTask.createDelaySubscriber(DeviceUtils.BACK_TO_HOME_DELAYED_TIME) {
-
-            if (BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE) {
-                startBackHomeSubscriber()
-                return@createDelaySubscriber
-            }
-
-            // Back to home page
-            navHomeId?.let { id ->
-                if (navController.currentDestination?.label != navHomeLabel) {
-                    Timber.d("Navigate to home page !!")
-                    navController.popBackStack(id, false)
-                    mBinding?.faceVerifyResultView?.visibility = View.GONE
-                    startSubscriber()
-                } else {
-                    startSubscriber(true)
-                }
-            }
-        }
-    }
-
-    fun startSubscriber(isForceScreenSaver: Boolean = false) {
-        if (!mPreferences.isScreenSaverEnable || !IS_ENABLE_SCREEN_SAVER) {
+    @Synchronized
+    fun startSubscriber() {
+        if (!mPreferences.isScreenSaverEnable) {
             SimpleRxTask.cancelSubscriber(screenSaverSubscriber)
             return
         }
@@ -412,18 +375,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
             navController.currentDestination?.label == ScreenSaverFragment::class.java.simpleName -> {
                 Timber.d("Already in the screen saver page")
                 navController.popBackStack()    // to home page
-//                startScreenSaverSubscriber()
             }
-
-//            navController.currentDestination?.label == navHomeLabel -> {
-//                if (isForceScreenSaver) {
-//                    startScreenSaverSubscriber()
-//                } else {
-//                    startBackHomeSubscriber()
-//                }
-//            }
-//
-//            else -> startBackHomeSubscriber()
         }
 
         startScreenSaverSubscriber()
@@ -482,6 +434,9 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
     fun initFdr() {
         mFdrManager.initFdr(this, factory)
+
+        // restart update cycle counter
+        mainViewModel.resetUpdateCounter()
     }
 
     fun navigateToHome() {
@@ -494,7 +449,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         }
     }
 
-    fun applyNewSetting() {
+    fun applyNewSetting(isNeedReconnectWebSocket: Boolean) {
         Timber.d("apply new setting()")
 
         mPreferences.applyNewSetting()
@@ -509,23 +464,60 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
         // To ensure RTSP camera setting is synchronized
 
-        mainViewModel.stopClockEventSendingJob()
+        mainViewModel.disableCoroutine()
+
         SimpleRxTask.onMain {
             mBinding?.titleText?.text = ""
             initSettingFinished()
         }
+
+        if (isNeedReconnectWebSocket) {
+            // disconnect web socket
+            mWebSocketManager.disconnect()
+            mBinding?.socketImage?.setImageResource(R.mipmap.ic_disconnected)
+        }
     }
 
-    fun setToolbarVisible(visible: Boolean) {
-        if (visible) {
-            if (!QrCodeFragment.isRtspClientRunning) {
-                mBinding?.toolbar?.visibility = View.VISIBLE
-                mBinding?.toolbarBottomLine?.visibility = View.VISIBLE
-            }
-        } else  {
+    fun getToolbarVisibility(): Int {
+        return mBinding?.toolbar?.visibility ?: View.VISIBLE
+    }
+
+    fun setToolbarVisible(visible: Boolean, isForce: Boolean = false) {
+        if (navController.currentDestination?.label == ScreenSaverFragment::class.java.simpleName) {
+            mBinding?.toolbar?.visibility = View.GONE
+            mBinding?.toolbarBottomLine?.visibility = View.GONE
+            return
+        }
+
+        val isShowToolbarInSingleMode = View.VISIBLE
+
+        if ((QrCodeFragment.isQrCodeScanning || QrCodeFragment.isRtspClientRunning
+                    || BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE)
+            && sharedViewModel.isSingleModuleMode() && !isForce) {
+            mBinding?.toolbar?.visibility = isShowToolbarInSingleMode
+            mBinding?.toolbarBottomLine?.visibility = isShowToolbarInSingleMode
+        } else if (visible || isForce) {
+            mBinding?.toolbar?.visibility = View.VISIBLE
+            mBinding?.toolbarBottomLine?.visibility = View.VISIBLE
+        } else {
             mBinding?.toolbar?.visibility = View.GONE
             mBinding?.toolbarBottomLine?.visibility = View.GONE
         }
+
+//        if (visible) {
+//            if ((QrCodeFragment.isQrCodeScanning || QrCodeFragment.isRtspClientRunning
+//                || BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE)
+//                && sharedViewModel.isSingleModuleMode() && !isForce) {
+//                mBinding?.toolbar?.visibility = isShowToolbarInSingleMode
+//                mBinding?.toolbarBottomLine?.visibility = isShowToolbarInSingleMode
+//            } else {
+//                mBinding?.toolbar?.visibility = View.VISIBLE
+//                mBinding?.toolbarBottomLine?.visibility = View.VISIBLE
+//            }
+//        } else {
+//            mBinding?.toolbar?.visibility = View.GONE
+//            mBinding?.toolbarBottomLine?.visibility = View.GONE
+//        }
     }
 
     private fun hasPermissions(): Boolean {
@@ -601,6 +593,10 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                 else -> mBinding?.languageImage?.setImageResource(R.mipmap.ic_en)
             }
             mainViewModel.changeLanguageConfig(this, mPreferences.languageId ?: MainViewModel.LANGUAGE_EN)
+
+            // apply language setting to waiting dialog
+            mBinding?.waitingView?.setWaitingText(getString(R.string.search_wait))
+            mBinding?.errorHintText?.text = getString(R.string.device_login_error)
         }
 
         mainViewModel.languageIdChangeEvent.observe(this, Observer { languageId ->
@@ -610,6 +606,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                 else -> mBinding?.languageImage?.setImageResource(R.mipmap.ic_en)
             }
             mPreferences.languageId = languageId
+            mPreferences.savePreferences()
         })
 
         mBinding?.languageImage?.let {
@@ -637,9 +634,9 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                     }
 
                     // if in fdr mode, do nothing for thread safety
-                    if (BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE) {
-                        return@subscribe
-                    }
+//                    if (BaseFragment.currentState == BaseFragment.VERIFY_FACE_RUNNING_STATE) {
+//                        return@subscribe
+//                    }
 
                     if (enterSettingCount >= DeviceUtils.ENTER_SETTING_CLICK_NUM
                         || (System.currentTimeMillis() - enterSettingClickTime) > DeviceUtils.ENTER_SETTING_INTERVAL_TIME) {
@@ -658,13 +655,15 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                         enterSettingCount = 0
 
                         mBinding?.faceVerifyResultView?.visibility = View.GONE
+                        mBinding?.userAgreement?.agreeLayout?.visibility = View.GONE
 
                         try {
                             mBinding?.waitingView?.setVisibleImmediate(View.GONE)
+                            mBinding?.agreeTitleText?.visibility = View.GONE
 
                             val navBuilder = NavOptions.Builder()
-                            navBuilder.setEnterAnim(R.anim.slide_bottom_in)
-                            navBuilder.setPopExitAnim(R.anim.slide_bottom_out)
+                            navBuilder.setEnterAnim(R.anim.slide_right_in)
+                            navBuilder.setPopExitAnim(R.anim.slide_left_out)
                             navController.navigate(R.id.settingFragment, null, navBuilder.build())
                         } catch (e: Exception) {
                             Timber.e("Navigate to setting page exception, message: ${e.message}")
@@ -675,10 +674,57 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         }
     }
 
+    fun softClickTimeText() {
+        mBinding?.timeText?.performClick()
+    }
+
     private fun initViewModelObservers() {
+        sharedViewModel.toastEvent.observe(this, Observer { msg ->
+            when (msg) {
+                Constants.UPDATE_USER_SUCCESS_MAGIC -> {
+                    Toast.makeText(this, getString(R.string.setting_refresh_users_finish), Toast.LENGTH_LONG).show()
+                }
+
+                else -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        sharedViewModel.restartAppEvent.observe(this, Observer {
+            restartActivity()
+        })
+
+        /**
+         * About user agreement for visitor registration
+         */
+        sharedViewModel.userAgreeEvent.observe(this, Observer {
+            //Timber.d("Show user agreement to visitor")
+            mBinding?.userAgreement?.agreeLayout?.visibility = View.VISIBLE
+            mBinding?.userAgreement?.agreeContent?.text = getString(R.string.user_agreement_content)
+            mBinding?.userAgreement?.btnDecline?.text = getString(R.string.decline)
+            mBinding?.userAgreement?.btnAgree?.text = getString(R.string.agree)
+
+            mBinding?.titleText?.visibility = View.GONE
+            mBinding?.agreeTitleText?.visibility = View.VISIBLE
+            mBinding?.agreeTitleText?.text = getString(R.string.user_agreement_title)
+        })
+        mBinding?.userAgreement?.btnDecline?.setOnClickListener {
+            backToPreviousPage()
+        }
+        mBinding?.userAgreement?.btnAgree?.setOnClickListener {
+            sharedViewModel.userHadAgreeEvent.postValue(true)
+            mBinding?.userAgreement?.agreeLayout?.visibility = View.GONE
+
+            mBinding?.titleText?.visibility = View.VISIBLE
+            mBinding?.agreeTitleText?.visibility = View.GONE
+        }
+        /////////////////////////////////////////////////////////////////
+
         sharedViewModel.changeTitleEvent.observe(this, Observer { title ->
-            Timber.d("setSubTitle(), sub title: $title")
+            //Timber.d("setSubTitle(), sub title: $title")
             mBinding?.titleText?.text = title
+            if (mBinding?.agreeTitleText?.visibility == View.GONE) {
+                mBinding?.titleText?.visibility = View.VISIBLE
+            }
         })
 
         sharedViewModel.fdrResultVisibilityEvent.observe(this, Observer { visibility ->
@@ -697,17 +743,25 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         })
 
         mainViewModel.initialLoad.observe(this, Observer { state ->
-            Timber.d("initlial load, state: ${state?.status}")
-            val visibility = if (state?.status == NetworkState.LOADING.status) View.VISIBLE else View.GONE
-            mBinding?.waitingView?.setVisibleWithAnimate(visibility)
+            when (state) {
+                NetworkState.LOADING -> {
+                    mBinding?.waitingView?.setVisibleWithAnimate(View.VISIBLE)
+                    mBinding?.errorHintText?.visibility = View.GONE
+                }
 
-            if (state != null && state.status == Status.FAILED && state.msg != null) {
-                Toast.makeText(this, state.msg, Toast.LENGTH_LONG).show()
-                mBinding?.errorHintText?.visibility = View.VISIBLE
-                stopSubscriber()
-            } else if (state != null && state.status == Status.RUNNING) {
-                //navigateToBaseFragment()
-                mBinding?.errorHintText?.visibility = View.GONE
+                NetworkState.LOADED -> {
+                    mBinding?.waitingView?.setVisibleImmediate(View.GONE)
+                }
+
+                is NetworkState.error -> {
+                    mBinding?.waitingView?.setVisibleWithAnimate(View.GONE)
+                    if (state.msg != null) {
+                        Toast.makeText(this, state.msg, Toast.LENGTH_LONG).show()
+                        mBinding?.hintText?.visibility = View.INVISIBLE
+                        mBinding?.errorHintText?.visibility = View.VISIBLE
+                        stopSubscriber()
+                    }
+                }
             }
         })
 
@@ -722,32 +776,73 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         })
 
         mainViewModel.faceVerifyUiMode.observe(this, Observer { uiMode ->
-            mBinding?.waitingView?.setVisibleImmediate(View.GONE)
-            mBinding?.faceVerifyResultView?.visibility = View.VISIBLE
-
             sharedViewModel.verifyFinishEvent.postValue(true)
 
             startSubscriber()
+            mBinding?.waitingView?.setVisibleImmediate(View.GONE)
 
-            when (uiMode) {
-                Constants.UI_FACE_UNKNOWN -> {
-                    // show failed UI
-                    mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
-                    mBinding?.faceVerifyResultView?.unknownLabel = getString(R.string.unknown_user)
-                    mBinding?.faceVerifyResultView?.failedLabel = getString(R.string.verification_failed)
-                    mBinding?.faceVerifyResultView?.failedText = "Description description description description description description description"
-                    sendFailedClockEvent()
+            if (sharedViewModel.isOptionClockMode()) {
+                when (uiMode) {
+                    Constants.UI_FACE_UNKNOWN -> {
+                        // show failed UI
+                        mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
+                        sendFailedClockEvent()
+
+                        mFdrManager.changeFaceColor(FdrManager.FACE_DETECT_COLOR_INVALID)
+                        sharedViewModel.bottomFaceResultEvent.postValue(
+                            BottomFaceResult(false, getString(R.string.result_recognition_failed)))
+                    }
+                    Constants.UI_FACE_VALID -> {
+                        mBinding?.faceVerifyResultView?.alpha = 0.0f
+                        mBinding?.faceVerifyResultView?.visibility = View.VISIBLE
+                        mBinding?.faceVerifyResultView?.let {
+                            it.animate()
+                                .alpha(1.0f)
+                                .setDuration(500L)
+                                .setListener(null)
+                        }
+
+                        // show success UI with different types
+                        mBinding?.faceVerifyResultView?.setVerifySuccessUI(
+                            sharedViewModel,
+                            mPreferences
+                        )
+
+                        mBinding?.faceVerifyResultView?.userImage = DeviceUtils.mFacePngList[0]
+                        mBinding?.faceVerifyResultView?.userName = sharedViewModel.getFullName()
+                        mBinding?.faceVerifyResultView?.successLabel = getString(R.string.welcome_back)
+                        mBinding?.faceVerifyResultView?.infoText =
+                            "Information information information information information"
+                        val dateNow = Date()
+                        mBinding?.faceVerifyResultView?.clockTime = dateNow
+                        mBinding?.faceVerifyResultView?.calendarTime = dateNow
+
+                        sharedViewModel.bottomFaceResultEvent.postValue(
+                            BottomFaceResult(true, sharedViewModel.getFullName()))
+                    }
                 }
-                Constants.UI_FACE_VALID -> {
-                    // show success UI with different types
-                    mBinding?.faceVerifyResultView?.setVerifySuccessUI(sharedViewModel, mPreferences)
-                    mBinding?.faceVerifyResultView?.userImage = DeviceUtils.mFacePngList[0]
-                    mBinding?.faceVerifyResultView?.userName = sharedViewModel.getFullName()
-                    mBinding?.faceVerifyResultView?.successLabel = getString(R.string.welcome_back)
-                    mBinding?.faceVerifyResultView?.infoText = "Information information information information information"
-                    val dateNow = Date()
-                    mBinding?.faceVerifyResultView?.clockTime = dateNow
-                    mBinding?.faceVerifyResultView?.calendarTime = dateNow
+            } else {
+                when (uiMode) {
+                    Constants.UI_FACE_UNKNOWN -> {
+                        // show failed UI
+                        mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
+                        sendFailedClockEvent()
+
+                        mFdrManager.changeFaceColor(FdrManager.FACE_DETECT_COLOR_INVALID)
+                        sharedViewModel.bottomFaceResultEvent.postValue(
+                            BottomFaceResult(false, getString(R.string.result_recognition_failed)))
+                    }
+                    Constants.UI_FACE_VALID -> {
+                        // show success UI with different types
+                        mBinding?.faceVerifyResultView?.setVerifySuccessUI(
+                            sharedViewModel,
+                            mPreferences
+                        )
+
+                        mFdrManager.changeFaceColor(FdrManager.FACE_DETECT_COLOR_VALID)
+                        sharedViewModel.bottomFaceResultEvent.postValue(
+                            BottomFaceResult(true, sharedViewModel.getFullName()))
+                    }
                 }
             }
 
@@ -765,7 +860,15 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
         mainViewModel.userRegisterUiMode.observe(this, Observer { uiMode ->
             mBinding?.waitingView?.setVisibleImmediate(View.GONE)
+
+            mBinding?.faceVerifyResultView?.alpha = 0.0f
             mBinding?.faceVerifyResultView?.visibility = View.VISIBLE
+            mBinding?.faceVerifyResultView?.let {
+                it.animate()
+                    .alpha(1.0f)
+                    .setDuration(500L)
+                    .setListener(null)
+            }
 
             sharedViewModel.registerFinishEvent.postValue(true)
 
@@ -776,16 +879,13 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                     mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
                     mBinding?.faceVerifyResultView?.unknownLabel = mainViewModel.getRegisterName()
                     mBinding?.faceVerifyResultView?.failedLabel = getString(R.string.registration_fail)
-                    mBinding?.faceVerifyResultView?.failedText = "Description description description description description description description"
+                    mBinding?.faceVerifyResultView?.failedText = "Description description description description description"
                 }
 
                 Constants.UI_REGISTER_COMPLETE -> {
                     mBinding?.faceVerifyResultView?.setRegisterSuccessUI(sharedViewModel, registerViewModel, mPreferences)
-                    mBinding?.faceVerifyResultView?.userImage = DeviceUtils.mFacePngList[0]
-                    mBinding?.faceVerifyResultView?.infoText = "Information information information information information"
-                    val dateNow = Date()
-                    mBinding?.faceVerifyResultView?.clockTime = dateNow
-                    mBinding?.faceVerifyResultView?.calendarTime = dateNow
+                    mBinding?.faceVerifyResultView?.registerUserImage = DeviceUtils.mFacePngList[0]
+                    //mBinding?.faceVerifyResultView?.infoText = "Information information information information information"
                 }
             }
 
@@ -837,6 +937,14 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         })
 
         mainViewModel.deviceLoginData.observe(this, Observer {
+            if (it == null) {
+                mBinding?.hintText?.visibility = View.INVISIBLE
+                mBinding?.errorHintText?.visibility = View.VISIBLE
+            } else {
+                mPreferences.isLoginFinish = true
+                mBinding?.errorHintText?.visibility = View.GONE
+            }
+
             Timber.d("deviceLoginData deviceToken = ${it?.deviceToken.toString()}")
             Timber.d("deviceLoginData locale = ${it?.locale.toString()}")
             Timber.d("deviceLoginData deviceName = ${it?.deviceName.toString()}")
@@ -851,7 +959,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
             //depend on modules
             sharedViewModel.deviceLoginData.value = it
-            sharedViewModel.deviceName = it.deviceName
+            sharedViewModel.deviceName = it?.deviceName
 
             // connect to websocket
             mWebSocketManager.connect(DeviceUtils.mWsUri, DeviceUtils.WEB_SOCKET_TIME_OUT, this)
@@ -862,7 +970,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
             initNavigationMap(it)
 
             // login success, start automatic clock event sending function
-            mainViewModel.startClockEventSendingJob()
+            mainViewModel.enableCoroutine()
 
             mPreferences.fetcherListener?.doneFetching()
         })
@@ -911,7 +1019,12 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                         label = ChooseModeFragment::class.java.simpleName
                     }
                 } else {
-                    //TODO : mode size 0 or null, show error page
+                    // module size 0 or null, show error page
+                    mBinding?.hintText?.visibility = View.VISIBLE
+                    mBinding?.errorHintText?.visibility = View.INVISIBLE
+
+                    graph.startDestination = R.id.baseFragment
+                    label = BaseFragment::class.java.simpleName
                 }
             } else {
                 //module size > 1, always two modules
@@ -919,7 +1032,10 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                 label = ChooseMemberFragment::class.java.simpleName
             }
         } else {
-            //TODO : module size 0 or null, show error page
+            // module size 0 or null, show error page
+            mBinding?.hintText?.visibility = View.VISIBLE
+            mBinding?.errorHintText?.visibility = View.INVISIBLE
+
             graph.startDestination = R.id.baseFragment
             label = BaseFragment::class.java.simpleName
         }
@@ -987,8 +1103,6 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         mFdrManager.initFdr(this, factory)
 
         mFdrManager.fdrMainEvent.observe(this, Observer { status ->
-            startSubscriber()
-
             when (status) {
                 FdrManager.STATUS_IDENTIFYING_FACE,
                 FdrManager.STATUS_FACE_FORWARD_CAMERA -> {
@@ -997,16 +1111,38 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
                 FdrManager.STATUS_GET_FACE_FAILED -> {
                     Timber.d("Observe fdrManager status: STATUS_GET_FACE_FAILED")
+                    startSubscriber()
+
                     mainViewModel.onGetFaceFailed()
+
+                    mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
+                    sendFailedClockEvent()
+
+                    sharedViewModel.bottomFaceResultEvent.postValue(
+                        BottomFaceResult(false, getString(R.string.result_not_living_face)))
                 }
 
                 FdrManager.STATUS_GET_FACE_SUCCESS -> {
                     Timber.d("Observe fdrManager status: STATUS_GET_FACE_SUCCESS")
+                    startSubscriber()
+
                     mainViewModel.onGetFaceSuccess()
+                }
+
+                FdrManager.STATUS_GET_FACE_OCCUR -> {
+                    Timber.d("Observe fdrManager status: STATUS_GET_FACE_OCCUR")
+                    startSubscriber()
+
+                    mBinding?.faceVerifyResultView?.setFailedUI(sharedViewModel, mPreferences)
+                    sendFailedClockEvent()
+
+                    sharedViewModel.bottomFaceResultEvent.postValue(
+                        BottomFaceResult(false, getString(R.string.result_recognition_occur)))
                 }
 
                 FdrManager.STATUS_GET_FACE_TIMEOUT -> {
                     Timber.d("Observe fdrManager status: STATUS_GET_FACE_TIMEOUT")
+                    startSubscriber()
 
                     // show timeout toast and popup to previous page
                     Toast.makeText(this, getString(R.string.face_verify_time_expire), Toast.LENGTH_LONG).show()
@@ -1016,17 +1152,24 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         })
     }
 
+    private var isWebSocketDisconnect = false
     private fun initWebSocketManager() {
         mWebSocketManager.webSocketStateEvent.observe(this, Observer { state ->
             when (state) {
                 WebSocket.STATE_WEB_SOCKET_CONNECT -> {
                     Timber.d("WebSocket state: STATE_WEB_SOCKET_CONNECT")
+                    isWebSocketDisconnect = false
                     mBinding?.socketImage?.setImageResource(R.mipmap.ic_connected)
                 }
 
                 WebSocket.STATE_WEB_SOCKET_DISCONNECT -> {
                     Timber.d("WebSocket state: STATE_WEB_SOCKET_DISCONNECT")
-                    mBinding?.socketImage?.setImageResource(R.mipmap.ic_disconnected)
+                    isWebSocketDisconnect = true
+                    SimpleRxTask.afterOnMain(2000L) {
+                        if (isWebSocketDisconnect) {
+                            mBinding?.socketImage?.setImageResource(R.mipmap.ic_disconnected)
+                        }
+                    }
 
                     if (AttendanceApp.isActivityVisible()) {
                         Timber.d("Do web socket reconnect")
@@ -1054,6 +1197,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
             when (syncData) {
                 WebSocket.PUSH_MESSAGE_SYNC_EMPLOYEE -> {
                     // Update employees + visitors + identities
+                    mainViewModel.isUpdateUser = true
                     mainViewModel.deleteAllAcceptance()
                     mainViewModel.getDeviceEmployees(mPreferences.tabletToken)
                     mainViewModel.getDeviceVisitors(mPreferences.tabletToken)
@@ -1062,6 +1206,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
                 WebSocket.PUSH_MESSAGE_SYNC_VISITOR -> {
                     // Update employees + visitors + identities
+                    mainViewModel.isUpdateUser = true
                     mainViewModel.deleteAllAcceptance()
                     mainViewModel.getDeviceEmployees(mPreferences.tabletToken)
                     mainViewModel.getDeviceVisitors(mPreferences.tabletToken)
@@ -1082,6 +1227,7 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
                 WebSocket.PUSH_MESSAGE_SYNC_ALL -> {
                     // Update employees + visitors + identities + marquee + screen saver
+                    mainViewModel.isUpdateUser = true
                     mainViewModel.deleteAllAcceptance()
                     mainViewModel.getDeviceEmployees(mPreferences.tabletToken)
                     mainViewModel.getDeviceVisitors(mPreferences.tabletToken)
@@ -1096,22 +1242,25 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
                 WebSocket.PUSH_MESSAGE_RESTART -> {
                     mPreferences.savePreferences()
-
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.addFlags(
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    intent.putExtra("crash", true)
-
-                    val restartIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
-                    val mgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, restartIntent)     // restart after 1 second
-
-                    android.os.Process.killProcess(android.os.Process.myPid())
-                    finish()
-                    exitProcess(0)
+                    restartActivity()
                 }
             }
         })
+    }
+
+    private fun restartActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.putExtra("crash", true)
+
+        val restartIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val mgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, restartIntent)     // restart after 1 second
+
+        android.os.Process.killProcess(android.os.Process.myPid())
+        this.finish()
+        exitProcess(0)
     }
 
     private fun initBtLeManager() {
@@ -1129,8 +1278,11 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
 
     private fun initSettingFinished() {
         if (mPreferences.serverIp.isEmpty() || mPreferences.tabletToken.isEmpty()) {
+            mBinding?.hintText?.visibility = View.VISIBLE
+            mBinding?.errorHintText?.visibility = View.INVISIBLE
             Toast.makeText(this, getString(R.string.empty_login_info), Toast.LENGTH_LONG).show()
         } else {
+            mBinding?.hintText?.visibility = View.GONE
             mInterceptor.setHost("http://" + mPreferences.serverIp)
             startLogin()
         }
@@ -1162,12 +1314,13 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
                 Toast.makeText(this, "Device network is unavailable and database is empty", Toast.LENGTH_LONG).show()
                 navigateToBaseFragment()
 
+                mBinding?.hintText?.visibility = View.INVISIBLE
                 mBinding?.errorHintText?.visibility = View.VISIBLE
             }
         }
     }
 
-    fun navigateToBaseFragment() {
+    private fun navigateToBaseFragment() {
         val navHostFragment = container as NavHostFragment
         val inflater = navHostFragment.navController.navInflater
         val graph = inflater.inflate(R.navigation.main)
@@ -1175,9 +1328,32 @@ class MainActivity @Inject constructor() : AppCompatActivity(), HasSupportFragme
         navHostFragment.navController.graph = graph
     }
 
-    private fun backToPreviousPage() {
+    fun navBack() {
+        mFdrManager.stopFdr()
+        
+        if (mBinding?.toolbar?.visibility == View.GONE) {
+            SimpleRxTask.afterOnMain(500L) {
+                mBinding?.toolbar?.visibility = View.VISIBLE
+                mBinding?.toolbarBottomLine?.visibility = View.VISIBLE
+            }
+        }
+
+        navController.popBackStack()
+    }
+
+    fun backToPreviousPage() {
         if (!sharedViewModel.isSingleModuleMode()) {
-            navController.popBackStack()
+            mFdrManager.stopFdr()
+
+            SimpleRxTask.afterOnMain(500L) {
+                setToolbarVisible(true)
+            }
+
+            navigateToHome()
+
+            mBinding?.userAgreement?.agreeLayout?.visibility = View.GONE
+            mBinding?.titleText?.visibility = View.VISIBLE
+            mBinding?.agreeTitleText?.visibility = View.GONE
         }
     }
 

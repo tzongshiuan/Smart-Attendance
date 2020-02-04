@@ -160,7 +160,7 @@ class MainRepository @Inject constructor (
         val getUpdateIdentitiesOb = apiService.getUpdateDeviceIdentities(deviceToken, updateTime)
         val deviceIdentitiesFlow = deviceIdentitiesDao.getDeviceIdentitiesData(deviceToken).toObservable()
 
-        if (mNetworkChecker.isNetworkAvailable() && MainActivity.GET_DEVICE_IDENTITIES) {
+        if (mNetworkChecker.isNetworkAvailable()) {
             if (updateTime == null) {
                 return Observable.zip<Response<DeviceLogin>, Response<DeviceEmployees>, Response<DeviceVisitors>
                         , Response<DeviceIdentities>, DeviceLogin>(
@@ -189,6 +189,7 @@ class MainRepository @Inject constructor (
                             acceptances?.let {
                                 for (acceptance in it) {
                                     acceptance.deviceToken = preferences.tabletToken
+                                    acceptance.type = Constants.USER_TYPE_EMPLOYEE
                                     deviceEmployeeDao.insertDeviceEmployeeData(acceptance)
                                 }
                             }
@@ -206,6 +207,7 @@ class MainRepository @Inject constructor (
                             acceptances?.let {
                                 for (acceptance in it) {
                                     acceptance.deviceToken = preferences.tabletToken
+                                    acceptance.type = Constants.USER_TYPE_VISITOR
                                     deviceVisitorDao.insertDeviceVisitorData(acceptance)
                                 }
                             }
@@ -273,6 +275,7 @@ class MainRepository @Inject constructor (
                             acceptances?.let {
                                 for (acceptance in it) {
                                     acceptance.deviceToken = preferences.tabletToken
+                                    acceptance.type = Constants.USER_TYPE_EMPLOYEE
                                     deviceEmployeeDao.insertDeviceEmployeeData(acceptance)
                                 }
                             }
@@ -290,6 +293,7 @@ class MainRepository @Inject constructor (
                             acceptances?.let {
                                 for (acceptance in it) {
                                     acceptance.deviceToken = preferences.tabletToken
+                                    acceptance.type = Constants.USER_TYPE_VISITOR
                                     deviceVisitorDao.insertDeviceVisitorData(acceptance)
                                 }
                             }
@@ -302,21 +306,39 @@ class MainRepository @Inject constructor (
                             val identities = identitiesResponse.body()?.data
                             identities?.deviceToken = preferences.tabletToken
 
+                            Timber.d("preIdentitiesData.employees?.size = ${preIdentitiesData.employees?.size}")
+                            Timber.d("preIdentitiesData.visitors?.size = ${preIdentitiesData.visitors?.size}")
+                            mOfflineIdentifyManager.initWithIdentities(preIdentitiesData)
+
                             if (identities?.employees?.size != 0 || identities.visitors?.size != 0) {
                                 identities?.employees?.let {
-                                    if (preIdentitiesData.employees != null) {
-                                        it.addAll(preIdentitiesData.employees!!)
-                                    }
+//                                    for (employee in it) {
+//                                        preIdentitiesData.employees?.let { preEmployees ->
+//                                            if (!preEmployees.contains(employee)) {
+//                                                preEmployees.add(employee)
+//                                            } else {
+//                                                preEmployees.set(preEmployees.indexOf(employee), employee)
+//                                            }
+//                                        }
+//                                    }
                                     mOfflineIdentifyManager.insertEmployees(it)
+                                    preIdentitiesData.employees = mOfflineIdentifyManager.employeeList
                                 }
                                 identities?.visitors?.let {
-                                    if (preIdentitiesData.visitors != null) {
-                                        it.addAll(preIdentitiesData.visitors!!)
-                                    }
+//                                    for (visitor in it) {
+//                                        preIdentitiesData.visitors?.let { preVisitors ->
+//                                            if (!preVisitors.contains(visitor)) {
+//                                                preVisitors.add(visitor)
+//                                            } else {
+//                                                preVisitors.set(preVisitors.indexOf(visitor), visitor)
+//                                            }
+//                                        }
+//                                    }
                                     mOfflineIdentifyManager.insertVisitors(it)
+                                    preIdentitiesData.visitors = mOfflineIdentifyManager.visitorList
                                 }
                                 // Save identities into DB for offline verification
-                                deviceIdentitiesDao.insertDeviceIdentitiesData(identities)
+                                deviceIdentitiesDao.insertDeviceIdentitiesData(preIdentitiesData)
                             }
 
                             // Update device info data in the database
@@ -422,11 +444,15 @@ class MainRepository @Inject constructor (
             .map { getDeviceEmployeesResponse ->
                 Timber.d("getDeviceEmployeesResponse?.body()?.data?.acceptances?.size = %s", getDeviceEmployeesResponse.body()?.data?.acceptances?.size)
                 if (getDeviceEmployeesResponse.isSuccessful) {
+                    // delete old employees
+                    deviceLoginDao.deleteEmployeeAcceptances(Constants.USER_TYPE_EMPLOYEE)
+
                     // save to DB
                     val acceptances = getDeviceEmployeesResponse.body()?.data?.acceptances
                     acceptances?.let {
                         for (acceptance in it) {
                             acceptance.deviceToken = preferences.tabletToken
+                            acceptance.type = Constants.USER_TYPE_EMPLOYEE
                             deviceEmployeeDao.insertDeviceEmployeeData(acceptance)
                         }
                     }
@@ -445,11 +471,15 @@ class MainRepository @Inject constructor (
             .map { getDeviceVisitorsResponse ->
                 Timber.d("getDeviceVisitorsResponse?.body()?.data?.acceptances?.size = %s", getDeviceVisitorsResponse.body()?.data?.acceptances?.size)
                 if (getDeviceVisitorsResponse.isSuccessful) {
+                    // delete old employees
+                    deviceLoginDao.deleteVisitorAcceptances(Constants.USER_TYPE_VISITOR)
+
                     // save to DB
                     val acceptances = getDeviceVisitorsResponse.body()?.data?.acceptances
                     acceptances?.let {
                         for (acceptance in it) {
                             acceptance.deviceToken = preferences.tabletToken
+                            acceptance.type = Constants.USER_TYPE_VISITOR
                             deviceVisitorDao.insertDeviceVisitorData(acceptance)
                         }
                     }
@@ -495,23 +525,41 @@ class MainRepository @Inject constructor (
     }
 
     private fun getDeviceIdentitiesAfterTimeApi(deviceToken: String?, updateTime: String?): Observable<DeviceIdentities> {
-        return apiService.getUpdateDeviceIdentities(deviceToken, updateTime)
-            .subscribeOn(Schedulers.io())
-            .map { getDeviceIdentitiesResponse ->
+        val getUpdateIdentitiesOb = apiService.getUpdateDeviceIdentities(deviceToken, updateTime)
+        val deviceIdentitiesFlow = deviceIdentitiesDao.getDeviceIdentitiesData(deviceToken).toObservable()
+
+        return Observable.zip(
+            getUpdateIdentitiesOb, deviceIdentitiesFlow,
+            BiFunction<Response<DeviceIdentities>, DeviceIdentitiesData, DeviceIdentities> {
+                    identitiesResponse, preIdentitiesData ->
                 Timber.d("getDeviceIdentitiesAfterTimeApi() success")
-                if (getDeviceIdentitiesResponse.isSuccessful) {
-                    val identities = getDeviceIdentitiesResponse.body()?.data
+                if (identitiesResponse.isSuccessful && identitiesResponse.body() != null) {
+                    val identities = identitiesResponse.body()?.data
                     identities?.deviceToken = preferences.tabletToken
+
+                    Timber.d("preIdentitiesData.employees?.size = ${preIdentitiesData.employees?.size}")
+                    Timber.d("preIdentitiesData.visitors?.size = ${preIdentitiesData.visitors?.size}")
 
                     if (identities?.employees?.size != 0 || identities.visitors?.size != 0) {
                         identities?.employees?.let {
                             mOfflineIdentifyManager.insertEmployees(it)
+                            preIdentitiesData.employees = mOfflineIdentifyManager.employeeList
                         }
                         identities?.visitors?.let {
+                            for (visitor in it) {
+                                preIdentitiesData.visitors?.let { preVisitors ->
+                                    if (!preVisitors.contains(visitor)) {
+                                        preVisitors.add(visitor)
+                                    } else {
+                                        preVisitors.set(preVisitors.indexOf(visitor), visitor)
+                                    }
+                                }
+                            }
                             mOfflineIdentifyManager.insertVisitors(it)
+                            preIdentitiesData.visitors = mOfflineIdentifyManager.visitorList
                         }
                         // Save identities into DB for offline verification
-                        deviceIdentitiesDao.insertDeviceIdentitiesData(identities)
+                        deviceIdentitiesDao.insertDeviceIdentitiesData(preIdentitiesData)
                     }
 
                     // Update device info data in the database
@@ -521,20 +569,14 @@ class MainRepository @Inject constructor (
                         it.updateTime = identities?.updateTime
                     }
                     deviceIdentitiesDao.insertDeviceInfoData(deviceInfoData)
-
-                    // Initial mIdentify
-                    //mOfflineIdentifyManager.initWithIdentities(identities)
-
-                    // Save identities into DB for offline verification
-                    //deviceIdentitiesDao.insertDeviceIdentitiesData(identities)
-
-                    getDeviceIdentitiesResponse.body()
+                    identitiesResponse.body()!!
                 } else {
                     val error =
-                        Gson().fromJson(getDeviceIdentitiesResponse.errorBody()?.string(), DeviceIdentities::class.java)
+                        Gson().fromJson(identitiesResponse.errorBody()?.string(), DeviceIdentities::class.java)
                     error
                 }
-            }
+            })
+            .subscribeOn(Schedulers.io())
     }
 
     private fun getDeviceMarqueesApi(deviceToken: String?): Observable<DeviceMarquees> {

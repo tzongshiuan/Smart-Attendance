@@ -18,8 +18,8 @@ interface ApiService {
      * about registration
      */
     @GET("SmartEnterprise/api/V1_1beta/user?")
-    fun checkUser(@Query("deviceToken") deviceToken: String?, @Query("type") type: String?
-                  , @Query("securityCode") securityCode: String?, @Query("rfid") rfid: String?): Observable<Response<CheckUserResponse>>
+    suspend fun checkUser(@Query("deviceToken") deviceToken: String?, @Query("type") type: String?
+                  , @Query("securityCode") securityCode: String?, @Query("rfid") rfid: String?): Response<CheckUserResponse>
 
     @GET("SmartEnterprise/api/V1_1beta/employee?")
     fun checkEmployee(@Query("deviceToken") deviceToken: String?, @Query("employeeId") employeeId: String?): Observable<Response<CheckUserResponse>>

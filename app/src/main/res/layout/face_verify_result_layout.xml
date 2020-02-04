@@ -4,6 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
+
         <variable name="failedNameText" type="String"/>
 
         <variable name="failedLabelText" type="String"/>
@@ -21,6 +23,10 @@
         <variable name="calendarText" type="String"/>
 
         <variable name="timeoutText" type="String"/>
+
+        <variable name="isShowEmployeeBtn" type="boolean"/>
+
+        <variable name="isShowVisitorBtn" type="boolean"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,8 +59,7 @@
                     android:src="@mipmap/ic_unknown_user"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintStart_toStartOf="parent"/>
 
             <androidx.constraintlayout.widget.Barrier
                     android:id="@+id/unknownBarrier"
@@ -121,7 +126,7 @@
                 app:layout_constraintHorizontal_chainStyle="packed"
                 android:background="@drawable/rounded_border"
                 android:visibility="gone"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
             <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/userImage"
@@ -135,10 +140,10 @@
                     android:src="@mipmap/ic_unknown_user"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintStart_toStartOf="parent"/>
 
             <ImageView
+                    android:id="@+id/checkImage"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@drawable/ic_check_circle_bg"
@@ -309,70 +314,172 @@
                 android:id="@+id/checkOptionLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:visibility="gone"
-                tools:visibility="visible"
                 app:layout_constraintTop_toTopOf="@+id/successResultLayout"
                 app:layout_constraintBottom_toBottomOf="@+id/successResultLayout"
                 app:layout_constraintStart_toEndOf="@+id/successResultLayout"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="gone">
 
             <Button
                     android:id="@+id/checkInBtn"
                     android:text="@string/clock_check_in"
+                    android:layout_marginStart="@dimen/fdr_title_margin"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/checkOutBtn"
+                    android:visibility="@{isShowEmployeeBtn ? View.VISIBLE : View.GONE}"
                     style="@style/clock_option_button_style"/>
 
             <Button
                     android:id="@+id/checkOutBtn"
                     android:text="@string/clock_check_out"
                     android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/fdr_title_margin"
                     app:layout_constraintTop_toBottomOf="@+id/checkInBtn"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/passBtn"
+                    android:visibility="@{isShowEmployeeBtn ? View.VISIBLE : View.GONE}"
                     style="@style/clock_option_button_style"/>
 
             <Button
                     android:id="@+id/passBtn"
                     android:text="@string/clock_pass"
                     android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/fdr_title_margin"
                     app:layout_constraintTop_toBottomOf="@+id/checkOutBtn"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    android:visibility="@{isShowEmployeeBtn ? View.VISIBLE : View.GONE}"
                     style="@style/clock_option_button_style"/>
 
             <Button
                     android:id="@+id/arriveBtn"
                     android:text="@string/clock_arrive"
+                    android:layout_marginStart="@dimen/fdr_title_margin"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/leaveBtn"
+                    android:visibility="@{isShowVisitorBtn ? View.VISIBLE : View.GONE}"
                     style="@style/clock_option_button_style"/>
 
             <Button
                     android:id="@+id/leaveBtn"
                     android:text="@string/clock_leave"
                     android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/fdr_title_margin"
                     app:layout_constraintTop_toBottomOf="@+id/arriveBtn"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    android:visibility="@{isShowVisitorBtn ? View.VISIBLE : View.GONE}"
                     style="@style/clock_option_button_style"/>
 
-            <androidx.constraintlayout.widget.Group
-                    android:id="@+id/employeeOptionGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="checkInBtn,checkOutBtn,passBtn"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.Group
-                    android:id="@+id/visitorOptionGroup"
+        <!--register layout-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/registerLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/fdr_result_margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/rounded_border"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/registerUserImage"
+                    android:layout_width="@dimen/fdr_result_image_size"
+                    android:layout_height="@dimen/fdr_result_image_size"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:layout_marginBottom="@dimen/circle_image_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    app:civ_border_width="5dp"
+                    app:civ_border_color="@color/white"
+                    android:src="@mipmap/ic_unknown_user"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <ImageView
+                    android:id="@+id/registerCheckImage"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/ic_check_circle_bg"
+                    android:src="@drawable/ic_check_circle"
+                    app:layout_constraintEnd_toEndOf="@+id/registerUserImage"
+                    app:layout_constraintBottom_toBottomOf="@+id/registerUserImage"
+                    app:layout_constraintStart_toStartOf="@+id/registerUserImage"
+                    app:layout_constraintTop_toTopOf="@+id/registerUserImage"
+                    app:layout_constraintHorizontal_bias="1.1"
+                    app:layout_constraintVertical_bias="0.9" tools:ignore="ContentDescription"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/registerBarrier"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="arriveBtn,leaveBtn"
-                    android:visibility="gone"/>
+                    app:barrierDirection="right"
+                    app:constraint_referenced_ids="registerUserImage"/>
+
+            <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/registerBarrier2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="registerUserImage"/>
+
+            <TextView
+                    android:id="@+id/registerUserNameText"
+                    android:layout_width="@dimen/fdr_result_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginTop="@dimen/circle_image_margin"
+                    android:text="@{userName}"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    tools:text="User Name"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_title_text_size"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/registerBarrier"/>
+
+            <TextView
+                    android:id="@+id/registerWelcomeLabel"
+                    android:layout_width="@dimen/fdr_result_text_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/fdr_title_margin"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    tools:text="@string/welcome_back"
+                    android:text="@{successLabelText}"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    app:layout_constraintTop_toBottomOf="@+id/registerUserNameText"
+                    app:layout_constraintStart_toEndOf="@+id/registerBarrier"/>
+
+            <TextView
+                    android:id="@+id/registerUserInfoText"
+                    android:layout_width="@dimen/fdr_description_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/circle_image_margin"
+                    android:layout_marginEnd="@dimen/circle_image_margin"
+                    android:text="@{infoText}"
+                    tools:text="info info info info info info info info info info info info info info info info info info info info"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fdr_subtitle_text_size"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintTop_toBottomOf="@+id/registerWelcomeLabel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/registerBarrier"
+                    android:visibility="invisible"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -409,8 +516,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/splitView2"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintEnd_toStartOf="@+id/splitView2"/>
 
             <TextView
                     android:id="@+id/retrainOwnName"
@@ -457,8 +563,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/splitView2"
-                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage2"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage2"/>
 
             <TextView
                     android:id="@+id/retrainCandidName1"
@@ -492,8 +597,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/retrainCandidImage1"
-                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage3"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintEnd_toStartOf="@+id/retrainCandidImage3"/>
 
             <TextView
                     android:id="@+id/retrainCandidName2"
@@ -527,8 +631,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/retrainCandidImage2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:contentDescription="@string/todo"/>
+                    app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                     android:id="@+id/retrainCandidName3"

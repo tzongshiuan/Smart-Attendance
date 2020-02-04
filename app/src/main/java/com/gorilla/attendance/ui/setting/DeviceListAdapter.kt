@@ -28,7 +28,7 @@ class DeviceListAdapter(val context: Context) : RecyclerView.Adapter<DeviceListA
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Timber.d("onCreateViewHolder()")
+        //Timber.d("onCreateViewHolder()")
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = SettingDeviceListItemBinding.inflate(layoutInflater, parent, false)
         return ViewHolder(binding)

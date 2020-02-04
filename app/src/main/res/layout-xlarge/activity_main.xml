@@ -68,6 +68,18 @@
                         android:textSize="@dimen/toolbar_title_text_size"
                         android:textColor="@color/toolbar_text_color" tools:ignore="RelativeOverlap"/>
 
+                <TextView
+                        android:id="@+id/agreeTitleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="18dp"
+                        tools:text="Toolbar Title"
+                        android:textSize="36sp"
+                        android:textColor="@color/toolbar_text_color" tools:ignore="RelativeOverlap"
+                        android:visibility="invisible"/>
+
                 <ImageView
                         android:id="@+id/languageImage"
                         android:layout_width="@dimen/toolbar_image_width"
@@ -82,11 +94,27 @@
                         android:layout_width="@dimen/toolbar_image_height"
                         android:layout_height="@dimen/toolbar_image_height"
                         android:layout_marginEnd="10dp"
-                        android:src="@mipmap/ic_connected"
+                        android:src="@mipmap/ic_disconnected"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true" tools:ignore="ContentDescription"/>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+                android:id="@+id/hintText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="gone"
+                android:text="@string/no_role_option"
+                android:textColor="@color/white"
+                android:textSize="@dimen/common_text_size"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
                 android:id="@+id/errorHintText"
@@ -113,7 +141,7 @@
                 app:defaultNavHost="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                app:layout_constraintTop_toBottomOf="@+id/toolbarBottomLine"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         <View
@@ -170,6 +198,16 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:visibility="gone"
                 tools:visibility="gone"/>
+
+        <include
+                android:id="@+id/userAgreement"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                layout="@layout/user_agreement"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbarBottomLine"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

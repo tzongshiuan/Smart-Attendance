@@ -6,13 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation
 import com.gorilla.attendance.R
 import com.gorilla.attendance.databinding.ChooseModeFragmentBinding
 import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.common.BaseFragment
 import com.gorilla.attendance.ui.common.SharedViewModel
+import com.gorilla.attendance.ui.main.MainActivity
 import com.gorilla.attendance.utils.Constants
+import com.jakewharton.rxbinding.view.RxView
+import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class ChooseModeFragment : BaseFragment(), Injectable {
     private var mBinding: ChooseModeFragmentBinding? = null
@@ -78,6 +83,8 @@ class ChooseModeFragment : BaseFragment(), Injectable {
                 }
             }
         })
+
+        initUI()
     }
 
     override fun onResume() {
@@ -93,6 +100,10 @@ class ChooseModeFragment : BaseFragment(), Injectable {
                 } else {
                     sharedViewModel.changeTitleEvent.postValue(getString(R.string.choose_mode_employee_registration_title))
                 }
+
+                mBinding?.txtIdCard?.text = getString(R.string.id_card_register)
+                mBinding?.txtSecurityCode?.text = getString(R.string.security_code_register)
+                mBinding?.txtQrCode?.text = getString(R.string.qr_code_register)
             }
 
             Constants.VERIFICATION_MODE -> {
@@ -103,7 +114,72 @@ class ChooseModeFragment : BaseFragment(), Injectable {
                 } else {
                     sharedViewModel.changeTitleEvent.postValue(getString(R.string.choose_mode_employee_verification_title))
                 }
+
+                mBinding?.txtIdCard?.text = getString(R.string.id_card)
+                mBinding?.txtSecurityCode?.text = getString(R.string.security_code)
+                mBinding?.txtQrCode?.text = getString(R.string.qr_code)
             }
         }
+
+        mBinding?.footerBar?.btnLeft?.visibility = View.VISIBLE
+    }
+
+    private fun initUI() {
+        mBinding?.footerBar?.btnLeft?.visibility = View.VISIBLE
+        mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+        mBinding?.footerBar?.btnLeft?.setOnClickListener {
+            Navigation.findNavController(it).popBackStack()
+        }
+        mBinding?.footerBar?.btnRight?.visibility = View.INVISIBLE
+
+        mBinding?.imgIdCard?.let { view ->
+            RxView.clicks(view)
+                .debounce(200L, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (chooseModeViewModel.isSafeToNavigate(view)) {
+                        chooseModeViewModel.showRFId(view)
+                    }
+                }
+        }
+
+        mBinding?.imgSecurityCode?.let { view ->
+            RxView.clicks(view)
+                .debounce(200L, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (chooseModeViewModel.isSafeToNavigate(view)) {
+                        chooseModeViewModel.showSecurity(view)
+                    }
+                }
+        }
+
+        mBinding?.imgQrCode?.let { view ->
+            RxView.clicks(view)
+                .debounce(200L, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (chooseModeViewModel.isSafeToNavigate(view)) {
+                        chooseModeViewModel.showQrCode(view)
+                        changeLayout()
+                    }
+                }
+        }
+
+        mBinding?.imgFacial?.let { view ->
+            RxView.clicks(view)
+                .debounce(200L, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (chooseModeViewModel.isSafeToNavigate(view)) {
+                        changeLayout()
+                        chooseModeViewModel.showFaceRecognition(view)
+                    }
+                }
+        }
+    }
+
+    private fun changeLayout() {
+        mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
     }
 }

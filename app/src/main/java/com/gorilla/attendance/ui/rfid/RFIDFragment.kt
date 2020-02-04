@@ -1,5 +1,7 @@
 package com.gorilla.attendance.ui.rfid
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -7,8 +9,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import com.gorilla.attendance.R
+import com.gorilla.attendance.data.model.NetworkState
 import com.gorilla.attendance.data.model.RegisterFormState
-import com.gorilla.attendance.data.model.Status
 import com.gorilla.attendance.databinding.RfidFragmentBinding
 import com.gorilla.attendance.di.Injectable
 import com.gorilla.attendance.ui.common.BaseFragment
@@ -33,6 +35,8 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     private lateinit var rfidViewModel: RFIDViewModel
 
     private var countDownDisposoble: Disposable? = null
+
+    private var isRetrain = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +68,11 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         if (!MainActivity.IS_SKIP_SCAN_CODE) {
             mNfcManager.initNfcManager(context!!)
         }
+
+        if (!MainActivity.IS_SKIP_SCAN_CODE) {
+            mNfcManager.start()
+            mNfcManager.setEnableReadCard(true)
+        }
     }
 
     override fun onStart() {
@@ -75,6 +84,10 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         super.onResume()
         Timber.d("onResume()")
 
+        mBinding?.fdrFrame?.foreground = null
+
+        mNfcManager.setRfidActive(true)
+
         if (mPreferences.applicationMode == Constants.VERIFICATION_MODE) {
             sharedViewModel.changeTitleEvent.postValue(getString(R.string.rfid_verification_title))
         } else {
@@ -82,21 +95,20 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 SharedViewModel.MODULE_VISITOR -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.visitor_registration_form))
                 else -> sharedViewModel.changeTitleEvent.postValue(getString(R.string.employee_registration_form))
             }
+
+            isStartRegister = true
         }
 
-        if (!MainActivity.IS_SKIP_SCAN_CODE) {
-            mNfcManager.start()
-            mNfcManager.setEnableReadCard(true)
-        }
+        mNfcManager.setEnableReadCard(true)
     }
 
     override fun onStop() {
         super.onStop()
         Timber.d("onStop()")
 
-        if (!MainActivity.IS_SKIP_SCAN_CODE) {
-            mNfcManager.stop()
-        }
+        mBinding?.fdrFrame?.foreground = ColorDrawable(Color.BLACK)
+
+        mNfcManager.setRfidActive(false)
 
         DeviceUtils.stopFdrOnDestroyTime = System.currentTimeMillis()
     }
@@ -105,8 +117,14 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         super.onDestroy()
         Timber.d("onDestroy()")
 
+        if (!MainActivity.IS_SKIP_SCAN_CODE) {
+            mNfcManager.stop()
+        }
+
         countDownDisposoble?.dispose()
         stopFdr()
+
+        isStartRegister = false
     }
 
     private fun initUI() {
@@ -126,12 +144,25 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    Timber.d("Click foot bar right button")
+                    Timber.i("Click foot bar right button")
                     onClickRightBtn()
                 }
         }
 
+        mBinding?.settingTrigger?.setOnClickListener {
+            (activity as MainActivity).softClickTimeText()
+        }
+
         startScan()
+        when (sharedViewModel.clockModule) {
+            SharedViewModel.MODULE_VISITOR -> {
+                mBinding?.visitorRegisterForm?.initUI(mPreferences, registerViewModel)
+            }
+
+            else -> {
+                mBinding?.employeeRegisterForm?.initUI(mPreferences, registerViewModel)
+            }
+        }
 
         /**
          * For android unit test
@@ -154,12 +185,10 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
         when (sharedViewModel.clockModule) {
             SharedViewModel.MODULE_VISITOR -> {
                 mBinding?.visitorRegisterForm?.visibility = View.GONE
-                mBinding?.visitorRegisterForm?.initUI(mPreferences, registerViewModel)
             }
 
             else -> {
                 mBinding?.employeeRegisterForm?.visibility = View.GONE
-                mBinding?.employeeRegisterForm?.initUI(mPreferences, registerViewModel)
             }
         }
 
@@ -202,9 +231,9 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 NfcManager.NFC_DEVICE_NOT_FOUND,
                 NfcManager.NFC_READER_NOT_SUPPORT -> {
                     Timber.d("NFC state: NFC_PERMISSION_DENIED | NFC_DEVICE_NOT_FOUND | NFC_READER_NOT_SUPPORT")
-                    if (!sharedViewModel.isSingleModuleMode()) {
-                        Navigation.findNavController(this.view!!).popBackStack()
-                    }
+                    //if (!sharedViewModel.isSingleModuleMode()) {
+                        //Navigation.findNavController(this.view!!).popBackStack()
+                    //}
                 }
             }
         })
@@ -215,19 +244,11 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             onReceiveNfcData(data)
         })
 
-        rfidViewModel.initialLoad.observe(this, Observer { networkState ->
-            when (networkState?.status) {
-                Status.RUNNING -> {
-
-                }
-
-                Status.SUCCESS -> {
-
-                }
-
-                Status.FAILED -> {
-                    Timber.d("onError, message: ${networkState.msg}")
-                }
+        rfidViewModel.initialLoad.observe(this, Observer { state ->
+            when (state) {
+                NetworkState.LOADING -> {}
+                NetworkState.LOADED -> {}
+                is NetworkState.error -> {}
             }
         })
 
@@ -263,40 +284,64 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                     //Timber.d("Observe fdrManager status: STATUS_IDENTIFYING_FACE | STATUS_FACE_FORWARD_CAMERA")
                 }
 
-                FdrManager.STATUS_GET_FACE_FAILED -> {
-                    Timber.d("Observe fdrManager status: STATUS_GET_FACE_FAILED")
-                    stopFdr()
-
-                    // show fail message, related to liveness verification
-                    Toast.makeText(context!!, "Get face failed", Toast.LENGTH_SHORT).show()
-                }
+                FdrManager.STATUS_GET_FACE_FAILED -> {}
 
                 FdrManager.STATUS_GET_FACE_SUCCESS -> {
                     Timber.d("Observe fdrManager status: STATUS_GET_FACE_SUCCESS")
-                    stopFdr()
 
-                    if (sharedViewModel.isSingleModuleMode()) {
+                    if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
+                        mBinding?.isStateLayoutDarkness = false
+                        stopFdr()
                         mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
                     }
                 }
+
+                FdrManager.STATUS_GET_FACE_OCCUR -> {}
+            }
+        })
+
+        sharedViewModel.bottomFaceResultEvent.observe(this, Observer { faceResult ->
+            if (faceResult.isSuccess) {
+                if (sharedViewModel.isOptionClockMode()) {
+                    stopFdr()
+                } else {
+                    mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                    mBinding?.footerBar?.successTextView?.visibility = View.VISIBLE
+                    mBinding?.footerBar?.successText = faceResult.result
+                }
+            } else {
+                currentState = VERIFY_FACE_FINISH_STATE
+                mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                mBinding?.footerBar?.failTextView?.visibility = View.VISIBLE
+                mBinding?.footerBar?.failText = faceResult.result
             }
         })
 
         sharedViewModel.restartSingleModeEvent.observe(this, Observer { mode ->
             if (mode == SharedViewModel.MODE_RFID) {
-                mBinding?.rfidGroup?.visibility = View.VISIBLE
-                mBinding?.errorHintText?.visibility = View.GONE
-                mNfcManager.setEnableReadCard(true)
-                currentState = VERIFY_SECURITY_CODE_STATE
+                doSelfRestart()
             }
         })
 
         sharedViewModel.verifyFinishEvent.observe(this, Observer {
+            currentState = VERIFY_FACE_FINISH_STATE
             updateStateUI(Constants.REGISTER_STATE_COMPLETE)
         })
 
         sharedViewModel.registerFinishEvent.observe(this, Observer {
             updateStateUI(Constants.REGISTER_STATE_COMPLETE)
+
+            if (sharedViewModel.isSingleModuleMode()) {
+                when (sharedViewModel.clockModule) {
+                    SharedViewModel.MODULE_VISITOR -> {
+                        mBinding?.visitorRegisterForm?.clearUI()
+                    }
+
+                    else -> {
+                        mBinding?.employeeRegisterForm?.clearUI()
+                    }
+                }
+            }
         })
 
         /**
@@ -322,12 +367,10 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                         when (sharedViewModel.clockModule) {
                             SharedViewModel.MODULE_VISITOR -> {
                                 mBinding?.visitorRegisterForm?.visibility = View.VISIBLE
-                                mBinding?.visitorRegisterForm?.initUI(mPreferences, registerViewModel)
                             }
 
                             else -> {
                                 mBinding?.employeeRegisterForm?.visibility = View.VISIBLE
-                                mBinding?.employeeRegisterForm?.initUI(mPreferences, registerViewModel)
                             }
                         }
 
@@ -412,8 +455,11 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
     }
 
     private fun startRetrain() {
+        isRetrain = true
+
         mBinding?.exitProfileText1?.visibility = View.VISIBLE
         mBinding?.exitProfileText2?.visibility = View.VISIBLE
+        mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
 
         countDownDisposoble = RxCountDownTimer.create(DeviceUtils.EXIST_PROFILE_SKIP_TIME, 1000)
             .subscribe {millisUntilFinished ->
@@ -421,6 +467,7 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 if (millisUntilFinished == 0L) {
                     mBinding?.exitProfileText1?.visibility = View.GONE
                     mBinding?.exitProfileText2?.visibility = View.GONE
+                    mBinding?.footerBar?.btnLeft?.visibility = View.VISIBLE
 
                     // information should get before start FDR
                     startFdr()
@@ -512,14 +559,20 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
                 }
 
                 mBinding?.footerBar?.middleTextView?.visibility = View.GONE
+                mBinding?.footerBar?.successTextView?.visibility = View.GONE
+                mBinding?.footerBar?.failTextView?.visibility = View.GONE
             }
         }
     }
 
     private fun doSelfRestart() {
+        stopFdr()
         startScan()
         mNfcManager.setEnableReadCard(true)
         currentState = VERIFY_SECURITY_CODE_STATE
+
+        mBinding?.footerBar?.successTextView?.visibility = View.GONE
+        mBinding?.footerBar?.failTextView?.visibility = View.GONE
     }
 
     override fun onClickLeftBtn() {
@@ -527,32 +580,82 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
 
         sharedViewModel.fdrResultVisibilityEvent.postValue(View.GONE)
 
-        if (sharedViewModel.isSingleModuleMode()) {
-            stopFdr()
-            doSelfRestart()
-        } else {
-            try {
-                when (currentState) {
-                    VERIFY_SECURITY_CODE_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
-                    }
+        if (mPreferences.applicationMode == Constants.REGISTER_MODE) {
+            when (mBinding?.registerState) {
+                Constants.REGISTER_STATE_SCAN_CODE -> {
+                    (activity as MainActivity).navBack()
+                }
 
-                    VERIFY_FACE_RUNNING_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
-                    }
+                Constants.REGISTER_STATE_FILL_FORM -> {
+                    doSelfRestart()
+                    mBinding?.employeeRegisterForm?.visibility = View.GONE
+                    mBinding?.visitorRegisterForm?.visibility = View.GONE
+                    mBinding?.footerBar?.btnRight?.visibility = View.INVISIBLE
+                    mBinding?.footerBar?.rightBtnText = getString(R.string.submit)
+                    updateStateUI(Constants.REGISTER_STATE_SCAN_CODE)
+                }
 
-                    VERIFY_FACE_FINISH_STATE -> {
-                        Navigation.findNavController(this.view!!).popBackStack()
+                Constants.REGISTER_STATE_FACE_GET -> {
+                    stopFdr()
+                    currentState = VERIFY_SECURITY_CODE_STATE
+                    if (isRetrain) {
+                        // back to scan code stage
+                        doSelfRestart()
+                        mBinding?.footerBar?.btnRight?.visibility = View.INVISIBLE
+                        mBinding?.footerBar?.rightBtnText = getString(R.string.submit)
+                        updateStateUI(Constants.REGISTER_STATE_SCAN_CODE)
+                    } else {
+                        // back to enter register info stage
+                        when (sharedViewModel.clockModule) {
+                            SharedViewModel.MODULE_VISITOR -> {
+                                mBinding?.visitorRegisterForm?.visibility = View.VISIBLE
+                            }
+
+                            else -> {
+                                mBinding?.employeeRegisterForm?.visibility = View.VISIBLE
+                            }
+                        }
+                        mBinding?.footerBar?.btnRight?.visibility = View.VISIBLE
+                        updateStateUI(Constants.REGISTER_STATE_FILL_FORM)
                     }
                 }
-            } catch (e: KotlinNullPointerException) {
-                e.printStackTrace()
+
+                Constants.REGISTER_STATE_COMPLETE -> {
+                    if (sharedViewModel.isSingleModuleMode()) {
+                        doSelfRestart()
+                    } else {
+                        (activity as MainActivity).backToPreviousPage()
+                    }
+                }
+            }
+            isRetrain = false
+        } else {
+            if (sharedViewModel.isSingleModuleMode()) {
+                doSelfRestart()
+            } else {
+                try {
+                    when (currentState) {
+                        VERIFY_SECURITY_CODE_STATE -> {
+                            (activity as MainActivity).navBack()
+                        }
+
+                        VERIFY_FACE_RUNNING_STATE -> {
+                            (activity as MainActivity).navBack()
+                        }
+
+                        VERIFY_FACE_FINISH_STATE -> {
+                            (activity as MainActivity).backToPreviousPage()
+                        }
+                    }
+                } catch (e: KotlinNullPointerException) {
+                    e.printStackTrace()
+                }
             }
         }
     }
 
     override fun onClickRightBtn() {
-        Timber.d("Click right button on state: $currentState")
+        Timber.i("Click right button on state: $currentState")
 
         when(currentState) {
             VERIFY_SECURITY_CODE_STATE -> {
@@ -579,6 +682,9 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             VERIFY_FACE_RUNNING_STATE -> {}
 
             VERIFY_FACE_FINISH_STATE -> {
+                // protected machanism
+                currentState = VERIFY_SECURITY_CODE_STATE
+
                 if (AppFeatureManager.IS_SUPPORT_RETRAIN_FEATURE) {
                     (activity as MainActivity).showRetrainPage()
                 }
@@ -597,16 +703,28 @@ class RFIDFragment: BaseFragment(), FootBarBaseInterface, Injectable {
             } else {
                 mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
             }
+        }
 
-            when (state) {
-                Constants.REGISTER_STATE_FILL_FORM,
-                Constants.REGISTER_STATE_FACE_GET -> {
-                    mBinding?.footerBar?.leftBtnText = getString(R.string.cancel)
-                }
+        when (state) {
+            Constants.REGISTER_STATE_SCAN_CODE -> {
+                mBinding?.isStateLayoutDarkness = false
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
 
-                Constants.REGISTER_STATE_COMPLETE -> {
-                    mBinding?.footerBar?.leftBtnText = getString(R.string.confirm)
-                }
+            Constants.REGISTER_STATE_FILL_FORM -> {
+                mBinding?.isStateLayoutDarkness = false
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
+
+            Constants.REGISTER_STATE_FACE_GET -> {
+                mBinding?.isStateLayoutDarkness = true
+                mBinding?.footerBar?.leftBtnText = getString(R.string.back)
+            }
+
+            Constants.REGISTER_STATE_COMPLETE -> {
+                mBinding?.isStateLayoutDarkness = false
+                //mBinding?.footerBar?.btnLeft?.visibility = View.INVISIBLE
+                //mBinding?.footerBar?.leftBtnText = getString(R.string.confirm)
             }
         }
     }

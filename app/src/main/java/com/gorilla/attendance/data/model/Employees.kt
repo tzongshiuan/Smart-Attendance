@@ -19,4 +19,12 @@ class Employees {
     var model : String? = null
     @SerializedName("createdTime")
     var createdTime : Long = 0
+
+    override fun equals(other: Any?): Boolean {
+        return (other as Employees).intId == this.intId
+    }
+
+    override fun hashCode(): Int {
+        return intId
+    }
 }

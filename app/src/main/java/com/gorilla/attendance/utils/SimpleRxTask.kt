@@ -63,4 +63,13 @@ object SimpleRxTask {
                 process()
             }
     }
+
+    fun createDelaySubscriberOnMain(delay: Long, process: () -> Unit): Disposable {
+        return Observable.timer(delay, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                process()
+            }
+    }
 }

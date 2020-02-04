@@ -7,6 +7,8 @@
         <variable
                 name="viewModel"
                 type="com.gorilla.attendance.ui.faceIdentification.FaceIdentificationViewModel"/>
+
+        <variable name="isStateLayoutDarkness" type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,12 +44,23 @@
                 android:id="@+id/fdrFrame"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="8dp"
+                android:paddingTop="@dimen/qr_scan_padding_vertical"
+                android:paddingBottom="@dimen/qr_scan_padding_vertical"
+                android:paddingStart="@dimen/qr_scan_padding_horizontal"
+                android:paddingEnd="@dimen/qr_scan_padding_horizontal"
+                android:background="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/footerBar"
                 android:visibility="visible"/>
+
+        <View
+                android:id="@+id/settingTrigger"
+                android:layout_width="200dp"
+                android:layout_height="100dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
 
         <include
                 android:id="@+id/footerBar"

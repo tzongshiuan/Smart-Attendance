@@ -41,7 +41,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/btnLeft"
                 app:layout_constraintEnd_toStartOf="@+id/guidelineBegin"
-                android:visibility="visible"/>
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
         <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineBegin"
@@ -84,14 +85,6 @@
                         app:layout_constraintTop_toTopOf="@+id/serverIpEditText"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
                         app:layout_constraintBottom_toBottomOf="@+id/serverIpEditText"
-                        style="@style/setting_text_label_style"/>
-
-                <TextView
-                        android:id="@+id/ftpIpLabel"
-                        android:text="@string/ftp_ip"
-                        app:layout_constraintTop_toTopOf="@+id/ftpIpEditText"
-                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner"
-                        app:layout_constraintBottom_toBottomOf="@+id/ftpIpEditText"
                         style="@style/setting_text_label_style"/>
 
                 <TextView
@@ -141,17 +134,6 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guidelineInner"
-                        app:layout_constraintBottom_toTopOf="@+id/ftpIpEditText"
-                        android:inputType="textUri"
-                        style="@style/setting_edit_text_style"/>
-
-                <EditText
-                        android:id="@+id/ftpIpEditText"
-                        tools:text="192.168.11.158"
-                        android:hint="@string/ftp_ip"
-                        app:layout_constraintTop_toBottomOf="@+id/serverIpEditText"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/guidelineInner"
                         app:layout_constraintBottom_toTopOf="@+id/webSocketIpEditText"
                         android:inputType="textUri"
                         style="@style/setting_edit_text_style"/>
@@ -160,7 +142,7 @@
                         android:id="@+id/webSocketIpEditText"
                         tools:text="192.168.11.158"
                         android:hint="@string/web_socket_ip"
-                        app:layout_constraintTop_toBottomOf="@+id/ftpIpEditText"
+                        app:layout_constraintTop_toBottomOf="@+id/serverIpEditText"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guidelineInner"
                         app:layout_constraintBottom_toTopOf="@+id/ftpAccountEditText"
@@ -253,7 +235,7 @@
                         android:id="@+id/guidelineInner2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintGuide_percent="0.35"
+                        app:layout_constraintGuide_percent="0.5"
                         android:orientation="vertical"/>
 
                 <TextView
@@ -505,7 +487,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/btnRight"
                 app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
                 android:visibility="gone"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -515,7 +497,7 @@
                         android:id="@+id/guidelineInner3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintGuide_percent="0.35"
+                        app:layout_constraintGuide_percent="0.4"
                         android:orientation="vertical"/>
 
                 <TextView
@@ -548,22 +530,6 @@
                         app:layout_constraintTop_toTopOf="@+id/webcamPasswordEditText"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
                         app:layout_constraintBottom_toBottomOf="@+id/webcamPasswordEditText"
-                        style="@style/setting_text_label_style"/>
-
-                <TextView
-                        android:id="@+id/doorModuleLabel"
-                        android:text="@string/door_module"
-                        app:layout_constraintTop_toTopOf="@+id/doorModuleSpinner"
-                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
-                        app:layout_constraintBottom_toBottomOf="@+id/doorModuleSpinner"
-                        style="@style/setting_text_label_style"/>
-
-                <TextView
-                        android:id="@+id/closeDoorLabel"
-                        android:text="@string/close_door_timeout"
-                        app:layout_constraintTop_toTopOf="@+id/closeDoorEditText"
-                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner3"
-                        app:layout_constraintBottom_toBottomOf="@+id/closeDoorEditText"
                         style="@style/setting_text_label_style"/>
 
                 <Spinner
@@ -603,32 +569,10 @@
                         tools:text="admin01"
                         android:hint="@string/webcam_passowrd"
                         app:layout_constraintTop_toBottomOf="@+id/webcamUsernameEditText"
-                        app:layout_constraintBottom_toTopOf="@+id/doorModuleSpinner"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/guidelineInner3"
                         android:inputType="textVisiblePassword"
-                        style="@style/setting_edit_text_style"/>
-
-                <Spinner
-                        android:id="@+id/doorModuleSpinner"
-                        tools:selectedItemPosition="0"
-                        app:layout_constraintTop_toBottomOf="@+id/webcamPasswordEditText"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
-                        app:layout_constraintBottom_toTopOf="@+id/closeDoorEditText"
-                        android:entries="@array/door_module_array"
-                        style="@style/setting_spinner_style"/>
-
-                <EditText
-                        android:id="@+id/closeDoorEditText"
-                        android:hint="@string/close_door_timeout"
-                        tools:text="5"
-                        app:layout_constraintTop_toBottomOf="@+id/doorModuleSpinner"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/guidelineInner3"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        android:inputType="number|numberDecimal"
-                        android:digits="0123456789"
                         style="@style/setting_edit_text_style"/>
 
                 <androidx.constraintlayout.widget.Group
@@ -637,6 +581,180 @@
                         android:layout_height="wrap_content"
                         app:constraint_referenced_ids="webcamUrlLabel,webcamUsernameLabel,webcamPasswordLabel,webcamUrlEditText,webcamUsernameEditText,webcamPasswordEditText"
                         android:visibility="visible"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!--Linked device layout-->
+        <ScrollView
+                android:id="@+id/linkedLayout2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineInner6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintGuide_percent="0.5"
+                    android:orientation="vertical"/>
+
+            <TextView
+                    android:id="@+id/doorModuleLabel"
+                    android:text="@string/door_module"
+                    app:layout_constraintTop_toTopOf="@+id/doorModuleSpinner"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner6"
+                    app:layout_constraintBottom_toBottomOf="@+id/doorModuleSpinner"
+                    style="@style/setting_text_label_style"/>
+
+            <TextView
+                    android:id="@+id/closeDoorLabel"
+                    android:text="@string/close_door_timeout"
+                    app:layout_constraintTop_toTopOf="@+id/closeDoorEditText"
+                    app:layout_constraintEnd_toStartOf="@+id/guidelineInner6"
+                    app:layout_constraintBottom_toBottomOf="@+id/closeDoorEditText"
+                    style="@style/setting_text_label_style"/>
+
+            <Spinner
+                    android:id="@+id/doorModuleSpinner"
+                    tools:selectedItemPosition="0"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineInner6"
+                    app:layout_constraintBottom_toTopOf="@+id/closeDoorEditText"
+                    android:entries="@array/door_module_array"
+                    style="@style/setting_spinner_style"/>
+
+            <EditText
+                    android:id="@+id/closeDoorEditText"
+                    tools:text="5"
+                    app:layout_constraintTop_toBottomOf="@+id/doorModuleSpinner"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineInner6"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:inputType="number|numberDecimal"
+                    android:digits="0123456789"
+                    style="@style/setting_edit_text_style"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!--Update cycle layout-->
+        <ScrollView
+                android:id="@+id/updateCycleLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintHorizontal_weight="13"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/btnRight"
+                app:layout_constraintStart_toEndOf="@+id/guidelineBegin"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guidelineInner5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintGuide_percent="0.6"
+                        android:orientation="vertical"/>
+
+                <TextView
+                        android:id="@+id/refreshUserLabel"
+                        android:text="@string/setting_refresh_cycle_users"
+                        app:layout_constraintTop_toTopOf="@+id/refreshUserEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner5"
+                        app:layout_constraintBottom_toBottomOf="@+id/refreshUserEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/refreshRecordsLabel"
+                        android:text="@string/setting_refresh_cycle_records"
+                        app:layout_constraintTop_toTopOf="@+id/refreshRecordsEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner5"
+                        app:layout_constraintBottom_toBottomOf="@+id/refreshRecordsEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/refreshOthersLabel"
+                        android:text="@string/setting_refresh_cycle_others"
+                        app:layout_constraintTop_toTopOf="@+id/refreshOthersEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner5"
+                        app:layout_constraintBottom_toBottomOf="@+id/refreshOthersEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <TextView
+                        android:id="@+id/clearCycleLabel"
+                        android:text="@string/clear_cycle_data"
+                        app:layout_constraintTop_toTopOf="@+id/clearCycleEditText"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner5"
+                        app:layout_constraintBottom_toBottomOf="@+id/clearCycleEditText"
+                        style="@style/setting_text_label_style"/>
+
+                <EditText
+                        android:id="@+id/refreshUserEditText"
+                        tools:text="60"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner5"
+                        app:layout_constraintBottom_toTopOf="@+id/refreshRecordsEditText"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/refreshRecordsEditText"
+                        tools:text="10"
+                        app:layout_constraintTop_toBottomOf="@+id/refreshUserEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner5"
+                        app:layout_constraintBottom_toTopOf="@+id/refreshOthersEditText"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/refreshOthersEditText"
+                        tools:text="60"
+                        app:layout_constraintTop_toBottomOf="@+id/refreshRecordsEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner5"
+                        app:layout_constraintBottom_toTopOf="@+id/clearCycleEditText"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
+                <EditText
+                        android:id="@+id/clearCycleEditText"
+                        tools:text="5"
+                        app:layout_constraintTop_toBottomOf="@+id/refreshOthersEditText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner5"
+                        android:inputType="number|numberDecimal"
+                        android:digits="0123456789"
+                        style="@style/setting_edit_text_style"/>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
 
@@ -755,10 +873,10 @@
                 android:id="@+id/btnLeft"
                 style="@style/footbar_button_style"
                 android:layout_marginBottom="16dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="@string/cancel"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintEnd_toStartOf="@+id/btnRight"/>
 
         <Button
                 android:id="@+id/btnRight"
@@ -774,7 +892,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/ic_bg"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

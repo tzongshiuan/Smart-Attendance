@@ -48,6 +48,7 @@ class NfcManager {
 
     private val readCommand = byteArrayOf(0xFF.toByte(), 0xCA.toByte(), 0x00, 0x00, 0x00)
 
+    private var mRfidActive = false
     private var mEnableReadCard = true
 
     val nfcReadStateEvent = SingleLiveEvent<Int>()
@@ -76,6 +77,10 @@ class NfcManager {
         isUserDenyPermission = false
     }
 
+    fun setRfidActive(isActive: Boolean) {
+        mRfidActive = isActive
+    }
+
     fun setEnableReadCard(enableReadCard: Boolean) {
         mEnableReadCard = enableReadCard
     }
@@ -83,11 +88,11 @@ class NfcManager {
     fun start() {
         Timber.d("start()")
 
-        if (isStarting) {
-            Timber.d("Already start, do nothing")
-            return
-        }
-        isStarting = true
+//        if (isStarting) {
+//            Timber.d("Already start, do nothing")
+//            return
+//        }
+//        isStarting = true
 
         //stop()
         val filter = IntentFilter()
@@ -289,7 +294,9 @@ class NfcManager {
                 STATUS_CLOSE
             }
 
-            nfcReadData.postValue(byteArrayToString(response, responseLength))
+            if (mRfidActive) {
+                nfcReadData.postValue(byteArrayToString(response, responseLength))
+            }
             return
         } catch (e: Exception) {
             Timber.e("readCard failed, message: ${e.message}")

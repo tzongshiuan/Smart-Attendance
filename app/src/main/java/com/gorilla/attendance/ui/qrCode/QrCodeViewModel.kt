@@ -51,6 +51,7 @@ class QrCodeViewModel @Inject constructor(
                         }
                         if (visitor.isNotEmpty()) {
                             mSharedViewModel.clockAcceptances = visitor[0]
+                            mSharedViewModel.initSingleIdentifier()
 
                             if (DateUtils.checkVisitorTime(visitor[0].startTime, visitor[0].endTime)) {
                                 verifyCodeResult.postValue(VERIFY_SECURITY_SUCCESS)
@@ -69,6 +70,7 @@ class QrCodeViewModel @Inject constructor(
                         }
                         if (employee.isNotEmpty()) {
                             mSharedViewModel.clockAcceptances = employee[0]
+                            mSharedViewModel.initSingleIdentifier()
                             verifyCodeResult.postValue(VERIFY_SECURITY_SUCCESS)
                         } else {
                             Timber.d("[Employee] user not found")

@@ -51,30 +51,30 @@ object CommonBind{
         var delta = now - timeMilli
         val resolution: Long
 
-        when {
-            delta <= DateUtils.MINUTE_IN_MILLIS -> {
-                resolution = DateUtils.SECOND_IN_MILLIS
-                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
-
-            }
-            delta <= DateUtils.HOUR_IN_MILLIS -> {
-                resolution = DateUtils.MINUTE_IN_MILLIS
-                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
-
-            }
-            delta <= DateUtils.DAY_IN_MILLIS -> {
-                resolution = DateUtils.HOUR_IN_MILLIS
-                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
-            }
-            delta < DateUtils.WEEK_IN_MILLIS -> //days ago
-                textView.text = (delta / DateUtils.DAY_IN_MILLIS).toString() + " " + context.getString(R.string.days_ago)
-            delta < AVERAGE_MONTH_IN_MILLIS ->
-                textView.text = (delta / DateUtils.WEEK_IN_MILLIS).toString() + " " + context.getString(R.string.weeks_ago)
-            delta < DateUtils.YEAR_IN_MILLIS ->
-                textView.text = (delta / AVERAGE_MONTH_IN_MILLIS).toString() + " " + context.getString(R.string.months_ago)
-            else ->
-                textView.text = (delta / DateUtils.YEAR_IN_MILLIS).toString() + " " + context.getString(R.string.years_ago)
-        }
+//        when {
+//            delta <= DateUtils.MINUTE_IN_MILLIS -> {
+//                resolution = DateUtils.SECOND_IN_MILLIS
+//                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
+//
+//            }
+//            delta <= DateUtils.HOUR_IN_MILLIS -> {
+//                resolution = DateUtils.MINUTE_IN_MILLIS
+//                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
+//
+//            }
+//            delta <= DateUtils.DAY_IN_MILLIS -> {
+//                resolution = DateUtils.HOUR_IN_MILLIS
+//                textView.text = DateUtils.getRelativeTimeSpanString(timeMilli, now, resolution).toString()
+//            }
+//            delta < DateUtils.WEEK_IN_MILLIS -> //days ago
+//                textView.text = (delta / DateUtils.DAY_IN_MILLIS).toString() + " " + context.getString(R.string.days_ago)
+//            delta < AVERAGE_MONTH_IN_MILLIS ->
+//                textView.text = (delta / DateUtils.WEEK_IN_MILLIS).toString() + " " + context.getString(R.string.weeks_ago)
+//            delta < DateUtils.YEAR_IN_MILLIS ->
+//                textView.text = (delta / AVERAGE_MONTH_IN_MILLIS).toString() + " " + context.getString(R.string.months_ago)
+//            else ->
+//                textView.text = (delta / DateUtils.YEAR_IN_MILLIS).toString() + " " + context.getString(R.string.years_ago)
+//        }
     }
 
     @JvmStatic

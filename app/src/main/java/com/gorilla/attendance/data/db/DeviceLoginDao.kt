@@ -21,4 +21,10 @@ abstract class DeviceLoginDao{
 
     @Query("DELETE FROM Acceptances")
     abstract fun deleteAcceptances()
+
+    @Query("DELETE FROM Acceptances WHERE type = :type")
+    abstract fun deleteEmployeeAcceptances(type: String)
+
+    @Query("DELETE FROM Acceptances WHERE type = :type")
+    abstract fun deleteVisitorAcceptances(type: String)
 }

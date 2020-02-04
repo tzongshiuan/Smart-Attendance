@@ -67,7 +67,7 @@ class MarqueeTextView(context: Context, attrs: AttributeSet?, defStyle: Int) :
             isFirst = false
             0
         } else {
-            ((roundDuration/speed).toDouble() * distance.toDouble() * 1.00000 / scrollingLen).toInt()
+            ((roundDuration/speed).toDouble() * distance.toDouble() * 1.00000 * 2.0/ scrollingLen).toInt()
         }
         visibility = View.VISIBLE
         mScroller!!.startScroll(mXPaused, 0, distance, 0, duration)

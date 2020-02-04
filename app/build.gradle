@@ -13,11 +13,11 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.gorilla.attendance"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 10
-        versionName "1.2.0.2"
+        versionName "1.2.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -35,14 +35,18 @@ android {
         resources.srcDirs += ['src/androidTest/assets']
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
+
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
+//    }
 
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            output.outputFileName = "Attendance_v${variant.versionName}_svn${getSvnRevision()}_${buildTime()}.apk"
+            output.outputFileName = "SmartAttendance_v${variant.versionName}_svn${getSvnRevision()}_${buildTime()}.apk"
         }
     }
 }
@@ -61,7 +65,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.1.0-alpha09'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
 
     // Mockito
     testImplementation 'org.mockito:mockito-core:2.19.0'
@@ -80,10 +84,10 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
 
     // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
-    androidTestImplementation "androidx.arch.core:core-testing:2.0.0"
-    testImplementation "androidx.arch.core:core-testing:2.0.0"
-    kapt "androidx.lifecycle:lifecycle-compiler:2.0.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.1.0"
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
@@ -98,6 +102,10 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.2"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
     implementation 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
+
+    // Auto Dispose
+    //implementation 'com.uber.autodispose:autodispose:1.3.0'
+    //implementation 'com.uber.autodispose:autodispose-android-archcomponents:1.3.0'
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
@@ -141,6 +149,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.0.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
+    // about sonarqube
+    implementation "javax.xml.bind:jaxb-api:2.2.11"
+    implementation "com.sun.xml.bind:jaxb-core:2.2.11"
+    implementation "com.sun.xml.bind:jaxb-impl:2.2.11"
+    implementation "javax.activation:activation:1.1.1"
+
     implementation project(path: ':downloader_library')
     implementation project(path: ':licensing_library')
     implementation project(path: ':zip_file')
@@ -155,6 +169,11 @@ def getSvnRevision(){
     SVNStatus status = statusClient.doStatus(projectDir, false)
     SVNRevision revision = status.getRevision()
     return revision.getNumber()
+}
+
+def getJenkinsBuildNumber() {
+    def number = System.getenv("BUILD_NUMBER") as Integer ?: -1
+    return number
 }
 
 def buildTime() {
@@ -177,3 +196,28 @@ task generateStrings {
 }
 
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
+
+apply plugin: 'org.sonarqube'
+subprojects {
+    sonarqube {
+        properties {
+            property "sonar.host.url", "http://localhost:9000/" //我本地SonarQube平臺的配置
+            property "sonar.projectName", "Smart Attendance"  //projectname
+            property "sonar.projectKey", "SmartAttendance" //projectkey
+            property "sonar.language", "java"  //語言
+            property "sonar.sourceEncoding", "UTF-8" //編碼
+            property "sonar.sources", android.sourceSets.main.java.srcDirs //原始碼，寫這個就行
+            property "sonar.projectVersion", "1.0.0"  //版本，隨意
+
+            property "sonar.language", "java"
+            property "sonar.dynamicAnalysis", "reuseReports"
+            //property "sonar.tests", android.sourceSets.instrumentTest.java.srcDirs
+            property "sonar.java.binaries", "build/intermediates/classes"
+            //property 'sonar.jacoco.reportPath', "build/jacoco/testReleaseUnitTest.exec"
+            //property "sonar.jacoco.itReportPath", "$buildDir/jacoco/testReleaseUnitTest.exec"
+            property "sonar.cobertura.reportPath", "build/reports/coverage/debug/report.xml"
+            property "sonar.core.codeCoveragePlugin", "cobertura"
+
+        }
+    }
+}

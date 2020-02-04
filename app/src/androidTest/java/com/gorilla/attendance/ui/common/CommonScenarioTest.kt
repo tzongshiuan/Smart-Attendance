@@ -49,9 +49,6 @@ class CommonScenarioTest {
         MainActivity.IS_DEBUG_GOGO = true
         MainActivity.IS_SKIP_FDR = true
         MainActivity.USE_TEST_FACE = true
-        MainActivity.SEND_CLOCK_EVENT = false
-        MainActivity.GET_DEVICE_IDENTITIES = true
-        MainActivity.IS_ENABLE_SCREEN_SAVER = false
     }
 
     /**

@@ -16,6 +16,8 @@
         <item>@string/connection_setting</item>
         <item>@string/function_setting</item>
         <item>@string/linked_device</item>
+        <item>@string/linked_device2</item>
+        <item>@string/update_cycle</item>
         <item>@string/bluetooth_setting</item>
     </string-array>
 

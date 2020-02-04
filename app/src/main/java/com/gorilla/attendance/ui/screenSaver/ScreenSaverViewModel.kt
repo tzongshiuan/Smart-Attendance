@@ -13,8 +13,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
+@Singleton
 class ScreenSaverViewModel @Inject constructor(
     sharedViewModel: SharedViewModel,
     compositeDisposable: CompositeDisposable
@@ -29,10 +31,13 @@ class ScreenSaverViewModel @Inject constructor(
 
     val stopVideoEvent = SingleLiveEvent<Boolean>()
 
-    private var videoIndex = -1
+    val syncMarqueesEvent = SingleLiveEvent<Boolean>()
+    val syncVideosEvent = SingleLiveEvent<Boolean>()
 
-    private fun isAllVideosExist(): Boolean {
-        if (DeviceUtils.deviceVideos?.size == 0) {
+    private var videoIndex = 0
+
+    fun isAllVideosExist(): Boolean {
+        if (DeviceUtils.deviceVideos == null || DeviceUtils.deviceVideos?.size == 0) {
             Timber.d("DeviceUtils.deviceVideos?.size == 0")
             return false
         }
@@ -54,18 +59,25 @@ class ScreenSaverViewModel @Inject constructor(
 
     fun getVideoFilePath(): String? {
         if (!isAllVideosExist()) {
-            videoIndex = -1
+            videoIndex = 0
             return null
         }
 
-        DeviceUtils.deviceVideos?.let {
-            videoIndex++
-            videoIndex %= it.size
+        try {
+            DeviceUtils.deviceVideos?.let {
+                videoIndex %= it.size
 
-            return DeviceUtils.SD_CARD_APP_CONTENT + "/" + it[videoIndex].name
+                return DeviceUtils.SD_CARD_APP_CONTENT + "/" + it[videoIndex].name
+            }
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            e.printStackTrace()
         }
 
         return null
+    }
+
+    fun addVideoIndex() {
+        videoIndex++
     }
 
     fun updateDateTime() {

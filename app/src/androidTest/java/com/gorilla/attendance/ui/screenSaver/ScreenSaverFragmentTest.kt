@@ -51,8 +51,6 @@ class ScreenSaverFragmentTest {
         mActivity.mPreferences.fetcherListener = fetchIdling
 
         MainActivity.IS_DEBUG_GOGO = true
-        MainActivity.GET_DEVICE_IDENTITIES = false
-        MainActivity.IS_ENABLE_SCREEN_SAVER = true
 
         /**
          * Extend idling resource timeout to 300 seconds

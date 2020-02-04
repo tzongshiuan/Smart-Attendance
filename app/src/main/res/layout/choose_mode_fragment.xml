@@ -11,15 +11,16 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/ic_bg">
+            android:id="@+id/chooseModeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_bg">
 
         <TextView
                 android:id="@+id/hintText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Please select verification mode"
+                tools:text="Please select authentication mode"
                 android:textSize="@dimen/choose_text_size"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +34,6 @@
                 android:layout_width="@dimen/choose_icon_size"
                 android:layout_height="@dimen/choose_icon_size"
                 android:src="@mipmap/ic_id_card"
-                android:onClick="@{(v) -> viewModel.showRFId(v)}"
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:layout_constraintHorizontal_chainStyle="spread"
@@ -62,7 +62,6 @@
                 android:layout_width="@dimen/choose_icon_size"
                 android:layout_height="@dimen/choose_icon_size"
                 android:src="@mipmap/ic_security_code"
-                android:onClick="@{(v) -> viewModel.showSecurity(v)}"
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:layout_constraintVertical_chainStyle="packed"
@@ -90,7 +89,6 @@
                 android:layout_width="@dimen/choose_icon_size"
                 android:layout_height="@dimen/choose_icon_size"
                 android:src="@mipmap/ic_qr_code"
-                android:onClick="@{(v) -> viewModel.showQrCode(v)}"
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:layout_constraintVertical_chainStyle="packed"
@@ -118,7 +116,6 @@
                 android:layout_width="@dimen/choose_icon_size"
                 android:layout_height="@dimen/choose_icon_size"
                 android:src="@mipmap/ic_facial_recognition"
-                android:onClick="@{(v) -> viewModel.showFaceRecognition(v)}"
                 android:visibility="gone"
                 tools:visibility="visible"
                 app:layout_constraintVertical_chainStyle="packed"
@@ -167,6 +164,16 @@
                 app:layout_constraintStart_toStartOf="@+id/imgFinger"
                 app:layout_constraintEnd_toEndOf="@+id/imgFinger"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <include
+                android:id="@+id/footerBar"
+                layout="@layout/footer_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" >
+        </include>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

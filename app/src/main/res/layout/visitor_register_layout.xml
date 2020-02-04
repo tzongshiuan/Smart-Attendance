@@ -55,7 +55,8 @@
                         app:layout_constraintTop_toTopOf="@+id/titleEditText"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
                         app:layout_constraintBottom_toBottomOf="@+id/titleEditText"
-                        style="@style/registration_text_label_style"/>
+                        style="@style/registration_text_label_style"
+                        android:visibility="gone"/>
 
                 <TextView
                         android:id="@+id/companyLabel"
@@ -63,7 +64,8 @@
                         app:layout_constraintTop_toTopOf="@+id/companyEditText"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner1"
                         app:layout_constraintBottom_toBottomOf="@+id/companyEditText"
-                        style="@style/registration_text_label_style"/>
+                        style="@style/registration_text_label_style"
+                        android:visibility="gone"/>
 
                 <TextView
                         android:id="@+id/phoneLabel"
@@ -107,7 +109,8 @@
                         app:layout_constraintStart_toEndOf="@id/guidelineInner1"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
                         android:inputType="text"
-                        style="@style/registration_edit_text_style"/>
+                        style="@style/registration_edit_text_style"
+                        android:visibility="gone"/>
 
                 <EditText
                         android:id="@+id/companyEditText"
@@ -117,13 +120,25 @@
                         app:layout_constraintStart_toEndOf="@id/guidelineInner1"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
                         android:inputType="text"
+                        style="@style/registration_edit_text_style"
+                        android:visibility="gone"/>
+
+
+                <EditText
+                        android:id="@+id/emailEditText"
+                        tools:text="tsunghsuanlai@goriila-technology.com"
+                        android:hint="@string/form_email"
+                        app:layout_constraintTop_toBottomOf="@+id/companyEditText"
+                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
+                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
+                        android:inputType="textEmailAddress"
                         style="@style/registration_edit_text_style"/>
 
                 <EditText
                         android:id="@+id/phoneEditText"
                         tools:text="0930565748"
                         android:hint="@string/form_phone_number"
-                        app:layout_constraintTop_toBottomOf="@+id/companyEditText"
+                        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
                         app:layout_constraintStart_toEndOf="@id/guidelineInner1"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
                         android:inputType="phone"
@@ -132,25 +147,13 @@
 
 
                 <EditText
-                        android:id="@+id/emailEditText"
-                        tools:text="tsunghsuanlai@goriila-technology.com"
-                        android:hint="@string/form_email"
-                        app:layout_constraintTop_toBottomOf="@+id/phoneEditText"
-                        app:layout_constraintStart_toEndOf="@id/guidelineInner1"
-                        app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
-                        android:inputType="textEmailAddress"
-                        style="@style/registration_edit_text_style"/>
-
-
-                <EditText
                         android:id="@+id/visitorSecurityEditText"
                         tools:text="12345678"
                         android:hint="@string/form_security_code"
-                        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
+                        app:layout_constraintTop_toBottomOf="@+id/phoneEditText"
                         app:layout_constraintStart_toEndOf="@id/guidelineInner1"
                         app:layout_constraintEnd_toStartOf="@+id/guidelineInner2"
-                        android:inputType="number|numberDecimal"
-                        android:digits="0123456789"
+                        android:inputType="text"
                         style="@style/registration_edit_text_style"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,9 +9,9 @@
 
     <!--about footbar-->
     <dimen name="footbar_button_width">220dp</dimen>
-    <dimen name="footbar_button_height">80dp</dimen>
+    <dimen name="footbar_button_height">60dp</dimen>
     <dimen name="footbar_button_text_size">24sp</dimen>
-    <dimen name="footbar_middle_text_size">36sp</dimen>
+    <dimen name="footbar_middle_text_size">32sp</dimen>
 
     <!--Common-->
     <dimen name="common_text_size">28sp</dimen>
@@ -33,14 +33,24 @@
     <dimen name="progress_text_size">32sp</dimen>
 
     <!--about registration-->
-    <dimen name="state_icon_size">40dp</dimen>
-    <dimen name="state_icon_text_size">24sp</dimen>
+    <dimen name="state_icon_size">32dp</dimen>
+    <dimen name="state_icon_text_size">18sp</dimen>
     <dimen name="state_title_size">28sp</dimen>
     <dimen name="state_text_size">20sp</dimen>
     <dimen name="state_transition_length">150dp</dimen>
     <dimen name="state_transition_margin_top">40dp</dimen>
     <dimen name="hint_dialog_title_height">100dp</dimen>
     <dimen name="hint_dialog_message_height">200dp</dimen>
+    <dimen name="qr_scan_padding_vertical">20dp</dimen>
+    <dimen name="qr_scan_padding_horizontal">32dp</dimen>
+    <dimen name="qr_scan_padding_vertical_verify">20dp</dimen>
+    <dimen name="qr_scan_padding_horizontal_verify">88dp</dimen>
+    <dimen name="qr_scan_padding_vertical_register">22dp</dimen>
+    <dimen name="qr_scan_padding_horizontal_register">32dp</dimen>
+    <dimen name="qr_scan_padding_vertical_verify_single">28dp</dimen>
+    <dimen name="qr_scan_padding_horizontal_verify_single">32dp</dimen>
+    <dimen name="qr_scan_padding_vertical_register_single">20dp</dimen>
+    <dimen name="qr_scan_padding_horizontal_register_single">102dp</dimen>
 
     <!--about FDR-->
     <dimen name="fdr_width">800dp</dimen>
